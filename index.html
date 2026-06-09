@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slap Battles – Glove Mastery Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS & RESET
+   ============================================================ */
+:root {
+  --yellow-bright:  #FFD700;
+  --yellow-mid:     #F5C200;
+  --yellow-dark:    #C89A00;
+  --yellow-stripe1: #F0B800;
+  --yellow-stripe2: #D49500;
+
+  --bg-outer:       #1a1a1a;
+  --bg-panel:       #2a2a2a;
+  --bg-card:        #2e2e2e;
+  --bg-card-inner:  #3a3a3a;
+
+  --border-bold:    #111111;
+  --border-card:    #222222;
+
+  --green-done:     #39ff14;
+  --red-close:      #ff3333;
+
+  --text-white:     #ffffff;
+  --text-light:     #eeeeee;
+  --text-muted:     #999999;
+  --text-yellow:    #FFD700;
+  --text-green:     #39ff14;
+  --text-orange:    #ff8c00;
+
+  --radius-card:  14px;
+  --radius-btn:   8px;
+
+  --shadow-card:  0 6px 20px rgba(0,0,0,0.6);
+  --shadow-glow:  0 0 18px rgba(255,215,0,0.45);
+  --shadow-green: 0 0 18px rgba(57,255,20,0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Fredoka', sans-serif;
+  background: var(--bg-outer);
+  color: var(--text-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--yellow-dark); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(22px) scale(0.93); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes greenPulse {
+  0%,100% { box-shadow: 0 0 10px rgba(57,255,20,0.35), var(--shadow-card); }
+  50%     { box-shadow: 0 0 22px rgba(57,255,20,0.65), var(--shadow-card); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes fadeInDetail {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes missionSlide {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes titlePop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, var(--yellow-bright) 0%, #fff8a0 38%, var(--yellow-bright) 58%, #ff8c00 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3s linear infinite;
+  display: inline-block;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+#app-header {
+  position: relative;
+  text-align: center;
+  padding: 18px 24px 14px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1c1c1c 100%);
+  border-bottom: 4px solid var(--yellow-bright);
+  overflow: hidden;
+}
+#app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,215,0,0.035) 0px, rgba(255,215,0,0.035) 2px,
+    transparent 2px, transparent 40px
+  );
+  pointer-events: none;
+}
+#app-header h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  position: relative;
+  animation: titlePop 4s ease-in-out infinite;
+}
+#app-header p {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin-top: 5px;
+  position: relative;
+}
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+#search-bar-wrap {
+  padding: 16px 24px 0;
+  max-width: 560px;
+  margin: 0 auto;
+}
+#search-input {
+  width: 100%;
+  background: #1e1e1e;
+  border: 3px solid #3a3a3a;
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  color: var(--text-white);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+#search-input::placeholder { color: #555; }
+#search-input:focus {
+  border-color: var(--yellow-bright);
+  box-shadow: 0 0 12px rgba(255,215,0,0.3);
+}
+
+/* ============================================================
+   STATS BAR
+   ============================================================ */
+#stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 10px 24px 0;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.stat-chip {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.stat-chip span {
+  color: var(--yellow-bright);
+  font-size: 1rem;
+}
+#stat-completed span { color: var(--green-done); }
+
+/* ============================================================
+   GRID VIEW
+   ============================================================ */
+#grid-view {
+  padding: 18px 20px 40px;
+}
+#masteries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.section-label {
+  grid-column: 1 / -1;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--text-muted);
+  border-bottom: 2px solid #333;
+  padding-bottom: 6px;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   MASTERY CARD
+   ============================================================ */
+.mastery-card {
+  background: var(--bg-card);
+  border: 4px solid #111;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, border-color .25s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: cardIn 0.4s ease both;
+}
+.mastery-card:hover {
+  transform: translateY(-5px) scale(1.025);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.7), var(--shadow-glow);
+  border-color: var(--yellow-bright);
+}
+.mastery-card.completed {
+  border-color: var(--green-done) !important;
+  animation: cardIn .4s ease both, greenPulse 2.5s ease-in-out .4s infinite;
+}
+.mastery-card.completed .card-top { opacity: 0.7; filter: saturate(0.6); }
+
+/* card top: thumbnail */
+.card-top {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-top img.card-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.card-banner-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(-45deg,#1e1600 0px,#1e1600 18px,#130f00 18px,#130f00 36px);
+  font-size: 3rem;
+}
+
+/* MASTERED ribbon */
+.mastered-ribbon {
+  position: absolute;
+  top: 12px; left: -30px;
+  background: var(--yellow-bright);
+  color: #000;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  padding: 4px 40px;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.mastery-card.completed .mastered-ribbon { opacity: 1; }
+
+.completed-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 30px; height: 30px;
+  background: var(--green-done);
+  border: 3px solid #000;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(57,255,20,0.6);
+  z-index: 2;
+}
+.mastery-card.completed .completed-badge { display: flex; }
+
+/* card body */
+.card-body {
+  padding: 11px 13px 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.card-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.25rem;
+  color: var(--text-white);
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.1;
+}
+.card-mission-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.card-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.progress-bar-bg {
+  flex: 1;
+  height: 9px;
+  background: #181818;
+  border-radius: 6px;
+  border: 2px solid #000;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--yellow-bright), #ff8c00);
+  border-radius: 4px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+.mastery-card.completed .progress-bar-fill {
+  background: linear-gradient(90deg, var(--green-done), #00cc55);
+}
+.progress-pct {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.82rem;
+  color: var(--text-yellow);
+  min-width: 36px;
+  text-align: right;
+}
+.mastery-card.completed .progress-pct { color: var(--green-done); }
+
+/* card footer */
+.card-footer {
+  display: flex;
+  gap: 8px;
+  padding: 0 13px 11px;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.92rem;
+  letter-spacing: .4px;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: filter .15s, transform .1s;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.btn:hover  { filter: brightness(1.18); }
+.btn:active { transform: scale(0.94); }
+
+.btn-primary {
+  background: var(--yellow-bright);
+  color: #111;
+  padding: 8px 14px;
+  flex: 1;
+  border: 3px solid #000;
+  box-shadow: 0 3px 0 #000;
+}
+.btn-primary:active { box-shadow: 0 1px 0 #000; transform: translateY(2px); }
+
+.btn-done {
+  background: #222;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  border: 3px solid #444;
+  box-shadow: 0 3px 0 #000;
+  font-size: 1rem;
+  transition: background .2s, color .2s, border-color .2s, box-shadow .2s;
+}
+.btn-done.active {
+  background: #0b220b;
+  color: var(--green-done);
+  border-color: var(--green-done);
+  box-shadow: 0 0 10px rgba(57,255,20,0.35), 0 3px 0 #000;
+}
+
+/* ============================================================
+   DETAIL VIEW — FULLSCREEN OVERLAY
+   ============================================================ */
+#detail-view {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(8,8,8,0.98);
+  flex-direction: column;
+  animation: fadeInDetail .22s ease;
+}
+#detail-view.open { display: flex; }
+
+#detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 20px;
+  background: linear-gradient(90deg, #0a0a0a 0%, #181818 100%);
+  border-bottom: 4px solid var(--yellow-bright);
+  flex-shrink: 0;
+}
+#detail-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.7rem;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 16px rgba(255,215,0,0.6), 2px 2px 0 #000;
+  letter-spacing: 1.5px;
+}
+#btn-close-detail {
+  background: var(--red-close);
+  color: #fff;
+  border: 3px solid #000;
+  border-radius: 10px;
+  width: 44px; height: 44px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #000;
+  transition: filter .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center;
+}
+#btn-close-detail:hover  { filter: brightness(1.2); }
+#btn-close-detail:active { transform: scale(0.91); }
+
+/* detail body: two-column */
+#detail-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* LEFT COLUMN */
+#detail-left {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 12px;
+  background: #181818;
+  border-right: 3px solid #2a2a2a;
+  overflow-y: auto;
+  min-height: 0;
+}
+#detail-left::-webkit-scrollbar { width: 5px; }
+#detail-left::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
+
+/* banner */
+#detail-banner-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 11px;
+  overflow: hidden;
+  border: 3px solid #333;
+  background: #0d0d0d;
+  aspect-ratio: 16/9;
+  flex-shrink: 0;
+}
+#detail-banner-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+#detail-banner-placeholder {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  background: repeating-linear-gradient(-45deg,#1e1600 0,#1e1600 18px,#130f00 18px,#130f00 36px);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: #555;
+}
+#detail-banner-placeholder .ph-emoji { font-size: 3rem; }
+
+/* glove row */
+#detail-glove-row {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+#detail-glove-img-wrap {
+  width: 96px; height: 96px;
+  background: #0d0d0d;
+  border: 3px solid #333;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem;
+}
+#detail-glove-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+#detail-glove-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#detail-glove-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.45rem;
+  color: var(--yellow-bright);
+  text-shadow: 1px 1px 0 #000;
+}
+.detail-section-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.72rem;
+  color: var(--text-orange);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+#detail-description-text {
+  font-size: 0.87rem;
+  color: var(--text-light);
+  line-height: 1.55;
+  font-style: italic;
+}
+
+/* upgrades */
+#detail-upgrades-wrap { flex-shrink: 0; }
+#detail-upgrades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 5px;
+}
+.upgrade-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #0e1a0e;
+  border: 2px solid #1f3a1f;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.87rem;
+  color: var(--text-light);
+  line-height: 1.4;
+}
+.upgrade-bullet {
+  color: var(--green-done);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+
+/* RIGHT COLUMN */
+#detail-right {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 10px;
+  overflow-y: auto;
+  min-height: 0;
+}
+#detail-right::-webkit-scrollbar { width: 5px; }
+#detail-right::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
+
+#missions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+#missions-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.35rem;
+  color: var(--yellow-bright);
+  text-shadow: 1px 1px 0 #000;
+}
+#missions-overall-progress {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* overall progress bar in detail */
+#missions-overall-bar-wrap {
+  flex-shrink: 0;
+}
+#missions-overall-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: #111;
+  border-radius: 6px;
+  border: 2px solid #000;
+  overflow: hidden;
+}
+#missions-overall-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--yellow-bright), #ff8c00);
+  border-radius: 4px;
+  transition: width .5s ease;
+}
+
+#missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* mission row */
+.mission-row {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 3px solid #1e1e1e;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  transition: border-color .2s, box-shadow .2s;
+  animation: missionSlide .3s ease both;
+}
+.mission-row.done {
+  border-color: var(--green-done);
+  box-shadow: 0 0 12px rgba(57,255,20,0.22), 0 3px 10px rgba(0,0,0,0.4);
+}
+.mission-bg {
+  padding: 11px 15px;
+  background: repeating-linear-gradient(-45deg,#251e00 0,#251e00 16px,#1a1500 16px,#1a1500 32px);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.mission-row.done .mission-bg {
+  background: repeating-linear-gradient(-45deg,#091709 0,#091709 16px,#040e04 16px,#040e04 32px);
+}
+
+/* checkbox */
+.mission-check {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  border: 3px solid #555;
+  background: #111;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.15rem;
+  transition: background .2s, border-color .2s, transform .15s;
+  user-select: none;
+  color: #000;
+  font-weight: bold;
+}
+.mission-check:hover { transform: scale(1.12); border-color: var(--yellow-bright); }
+.mission-row.done .mission-check {
+  background: var(--green-done);
+  border-color: var(--green-done);
+}
+
+/* mission content */
+.mission-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.mission-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.97rem;
+  color: var(--text-white);
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.2;
+}
+.mission-row.done .mission-text {
+  color: var(--green-done);
+  text-decoration: line-through;
+  text-decoration-color: rgba(57,255,20,0.35);
+}
+
+.mission-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.mission-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #111;
+  border-radius: 5px;
+  border: 2px solid #000;
+  overflow: hidden;
+}
+.mission-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--yellow-bright), #ff8c00);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+.mission-row.done .mission-bar-fill {
+  background: linear-gradient(90deg, var(--green-done), #00cc55);
+}
+.mission-counter-label {
+  font-size: 0.78rem;
+  color: var(--text-yellow);
+  font-family: 'Fredoka One', cursive;
+  white-space: nowrap;
+  min-width: 88px;
+  text-align: right;
+}
+.mission-row.done .mission-counter-label { color: var(--green-done); }
+
+.mission-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 1px;
+}
+.mission-counter-input {
+  width: 82px;
+  background: #111;
+  border: 2px solid #3a3a3a;
+  border-radius: 6px;
+  color: var(--text-white);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.83rem;
+  padding: 4px 8px;
+  outline: none;
+  transition: border-color .2s;
+  text-align: center;
+}
+.mission-counter-input:focus { border-color: var(--yellow-bright); }
+.mission-counter-input::-webkit-inner-spin-button,
+.mission-counter-input::-webkit-outer-spin-button { opacity: 1; }
+.mission-target-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* empty state */
+#empty-state {
+  display: none;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.35rem;
+}
+
+/* ── Save Toast ── */
+#save-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #111;
+  border: 2px solid var(--yellow-bright);
+  border-radius: 10px;
+  color: var(--yellow-bright);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  padding: 10px 18px;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+  box-shadow: 0 0 14px rgba(255,215,0,0.3);
+}
+#save-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Reset button ── */
+#btn-reset {
+  background: transparent;
+  border: 2px solid #444;
+  border-radius: 8px;
+  color: #666;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+  margin-top: 4px;
+}
+#btn-reset:hover {
+  border-color: var(--red-close);
+  color: var(--red-close);
+}
+
+/* ── Indicador de guardado automático ── */
+#autosave-badge {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  color: #555;
+  text-align: center;
+  padding: 6px 0 0;
+  letter-spacing: 0.5px;
+}
+
+/* responsive */
+@media (max-width: 860px) {
+  #detail-body { grid-template-columns: 1fr; }
+  #detail-left { border-right: none; border-bottom: 3px solid #2a2a2a; max-height: 48vh; }
+}
+
+/* ============================================================
+   CHANGELOG MODAL
+   ============================================================ */
+#changelog-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+  animation: fadeInDetail .22s ease;
+}
+#changelog-overlay.open { display: flex; }
+
+#changelog-modal {
+  position: relative;
+  background: var(--bg-panel);
+  border: 4px solid var(--yellow-bright);
+  border-radius: 16px;
+  box-shadow: var(--shadow-glow), 0 12px 40px rgba(0,0,0,0.8);
+  max-width: 520px;
+  width: 90%;
+  padding: 0;
+  overflow: hidden;
+  animation: cardIn .3s ease both;
+}
+
+#changelog-header {
+  background: linear-gradient(90deg, #0a0a0a 0%, #1c1c1c 100%);
+  border-bottom: 3px solid var(--yellow-bright);
+  padding: 14px 52px 14px 20px;
+  position: relative;
+}
+#changelog-header h2 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.25rem;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 14px rgba(255,215,0,0.5), 2px 2px 0 #000;
+  letter-spacing: 1.5px;
+  line-height: 1.2;
+}
+#changelog-header .changelog-date {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+}
+
+#btn-close-changelog {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  background: var(--red-close);
+  color: #fff;
+  border: 3px solid #000;
+  border-radius: 10px;
+  width: 38px; height: 38px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #000;
+  transition: filter .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center;
+}
+#btn-close-changelog:hover  { filter: brightness(1.2); }
+#btn-close-changelog:active { transform: translateY(-50%) scale(0.91); }
+
+#changelog-body {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.changelog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: repeating-linear-gradient(-45deg,#251e00 0,#251e00 16px,#1a1500 16px,#1a1500 32px);
+  border: 2px solid #3a2e00;
+  border-radius: 9px;
+  padding: 9px 13px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.4;
+  animation: missionSlide .3s ease both;
+}
+.changelog-bullet {
+  color: var(--yellow-bright);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: -1px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+
+/* ── Badge link button ── */
+.btn-badge-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #1a0a2e;
+  color: #c084fc;
+  border: 2px solid #7c3aed;
+  border-radius: 6px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 6px;
+  transition: background .15s, border-color .15s, filter .15s;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.btn-badge-link:hover {
+  background: #2d1052;
+  border-color: #a855f7;
+  filter: brightness(1.15);
+}
+.btn-badge-link:active { transform: scale(0.94); }
+</style>
+</head>
+<body>
+
+<!-- ========================================================
+     HEADER
+     ======================================================== -->
+<header id="app-header">
+  <h1 class="shimmer-text">⚔️ SLAP BATTLES — GLOVE MASTERIES</h1>
+  <p>Tracker de progreso · Pulsa <strong style="color:var(--text-yellow)">VER MÁS</strong> para detalles · Marca completada con <strong style="color:var(--green-done)">○</strong></p>
+</header>
+
+<!-- ========================================================
+     SEARCH + STATS
+     ======================================================== -->
+<div id="search-bar-wrap">
+  <input type="text" id="search-input" placeholder="🔍  Buscar maestría..." oninput="filterMasteries()" autocomplete="off">
+</div>
+<div id="stats-bar">
+  <div class="stat-chip" id="stat-total">Total: <span id="val-total">0</span></div>
+  <div class="stat-chip" id="stat-completed">Completadas: <span id="val-completed">0</span></div>
+  <div class="stat-chip">En progreso: <span id="val-inprogress" style="color:#ff8c00">0</span></div>
+</div>
+<div id="autosave-badge">💾 Progreso guardado automáticamente en este navegador</div>
+<div style="text-align:center;padding:4px 0 0;">
+  <button id="btn-reset" onclick="resetAllProgress()">🗑️ Resetear todo el progreso</button>
+</div>
+
+<!-- Toast de guardado -->
+<div id="save-toast">💾 Guardado</div>
+
+<!-- ========================================================
+     GRID VIEW
+     ======================================================== -->
+<div id="grid-view">
+  <div id="masteries-grid">
+    <div id="empty-state">No se encontraron maestrías 😔</div>
+  </div>
+</div>
+
+<!-- ========================================================
+     CHANGELOG MODAL
+     ======================================================== -->
+<div id="changelog-overlay">
+  <div id="changelog-modal">
+    <div id="changelog-header">
+      <h2 id="changelog-title">📋 REGISTRO DE CAMBIOS</h2>
+      <div id="changelog-date-label" class="changelog-date"></div>
+      <button id="btn-close-changelog" onclick="closeChangelog()" title="Cerrar">✕</button>
+    </div>
+    <div id="changelog-body"></div>
+  </div>
+</div>
+
+<!-- ========================================================
+     DETAIL VIEW
+     ======================================================== -->
+<div id="detail-view">
+
+  <div id="detail-header">
+    <span id="detail-title">⚔️ GLOVE MASTERY</span>
+    <button id="btn-close-detail" onclick="closeDetail()" title="Cerrar (Esc)">✕</button>
+  </div>
+
+  <div id="detail-body">
+
+    <!-- LEFT -->
+    <div id="detail-left">
+
+      <div id="detail-banner-wrap">
+        <img id="detail-banner-img" src="" alt="Banner">
+        <div id="detail-banner-placeholder">
+          <span class="ph-emoji">🖼️</span>
+          <span id="ph-banner-text">Sin banner disponible</span>
+        </div>
+      </div>
+
+      <div id="detail-glove-row">
+        <div id="detail-glove-img-wrap">
+          <img id="detail-glove-img" src="" alt="Glove">
+        </div>
+        <div id="detail-glove-info">
+          <div id="detail-glove-name">Nombre del Guante</div>
+          <div class="detail-section-label">DESCRIPCIÓN</div>
+          <div id="detail-description-text"></div>
+        </div>
+      </div>
+
+      <div id="detail-upgrades-wrap">
+        <div class="detail-section-label">⚡ MASTER UPGRADES</div>
+        <div id="detail-upgrades-list"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div id="detail-right">
+      <div id="missions-header">
+        <div id="missions-title">🎯 MISIONES</div>
+        <div id="missions-overall-progress">0 / 0 completadas</div>
+      </div>
+      <div id="missions-overall-bar-wrap">
+        <div id="missions-overall-bar-bg">
+          <div id="missions-overall-bar-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <div id="missions-list"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ========================================================
+     JAVASCRIPT
+     ======================================================== -->
+<script>
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║               REGISTRO DE CAMBIOS                        ║
+   ║                                                          ║
+   ║  Formato de cada entrada:                                ║
+   ║    - La PRIMERA variable es la fecha/versión (ej: "09/06/2025") ║
+   ║    - Las siguientes son los cambios en orden             ║
+   ║                                                          ║
+   ║  Al actualizar: cambia la primera variable (fecha)       ║
+   ║  El modal se mostrará automáticamente la próxima vez     ║
+   ║  que el usuario abra el archivo.                         ║
+   ╚══════════════════════════════════════════════════════════╝ */
+
+const CHANGELOG = [
+  "09/06/2026",                                              // <-- FECHA / VERSIÓN (variable 1)
+  "Pagina creada!",                  // <-- cambio 1
+  "Puedes cargar maestrias como 'completadas', el progreso es solo para ti!",     // <-- cambio 2
+  "No estan todos los guantes, pero pronto seran agregados",                 // <-- cambio 3
+  "Los 'emojis' al igual son un placeholder, cuando termine con las maestrias agergare baners y diseño de guantes",
+  "Te volvera a salir esta pantalla cuando haya algun cambio, hasta entonces, disfruta de la pagina!",
+  // Agrega más entradas aquí si lo necesitas
+];
+
+const STORAGE_KEY_CHANGELOG = 'slap_battles_changelog_seen';
+
+function checkChangelog() {
+  const lastSeen = localStorage.getItem(STORAGE_KEY_CHANGELOG);
+  if (lastSeen !== CHANGELOG[0]) {
+    showChangelog();
+  }
+}
+
+function showChangelog() {
+  const overlay = document.getElementById('changelog-overlay');
+  const title   = document.getElementById('changelog-title');
+  const dateEl  = document.getElementById('changelog-date-label');
+  const body    = document.getElementById('changelog-body');
+
+  title.textContent   = '📋 REGISTRO DE CAMBIOS ( ' + CHANGELOG[0] + ' )';
+  dateEl.textContent  = '';
+  body.innerHTML = '';
+
+  for (let i = 1; i < CHANGELOG.length; i++) {
+    const item = document.createElement('div');
+    item.className = 'changelog-item';
+    item.style.animationDelay = ((i - 1) * 0.07) + 's';
+    item.innerHTML = `<span class="changelog-bullet">★</span><span>${CHANGELOG[i]}</span>`;
+    body.appendChild(item);
+  }
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeChangelog() {
+  const overlay = document.getElementById('changelog-overlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  // Guardar que ya se vio esta versión
+  try { localStorage.setItem(STORAGE_KEY_CHANGELOG, CHANGELOG[0]); } catch(e) {}
+}
+
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║          DATA — MAESTRÍAS DE SLAP BATTLES                ║
+   ║                                                          ║
+   ║  Para agregar una nueva maestría, copia la plantilla     ║
+   ║  al final del array MASTERIES y rellena los campos.      ║
+   ╚══════════════════════════════════════════════════════════╝
+
+   ESTRUCTURA DE CADA MAESTRÍA:
+   ─────────────────────────────
+   {
+     id:          string  → único, minúsculas, sin espacios (sirve para nombres de imagen)
+     name:        string  → nombre tal como aparece en el juego
+     description: string  → texto de descripción de la maestría
+     upgrades:    string[] → lista de mejoras que otorga la maestría
+     missions: [
+       {
+         text:   string  → descripción de la misión
+         target: number  → objetivo numérico (usa 1 si es booleano/badge)
+         isBool: bool    → true si no tiene contador (ej: "consigue el badge X")
+       }
+     ]
+   }
+
+   ARCHIVOS DE IMAGEN ESPERADOS (colócalos junto al HTML):
+     banner_(id).png   — banner horizontal de la maestría (recomendado 800×450)
+     glove_(id).png    — imagen del guante mastered  (recomendado 200×200)
+
+   EJEMPLO:
+     id: "brick"  →  banner_brick.png  /  glove_brick.png
+   ─────────────────────────────────────────────────────────── */
+
+const MASTERIES = [
+
+  // ── BRICK ─────────────────────────────────────────────────────
+  {
+    id: "brick",
+    name: "Brick",
+    description: "¿Cansado de fallar tus lanzamientos de ladrillo? No te preocupes, con tanta práctica ¡el ladrillo ha ganado memoria muscular!",
+    upgrades: [
+      "Los ladrillos dejan un rastro blanco al volar.",
+      "Los ladrillos se dirigen automáticamente al jugador más cercano al lanzarse (Heat Seeking Brick).",
+      "Puede fallar contra jugadores con mucho lag."
+    ],
+    missions: [
+      { text: "Own the Brick Master badge",               target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI" },
+      { text: "Haz que 1000 personas tropiecen (Trip)",   target: 1000, isBool: false },
+      { text: "Lanza un ladrillo a 200 km/h",             target: 200,  isBool: false }
+    ]
+  },
+
+  // ── SPIN ──────────────────────────────────────────────────────
+  {
+    id: "spin",
+    name: "Spin",
+    description: "10 horas girando. Diez. Horas. No hay palabras para describir tu dedicación (ni tu mareo).",
+    upgrades: [
+      "La velocidad de giro aumenta significativamente.",
+      "Asciendes lentamente mientras giras.",
+      "Los slaps ocurren automáticamente.",
+      "El poder de slap aumenta a ~50."
+    ],
+    missions: [
+      { text: "Gira durante 36,000 segundos (10 horas)", target: 36000, isBool: false }
+    ]
+  },
+
+  // ── ULTRA INSTINCT ────────────────────────────────────────────
+  {
+    id: "ultrainstinct",
+    name: "Ultra Instinct",
+    description: "Has esquivado tantos golpes que tu cuerpo actúa solo. La verdadera Ultra Instinct no se piensa — simplemente ocurre.",
+    upgrades: [
+      "[E] te teletransporta instantáneamente a un lugar aleatorio de la isla principal.",
+      "Tu probabilidad de esquivar aumenta un 15%, llegando al 65%."
+    ],
+    missions: [
+      { text: "Contraataca a 600 personas esquivando y golpeando", target: 600, isBool: false },
+      { text: "Esquiva 7 ataques seguidos sin fallar",             target: 7,   isBool: false }
+    ]
+  },
+
+  // ── BUS ───────────────────────────────────────────────────────
+  {
+    id: "bus",
+    name: "Bus",
+    description: "El autobús no discrimina. Ahora tampoco discrimina la dirección en la que ataca. Ride or die.",
+    upgrades: [
+      "Los ataques del bus son omnidireccionales.",
+      "El bus ya no te daña a ti mismo.",
+      "[R] activa el Bus Ride: te montas en el bus y puedes conducirlo."
+    ],
+    missions: [
+      { text: "Golpea a 1000 personas con el bus",               target: 1000, isBool: false },
+      { text: "Own the G-Grandson..? badge",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Golpea a 750 personas con la habilidad del bus",   target: 750,  isBool: false }
+    ]
+  },
+
+  // ── FLASH ─────────────────────────────────────────────────────
+  {
+    id: "flash",
+    name: "Flash",
+    description: "Undo. La velocidad sin consecuencias. Teletransportarte ya no te deja vulnerable — ahora es un arte.",
+    upgrades: [
+      "[R] activa Undo después de teletransportarte.",
+      "Sin pantalla negra ni tiempo de carga al teletransportarse."
+    ],
+    missions: [
+      { text: "Usa la habilidad 100 veces seguidas sin recibir golpes o morir", target: 100,  isBool: false },
+      { text: "Embosca a 750 enemigos tras la teletransportación",               target: 750,  isBool: false },
+      { text: "Usa la habilidad 1500 veces en total",                            target: 1500, isBool: false }
+    ]
+  },
+
+  // ── GLOVEL ────────────────────────────────────────────────────
+  {
+    id: "glovel",
+    name: "Glovel",
+    description: "Market Gardener mode: ACTIVADO. Tus golpes críticos ya no son suerte — son ciencia.",
+    upgrades: [
+      "[R] activa el Market Gardening: golpes críticos más fuertes (65 → 75).",
+      "La animación de entrada al suelo es más rápida (3s → 2s)."
+    ],
+    missions: [
+      { text: "Usa la habilidad Dig 350 veces",               target: 350,  isBool: false },
+      { text: "Consigue 1000 golpes críticos (crit hits)",    target: 1000, isBool: false },
+      { text: "Realiza 20 golpes críticos seguidos sin fallar", target: 20, isBool: false }
+    ]
+  },
+
+  // ── DICE ──────────────────────────────────────────────────────
+  {
+    id: "dice",
+    name: "Dice",
+    description: "La suerte está de tu lado. Los dados ruedan y el caos te sigue a todas partes. Ahora con más opciones... y más caos.",
+    upgrades: [
+      "[R] lanza un dado gigante que aplasta a los jugadores cercanos.",
+      "El dado tiene más opciones de resultado favorables.",
+      "Cooldown del dado reducido."
+    ],
+    missions: [
+      { text: "Consigue 500 sixes (6s) con el dado",          target: 500,  isBool: false },
+      { text: "Golpea a 1000 personas usando efectos del dado", target: 1000, isBool: false },
+      { text: "Usa la habilidad del dado 750 veces",           target: 750,  isBool: false }
+    ]
+  },
+
+  // ── CHAIN ─────────────────────────────────────────────────────
+  {
+    id: "chain",
+    name: "Chain",
+    description: "Encadenado. Literalmente. Ahora puedes atar a varios enemigos a la vez y dominarlos a todos.",
+    upgrades: [
+      "[R] activa Whiplash: tiras de la cadena con fuerza hacia ti.",
+      "Puedes encadenar a múltiples jugadores simultáneamente.",
+      "La cadena tiene mayor alcance."
+    ],
+    missions: [
+      { text: "Encadena a 1000 personas",                       target: 1000, isBool: false },
+      { text: "Encadena a 3 personas a la vez",                  target: 3,    isBool: false },
+      { text: "Lanza a 500 personas al vacío con la cadena",     target: 500,  isBool: false }
+    ]
+  },
+
+  // ── OBBY ──────────────────────────────────────────────────────
+  {
+    id: "obby",
+    name: "Obby",
+    description: "Has construido tantos obstáculos que ya puedes hacerlo incluso en el aire. Tu mente de ingeniero no tiene límites.",
+    upgrades: [
+      "Puedes colocar partes en el aire (midair placement).",
+      "Puedes colocar un 50% más de partes.",
+      "El cooldown de la habilidad se reduce de 3s a 1.5s."
+    ],
+    missions: [
+      { text: "Golpea a 1000 enemigos con el obby",             target: 1000, isBool: false },
+      { text: "Mata a 500 personas con kill bricks",            target: 500,  isBool: false },
+      { text: "Coloca 2000 partes de obby",                     target: 2000, isBool: false }
+    ]
+  },
+
+  // ── CLOUD ─────────────────────────────────────────────────────
+  {
+    id: "cloud",
+    name: "Cloud",
+    description: "\"The One Piece is real\" — y tu nube también lo es. Más grande, más rápida y con asientos VIP para tus amigos (o enemigos).",
+    upgrades: [
+      "La nube se vuelve más grande y gana un tercer asiento.",
+      "La nube se mueve más rápido.",
+      "[R] expulsa a todos los pasajeros, incluyéndote a ti."
+    ],
+    missions: [
+      { text: "Realiza 50 slaps 'death from above' exitosos",  target: 50,     isBool: false },
+      { text: "Pasa 200 minutos en el aire sobre la nube",     target: 200,    isBool: false },
+      { text: "Viaja 200,000 studs en tu nube",                target: 200000, isBool: false },
+      { text: "Recoge a 100 personas en tu nube",              target: 100,    isBool: false }
+    ]
+  },
+
+  // ── WORMHOLE ──────────────────────────────────────────────────
+  {
+    id: "wormhole",
+    name: "Wormhole",
+    description: "Has dominado el arte del espacio y el tiempo. Ahora los portales obedecen tu voluntad... y puedes teletransportarte a ellos a voluntad.",
+    upgrades: [
+      "[R] te teletransporta al portal más cercano.",
+      "Los boost de velocidad de los portales duran más.",
+      "Puedes colocar portales en el aire."
+    ],
+    missions: [
+      { text: "Embosca a 500 personas con portales",    target: 500,  isBool: false },
+      { text: "Teletranspórtate 1250 veces",            target: 1250, isBool: false },
+      { text: "Coloca 750 wormholes",                   target: 750,  isBool: false }
+    ]
+  },
+
+  // ── KILLSTREAK ────────────────────────────────────────────────
+  {
+    id: "killstreak",
+    name: "Killstreak",
+    description: "Cien almas. Mil víctimas. Y aún tienes hambre. Tu sed de poder no conoce límites.",
+    upgrades: [
+      "Puedes almacenar hasta 10 almas sin perderlas al morir.",
+      "Ganas un alma instantáneamente al spawnear.",
+      "Puedes robar almas a otros usuarios de Killstreak en servidores normales."
+    ],
+    missions: [
+      { text: "Alcanza la Fase 7 (100 souls acumuladas)",             target: 7,    isBool: false },
+      { text: "Mata a 1000 personas",                                 target: 1000, isBool: false },
+      { text: "Roba 100 almas a otros usuarios de Killstreak",        target: 100,  isBool: false }
+    ]
+  },
+
+  // ── RUN ───────────────────────────────────────────────────────
+  {
+    id: "run",
+    name: "Run",
+    description: "Terry. Ese es el nombre de la leyenda en la que te has convertido. Rápido, imparable, inalcanzable.",
+    upgrades: [
+      "[R] te transforma en TERRY durante 3 segundos en la Normal Arena.",
+      "Velocidad y agilidad enormemente aumentadas en forma TERRY."
+    ],
+    missions: [
+      { text: "Mata a 7 personas en un solo uso de habilidad en el laberinto", target: 7,   isBool: false },
+      { text: "Consigue 500 kills como Terry",                                  target: 500, isBool: false },
+      { text: "Reubícate 200 veces después de usar la habilidad",               target: 200, isBool: false }
+    ]
+  },
+
+  // ── BOMB ──────────────────────────────────────────────────────
+  {
+    id: "bomb",
+    name: "Bomb",
+    description: "¿Una bomba normal? No, tú eres el maestro de la detonación. La Reversal Bomb lo cambia todo.",
+    upgrades: [
+      "La bomba flota más rápido.",
+      "Cooldown reducido de 10s a 8s.",
+      "[R] activa la Reversal Bomb: explosión que lanza a todos hacia afuera."
+    ],
+    missions: [
+      { text: "Usa la habilidad de bomba 1650 veces",            target: 1650, isBool: false },
+      { text: "Elimina a 250 oponentes con auto-detonación",     target: 250,  isBool: false },
+      { text: "Lanza a 750 personas al vacío (void)",            target: 750,  isBool: false }
+    ]
+  },
+
+  // ── ROB ───────────────────────────────────────────────────────
+  {
+    id: "rob",
+    name: "rob",
+    description: "Clipped Wings. Has sobrevivido lo insuperable y ahora dominas el vacío. Grab activo.",
+    upgrades: [
+      "La habilidad dura 15 segundos en vez de 10.",
+      "La transformación es más rápida (3s → 1s).",
+      "[R] activa Grab: agarra a un jugador y lo lanza al vacío."
+    ],
+    missions: [
+      { text: "Crea 3 Null Portals y sobrevívelos",              target: 3,     isBool: false },
+      { text: "Viaja 25,000 studs sobre el vacío",               target: 25000, isBool: false },
+      { text: "Mata a 1000 personas con la habilidad rob",       target: 1000,  isBool: false },
+      { text: "Own the Clipped Wings badge",                     target: 1,     isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  }
+    ]
+  },
+
+  // ── MOAI ──────────────────────────────────────────────────────
+  {
+    id: "moai",
+    name: "🗿 Moai",
+    description: "La estatua te ha elegido. Ahora el 🗿 puede moverse... y no está feliz de que lo hayas despertado.",
+    upgrades: [
+      "La estatua 🗿 puede ser movida golpeándola.",
+      "La onda de choque tiene más knockback."
+    ],
+    missions: [
+      { text: "Aturde a 500 personas con la estatua 🗿",  target: 500, isBool: false },
+      { text: "Aturde a 450 enemigos con la habilidad",   target: 450, isBool: false },
+      { text: "Mata a 500 personas con la habilidad",     target: 500, isBool: false }
+    ]
+  },
+
+  // ── FORT ──────────────────────────────────────────────────────
+  {
+    id: "fort",
+    name: "Fort",
+    description: "Cranking 90's activado. Tus muros ahora son fortalezas vivientes con un bonus de salto que desafía la física.",
+    upgrades: [
+      "[R] construye 'stairs' instantáneamente.",
+      "Los edificios tienen más durabilidad.",
+      "Las construcciones otorgan un boost de salto.",
+      "Se puede alcanzar una mayor altura máxima."
+    ],
+    missions: [
+      { text: "Own the Cranking 90's badge",                           target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Destruye 500 de tus propios muros golpeando a personas", target: 500, isBool: false },
+      { text: "Usa la habilidad de construcción 1500 veces",            target: 1500, isBool: false }
+    ]
+  },
+
+  // ── ENGINEER ──────────────────────────────────────────────────
+  {
+    id: "engineer",
+    name: "Engineer",
+    description: "Nivel de ingeniería: MÁXIMO. Tu centinela ahora es prácticamente indestructible y lleva artillería pesada.",
+    upgrades: [
+      "Tu centinela gana inmunidad al stun.",
+      "Módulo extra de guante añadido al centinela.",
+      "[R] activa módulo de defensa con cañón (como Track)."
+    ],
+    missions: [
+      { text: "Golpea a 2000 personas con tu centinela",          target: 2000, isBool: false },
+      { text: "Lanza a 1000 personas al vacío con el centinela",  target: 1000, isBool: false },
+      { text: "Coloca 750 centinelas",                            target: 750,  isBool: false }
+    ]
+  },
+
+  // ── BOOSTER ───────────────────────────────────────────────────
+  {
+    id: "booster",
+    name: "Booster",
+    description: "Strap In. Dos propulsores en la espalda, velocidad al máximo. Tus aliados (y víctimas) nunca han volado tan rápido.",
+    upgrades: [
+      "[E] activa Strap In: adjunta dos propulsores a un jugador durante ~7 segundos.",
+      "Los propulsores son más potentes y duran más."
+    ],
+    missions: [
+      { text: "Adjunta ambos propulsores a un solo jugador 750 veces", target: 750, isBool: false }
+    ]
+  },
+
+  // ── SPACE ─────────────────────────────────────────────────────
+  {
+    id: "space",
+    name: "Space",
+    description: "El vacío del espacio te llama. Y ahora tú puedes arrastrar a otros hacia él con tu Gravity Reversal Bubble.",
+    upgrades: [
+      "Cooldown de la habilidad reducido de 15s a 10s.",
+      "[R] activa Gravity Reversal Bubble: lanza a los enemigos cercanos por los aires.",
+      "Los jugadores golpeados experimentan gravedad reducida temporalmente."
+    ],
+    missions: [
+      { text: "Usa la habilidad del cañón 750 veces",                   target: 750, isBool: false },
+      { text: "Own the To the Moon badge",                               target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Dispárate al árbol de Slapple Island con el cañón",      target: 1,   isBool: true  },
+      { text: "Embosca a 500 jugadores justo después de aterrizar",      target: 500, isBool: false }
+    ]
+  },
+
+  // ── [REDACTED] ────────────────────────────────────────────────
+  {
+    id: "redacted",
+    name: "[REDACTED]",
+    description: "Información clasificada. Lo que los portales ocultan, nadie puede saberlo. Excepto tú.",
+    upgrades: [
+      "Los portales atraen a personas desde más lejos.",
+      "Los portales aparecen más rápido.",
+      "Cooldown reducido de 11s a 9s.",
+      "[R] activa Muck: efecto de ralentización en área."
+    ],
+    missions: [
+      { text: "Captura a 6 personas con un solo portal",  target: 6,    isBool: false },
+      { text: "Captura a 1000 personas en total",          target: 1000, isBool: false },
+      { text: "Coloca 500 portales",                       target: 500,  isBool: false }
+    ]
+  },
+
+  /* ============================================================
+     ╔══════════════════════════════════════════════════════════╗
+     ║            PLANTILLA — NUEVA MAESTRÍA                   ║
+     ║                                                          ║
+     ║  Copia este bloque comentado, descoméntalo y rellena    ║
+     ║  todos los campos. Guarda el archivo y recarga.         ║
+     ╚══════════════════════════════════════════════════════════╝
+
+  {
+    id: "nombreid",              // ← sin espacios, solo minúsculas/números
+    name: "Nombre del Guante",   // ← tal como aparece en el juego
+    description: "Descripción de la maestría tal como aparece en el juego.",
+    upgrades: [
+      "Primera mejora que otorga la maestría.",
+      "Segunda mejora.",
+      "[R] activa la habilidad secundaria especial."
+    ],
+    missions: [
+      { text: "Descripción de la misión 1",  target: 100, isBool: false },
+      { text: "Obtén el badge XYZ",          target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Descripción de la misión 3",  target: 500, isBool: false }
+    ]
+  },
+
+  */
+
+];
+
+
+/* ============================================================
+   PERSISTENCIA CON localStorage
+   ============================================================ */
+const STORAGE_KEY_PROGRESS  = 'slap_battles_progress_v2';
+const STORAGE_KEY_COMPLETED = 'slap_battles_completed_v2';
+
+function saveProgress() {
+  try {
+    const completedArr = Array.from(completedSet);
+    localStorage.setItem(STORAGE_KEY_PROGRESS,  JSON.stringify(progressData));
+    localStorage.setItem(STORAGE_KEY_COMPLETED, JSON.stringify(completedArr));
+  } catch(e) { console.warn('No se pudo guardar:', e); }
+}
+
+function loadProgress() {
+  try {
+    const rawProg = localStorage.getItem(STORAGE_KEY_PROGRESS);
+    const rawComp = localStorage.getItem(STORAGE_KEY_COMPLETED);
+    if (rawProg) {
+      const stored = JSON.parse(rawProg);
+      // Fusionar con datos actuales (por si se agregan nuevas maestrías)
+      MASTERIES.forEach(m => {
+        if (stored[m.id]) {
+          progressData[m.id] = stored[m.id];
+        }
+      });
+    }
+    if (rawComp) {
+      const arr = JSON.parse(rawComp);
+      arr.forEach(id => {
+        if (MASTERIES.find(m => m.id === id)) completedSet.add(id);
+      });
+    }
+  } catch(e) { console.warn('No se pudo cargar progreso:', e); }
+}
+
+function resetAllProgress() {
+  if (!confirm('¿Seguro que quieres borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
+  progressData = {};
+  completedSet.clear();
+  MASTERIES.forEach(m => {
+    progressData[m.id] = {};
+    m.missions.forEach((_, i) => { progressData[m.id][i] = 0; });
+  });
+  saveProgress();
+  renderGrid(document.getElementById('search-input').value);
+  showToast('🗑️ Progreso reseteado');
+}
+
+/* ============================================================
+   TOAST DE GUARDADO
+   ============================================================ */
+function showToast(msg) {
+  let toast = document.getElementById('save-toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+
+/* ============================================================
+   ESTADO EN MEMORIA
+   ============================================================ */
+let progressData   = {};
+let completedSet   = new Set();
+let detailOpen     = null;
+let _detailClosing = false;
+
+/* Emoji por defecto por id de guante */
+function getGloveEmoji(id) {
+  const map = {
+    brick:'🧱', obby:'🔧', cloud:'☁️', wormhole:'🌀', killstreak:'💀',
+    ultrainstinct:'⚡', run:'🏃', glovel:'⛏️', bus:'🚌', redacted:'❓',
+    moai:'🗿', bomb:'💣', rob:'🖤', spin:'🌪️', fort:'🏰',
+    engineer:'🤖', flash:'⚡', booster:'🚀', space:'🌌', dice:'🎲', chain:'⛓️'
+  };
+  return map[id] || '🥊';
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  // Inicializar structure primero
+  MASTERIES.forEach(m => {
+    progressData[m.id] = {};
+    m.missions.forEach((_, i) => { progressData[m.id][i] = 0; });
+  });
+  // Cargar datos guardados encima
+  loadProgress();
+  renderGrid();
+  updateStats();
+  setupEventDelegation();
+  // Mostrar changelog si hay cambios nuevos
+  checkChangelog();
+}
+
+/* ============================================================
+   STATS BAR
+   ============================================================ */
+function updateStats() {
+  const total     = MASTERIES.length;
+  const completed = completedSet.size;
+  const inprogress = MASTERIES.filter(m => {
+    if (completedSet.has(m.id)) return false;
+    return getMasteryProgress(m) > 0;
+  }).length;
+
+  document.getElementById('val-total').textContent      = total;
+  document.getElementById('val-completed').textContent  = completed;
+  document.getElementById('val-inprogress').textContent = inprogress;
+}
+
+/* ============================================================
+   RENDER GRID
+   ============================================================ */
+function renderGrid(filter = '') {
+  const grid  = document.getElementById('masteries-grid');
+  const empty = document.getElementById('empty-state');
+  grid.innerHTML = '';
+
+  const query  = filter.toLowerCase().trim();
+  const active = MASTERIES.filter(m => !completedSet.has(m.id) && m.name.toLowerCase().includes(query));
+  const done   = MASTERIES.filter(m =>  completedSet.has(m.id) && m.name.toLowerCase().includes(query));
+
+  if (active.length === 0 && done.length === 0) {
+    empty.style.display = 'block';
+    grid.appendChild(empty);
+    return;
+  }
+  empty.style.display = 'none';
+
+  active.forEach((m, i) => {
+    const card = createCard(m);
+    card.style.animationDelay = (i * 0.04) + 's';
+    grid.appendChild(card);
+  });
+
+  if (done.length > 0) {
+    const sep = document.createElement('div');
+    sep.className = 'section-label';
+    sep.textContent = '✅ COMPLETADAS / OCULTAS';
+    grid.appendChild(sep);
+    done.forEach(m => grid.appendChild(createCard(m)));
+  }
+
+  grid.appendChild(empty);
+  updateStats();
+}
+
+function filterMasteries() {
+  renderGrid(document.getElementById('search-input').value);
+}
+
+/* ============================================================
+   CREATE CARD
+   ============================================================ */
+function createCard(mastery) {
+  const isDone = completedSet.has(mastery.id);
+  const pct    = getMasteryProgress(mastery);
+
+  const card = document.createElement('div');
+  card.className = 'mastery-card' + (isDone ? ' completed' : '');
+  card.dataset.id = mastery.id;
+
+  card.innerHTML = `
+    <div class="card-top">
+      <img class="card-banner-img"
+           src="banner_${mastery.id}.png"
+           alt="${mastery.name}"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="card-banner-fallback" style="display:none">${getGloveEmoji(mastery.id)}</div>
+      <div class="mastered-ribbon">MASTERED</div>
+      <div class="completed-badge">✓</div>
+    </div>
+
+    <div class="card-body">
+      <div class="card-name">${mastery.name}</div>
+      <div class="card-mission-count">${mastery.missions.length} misión${mastery.missions.length !== 1 ? 'es' : ''}</div>
+      <div class="card-progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${pct}%"></div>
+        </div>
+        <span class="progress-pct">${pct}%</span>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button class="btn btn-primary" data-action="open" data-id="${mastery.id}">📖 VER MÁS</button>
+      <button class="btn btn-done ${isDone ? 'active' : ''}"
+              data-action="toggle" data-id="${mastery.id}"
+              title="${isDone ? 'Desmarcar completada' : 'Marcar como completada'}">
+        ${isDone ? '✓' : '○'}
+      </button>
+    </div>
+  `;
+
+  return card;
+}
+
+/* Progreso global de una maestría (0-100%) */
+function getMasteryProgress(mastery) {
+  const prog = progressData[mastery.id] || {};
+  let total = mastery.missions.length, achieved = 0;
+  mastery.missions.forEach((m, i) => {
+    const cur = prog[i] || 0;
+    if (m.isBool ? cur >= 1 : cur >= m.target) achieved++;
+  });
+  if (total === 0) return 0;
+  return Math.round((achieved / total) * 100);
+}
+
+/* ============================================================
+   TOGGLE COMPLETED (mover arriba/abajo + borde verde)
+   ============================================================ */
+function toggleCompleted(id, e) {
+  if (e) e.stopPropagation();
+  if (completedSet.has(id)) completedSet.delete(id);
+  else                       completedSet.add(id);
+  saveProgress();
+  showToast('💾 Guardado');
+  renderGrid(document.getElementById('search-input').value);
+}
+
+/* ============================================================
+   OPEN DETAIL
+   ============================================================ */
+function openDetail(id) {
+  const mastery = MASTERIES.find(m => m.id === id);
+  if (!mastery) return;
+  detailOpen = mastery;
+
+  // Title
+  document.getElementById('detail-title').textContent = '⚔️ GLOVE MASTERY — ' + mastery.name.toUpperCase();
+
+  // Banner
+  const bannerImg = document.getElementById('detail-banner-img');
+  const bannerPH  = document.getElementById('detail-banner-placeholder');
+  bannerPH.style.display  = 'none';
+  bannerImg.style.display = 'block';
+  bannerImg.onload  = null;
+  bannerImg.onerror = null;
+  bannerImg.onerror = () => {
+    bannerImg.style.display = 'none';
+    bannerPH.style.display  = 'flex';
+    const ph = document.getElementById('ph-banner-text');
+    if (ph) ph.textContent = 'Sin banner disponible';
+  };
+  bannerImg.src = 'banner_' + mastery.id + '.png';
+
+  // Glove img
+  const gloveWrap = document.getElementById('detail-glove-img-wrap');
+  const gloveImg  = document.getElementById('detail-glove-img');
+  gloveImg.onload  = null;
+  gloveImg.onerror = null;
+  gloveImg.style.display   = 'block';
+  gloveWrap.style.fontSize = '';
+  gloveImg.onerror = () => {
+    gloveImg.style.display  = 'none';
+    gloveWrap.textContent   = getGloveEmoji(mastery.id);
+    gloveWrap.style.fontSize = '3rem';
+  };
+  gloveImg.src = 'glove_' + mastery.id + '.png';
+
+  // Name + description
+  document.getElementById('detail-glove-name').textContent       = mastery.name;
+  document.getElementById('detail-description-text').textContent = mastery.description;
+
+  // Upgrades
+  const ul = document.getElementById('detail-upgrades-list');
+  ul.innerHTML = '';
+  mastery.upgrades.forEach(u => {
+    ul.innerHTML += `<div class="upgrade-item"><span class="upgrade-bullet">+</span><span>${u}</span></div>`;
+  });
+
+  // Missions
+  renderMissions(mastery);
+
+  // Show
+  document.getElementById('detail-view').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ============================================================
+   CLOSE DETAIL
+   ============================================================ */
+function closeDetail() {
+  document.getElementById('detail-view').classList.remove('open');
+  document.body.style.overflow = '';
+  detailOpen = null;
+  _detailClosing = true;
+  renderGrid(document.getElementById('search-input').value);
+  // Pequeño delay para evitar que el click que cierra el detalle
+  // se propague inmediatamente a las tarjetas recién renderizadas
+  setTimeout(() => { _detailClosing = false; }, 120);
+}
+
+/* ============================================================
+   RENDER MISSIONS
+   ============================================================ */
+function renderMissions(mastery) {
+  const list = document.getElementById('missions-list');
+  list.innerHTML = '';
+  const prog = progressData[mastery.id] || {};
+
+  mastery.missions.forEach((m, i) => {
+    const cur    = prog[i] || 0;
+    const isDone = m.isBool ? cur >= 1 : cur >= m.target;
+    const pct    = m.isBool
+      ? (isDone ? 100 : 0)
+      : Math.min(100, Math.round((cur / m.target) * 100));
+
+    const row = document.createElement('div');
+    row.className = 'mission-row' + (isDone ? ' done' : '');
+    row.id = `mission_${mastery.id}_${i}`;
+    row.style.animationDelay = (i * 0.07) + 's';
+
+    row.innerHTML = `
+      <div class="mission-bg">
+        <div class="mission-check" data-action="toggle-mission" data-mastery="${mastery.id}" data-index="${i}">${isDone ? '✓' : ''}</div>
+        <div class="mission-content">
+          <div class="mission-text">
+            ${m.text}${m.isBool && m.badgeUrl ? `<a class="btn-badge-link" href="${m.badgeUrl}" target="_blank" rel="noopener noreferrer">🏅 Ver badge</a>` : ''}
+          </div>
+          <div class="mission-bar-row">
+            <div class="mission-bar-bg">
+              <div class="mission-bar-fill" id="mbar_${mastery.id}_${i}" style="width:${pct}%"></div>
+            </div>
+            <span class="mission-counter-label" id="mlabel_${mastery.id}_${i}">
+              ${m.isBool ? (isDone ? '✓ Completado' : 'No obtenido') : `${pct}% (${cur.toLocaleString()}/${m.target.toLocaleString()})`}
+            </span>
+          </div>
+          ${!m.isBool ? `
+          <div class="mission-input-wrap">
+            <input class="mission-counter-input"
+                   type="number" min="0" max="${m.target * 10}"
+                   value="${cur}"
+                   placeholder="Tu progreso..."
+                   data-action="update-counter"
+                   data-mastery="${mastery.id}"
+                   data-index="${i}">
+            <span class="mission-target-label">/ ${m.target.toLocaleString()}</span>
+          </div>` : ''}
+        </div>
+      </div>
+    `;
+
+    list.appendChild(row);
+  });
+
+  updateOverallProgress(mastery);
+}
+
+/* ============================================================
+   TOGGLE MISSION CHECKBOX
+   ============================================================ */
+function toggleMission(masteryId, missionIndex) {
+  const mastery = MASTERIES.find(m => m.id === masteryId);
+  if (!mastery) return;
+  const mission = mastery.missions[missionIndex];
+  if (!progressData[masteryId]) progressData[masteryId] = {};
+
+  const cur = progressData[masteryId][missionIndex] || 0;
+  if (mission.isBool) {
+    progressData[masteryId][missionIndex] = cur >= 1 ? 0 : 1;
+  } else {
+    progressData[masteryId][missionIndex] = cur >= mission.target ? 0 : mission.target;
+  }
+
+  saveProgress();
+  showToast('💾 Guardado');
+  renderMissions(mastery);
+}
+
+/* ============================================================
+   UPDATE NUMERIC COUNTER
+   ============================================================ */
+let _saveTimer = null;
+function updateCounter(masteryId, missionIndex, value) {
+  const mastery = MASTERIES.find(m => m.id === masteryId);
+  if (!mastery) return;
+  const mission = mastery.missions[missionIndex];
+  const val = Math.max(0, parseInt(value) || 0);
+
+  if (!progressData[masteryId]) progressData[masteryId] = {};
+  progressData[masteryId][missionIndex] = val;
+
+  // Live update bar + label
+  const pct   = Math.min(100, Math.round((val / mission.target) * 100));
+  const row   = document.getElementById(`mission_${masteryId}_${missionIndex}`);
+  const bar   = document.getElementById(`mbar_${masteryId}_${missionIndex}`);
+  const label = document.getElementById(`mlabel_${masteryId}_${missionIndex}`);
+
+  if (bar)   bar.style.width   = pct + '%';
+  if (label) label.textContent = `${pct}% (${val.toLocaleString()}/${mission.target.toLocaleString()})`;
+
+  if (row) {
+    if (val >= mission.target) {
+      row.classList.add('done');
+      const chk = row.querySelector('.mission-check');
+      if (chk) chk.textContent = '✓';
+    } else {
+      row.classList.remove('done');
+      const chk = row.querySelector('.mission-check');
+      if (chk) chk.textContent = '';
+    }
+  }
+
+  updateOverallProgress(mastery);
+
+  // Guardar con debounce para no saturar localStorage
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    saveProgress();
+    showToast('💾 Guardado');
+  }, 600);
+}
+
+/* ============================================================
+   OVERALL PROGRESS IN DETAIL
+   ============================================================ */
+function updateOverallProgress(mastery) {
+  const prog = progressData[mastery.id] || {};
+  let total = mastery.missions.length, done = 0;
+  mastery.missions.forEach((m, i) => {
+    const cur = prog[i] || 0;
+    if (m.isBool ? cur >= 1 : cur >= m.target) done++;
+  });
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById('missions-overall-progress').textContent = `${done} / ${total} misiones`;
+  const fillEl = document.getElementById('missions-overall-bar-fill');
+  if (fillEl) fillEl.style.width = pct + '%';
+}
+
+/* ============================================================
+   IMAGE ERROR HANDLERS
+   ============================================================ */
+function handleBannerError(img) {
+  img.style.display = 'none';
+  const ph = document.getElementById('detail-banner-placeholder');
+  if (ph) ph.style.display = 'flex';
+}
+
+function handleGloveError(img) {
+  img.style.display = 'none';
+  const wrap = document.getElementById('detail-glove-img-wrap');
+  if (wrap) {
+    wrap.textContent  = detailOpen ? getGloveEmoji(detailOpen.id) : '🥊';
+    wrap.style.fontSize = '3rem';
+  }
+}
+
+/* ============================================================
+   EVENT DELEGATION — arregla el "Ver más" y todos los botones
+   ============================================================ */
+function setupEventDelegation() {
+  // Grid: click en botones de tarjeta
+  document.getElementById('masteries-grid').addEventListener('click', function(e) {
+    if (_detailClosing) return;   // ignorar el click que acaba de cerrar el detalle
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    e.stopPropagation();
+    const action = btn.dataset.action;
+    const id     = btn.dataset.id;
+    if (action === 'open')   openDetail(id);
+    if (action === 'toggle') toggleCompleted(id);
+  });
+
+  // Detail: misiones
+  document.getElementById('detail-right').addEventListener('click', function(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    if (el.dataset.action === 'toggle-mission') {
+      toggleMission(el.dataset.mastery, parseInt(el.dataset.index));
+    }
+  });
+
+  document.getElementById('detail-right').addEventListener('input', function(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    if (el.dataset.action === 'update-counter') {
+      updateCounter(el.dataset.mastery, parseInt(el.dataset.index), el.value);
+    }
+  });
+}
+
+/* ============================================================
+   KEYBOARD: ESC to close
+   ============================================================ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && detailOpen) closeDetail();
+});
+
+/* ============================================================
+   START
+   ============================================================ */
+init();
+</script>
+
+</body>
+</html>
