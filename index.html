@@ -1141,12 +1141,11 @@ body {
    ╚══════════════════════════════════════════════════════════╝ */
 
 const CHANGELOG = [
-  "09/06/2026",                                              // <-- FECHA / VERSIÓN (variable 1)
-  "Pagina creada!", 
-  "Puedes cargar maestrias como 'completadas', el progreso es solo para ti!",
-  "No estan todos los guantes, pero pronto seran agregados",
-  "A parte de los guantes, se agregaran mas idiomas, explicaciones a detalle de misiones y mas cosas tambien!",
-  "Te volvera a salir esta pantalla cuando haya algun cambio, hasta entonces, disfruta de la pagina!",
+  "10/06/2026",                                              // <-- FECHA / VERSIÓN (variable 1)
+  "Arreglado algunas misiones incorrectas",
+  "Palo",
+  "Re-hecho todo Ultra instinct ya que no sabia que havia un rework del guante."
+  
   // Agrega más entradas aquí si lo necesitas
 ];
 
@@ -1231,10 +1230,10 @@ const MASTERIES = [
     upgrades: [
       "Los ladrillos dejan un rastro blanco al volar.",
       "Los ladrillos se dirigen automáticamente al jugador más cercano al lanzarse (Heat Seeking Brick).",
-      "Puede fallar contra jugadores con mucho lag."
+      "Aún requieres de técnica: cuanto mejor lo lanzes, más rápido irá y más veces acertará."
     ],
     missions: [
-      { text: "Own the Brick Master badge",               target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/2127567042/Brick-Master" },
+      { text: "Obtén el logro Brick Master",               target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/2127567042/Brick-Master" },
       { text: "Haz que 1000 personas tropiecen (Trip)",   target: 1000, isBool: false },
       { text: "Lanza un ladrillo a 200 km/h",             target: 200,  isBool: false }
     ]
@@ -1262,8 +1261,9 @@ const MASTERIES = [
     name: "Ultra Instinct",
     description: "Has esquivado tantos golpes que tu cuerpo actúa solo. La verdadera Ultra Instinct no se piensa — simplemente ocurre.",
     upgrades: [
-      "[E] te teletransporta instantáneamente a un lugar aleatorio de la isla principal.",
-      "Tu probabilidad de esquivar aumenta un 15%, llegando al 65%."
+      "Tu barra de esquive se duplica, con un máximo de 80% de esquive.",
+      "[E] te teletransporta instantáneamente a un lugar aleatorio de la isla principal. a cambio de 6 puntos de tu barra de esquive.",
+  
     ],
     missions: [
       { text: "Contraataca a 600 personas esquivando y golpeando", target: 600, isBool: false },
@@ -1275,15 +1275,15 @@ const MASTERIES = [
   {
     id: "bus",
     name: "Bus",
-    description: "El autobús no discrimina. Ahora tampoco discrimina la dirección en la que ataca. Ride or die.",
+    description: "El autobús no discrimina. Ahora tampoco discrimina la dirección en la que ataca.",
     upgrades: [
-      "Los ataques del bus son omnidireccionales.",
+      "Los buses salen desde todas las direcciones.",
       "El bus ya no te daña a ti mismo.",
       "[R] activa el Bus Ride: te montas en el bus y puedes conducirlo."
     ],
     missions: [
-      { text: "Golpea a 1000 personas con el bus",               target: 1000, isBool: false },
-      { text: "Own the G-Grandson..? badge",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/3335299217032061/G-Grandson"  },
+      { text: "Golpea a 1000 personas.",                          target: 1000, isBool: false },
+      { text: "Obtén el logro G-Grandson..?",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/3335299217032061/G-Grandson"  },
       { text: "Golpea a 750 personas con la habilidad del bus",   target: 750,  isBool: false }
     ]
   },
@@ -1294,8 +1294,8 @@ const MASTERIES = [
     name: "Flash",
     description: "Undo. La velocidad sin consecuencias. Teletransportarte ya no te deja vulnerable — ahora es un arte.",
     upgrades: [
-      "[R] activa Undo después de teletransportarte.",
-      "Sin pantalla negra ni tiempo de carga al teletransportarse."
+      "[R] activa Undo después de teletransportarte, pero asegúrate de acertar el golpe para poder usarlo.",
+      "Carga del teletransporte reducido."
     ],
     missions: [
       { text: "Usa la habilidad 100 veces seguidas sin recibir golpes o morir", target: 100,  isBool: false },
@@ -1308,10 +1308,10 @@ const MASTERIES = [
   {
     id: "glovel",
     name: "Glovel",
-    description: "Market Gardener mode: ACTIVADO. Tus golpes críticos ya no son suerte — son ciencia.",
+    description: "En busca de tesoros, te encuentras con el verdadero motivo de todo, una pala dorada que ya no tiene críticos mejorados.",
     upgrades: [
-      "[R] activa el Market Gardening: golpes críticos más fuertes (65 → 75).",
-      "La animación de entrada al suelo es más rápida (3s → 2s)."
+      "[R] activa el Market Gardening: sal volando con poco control de a dónde vas..",
+      "Mayor velocidad bajo tierra."
     ],
     missions: [
       { text: "Usa la habilidad Dig 350 veces",               target: 350,  isBool: false },
@@ -1324,16 +1324,16 @@ const MASTERIES = [
   {
     id: "dice",
     name: "Dice",
-    description: "La suerte está de tu lado. Los dados ruedan y el caos te sigue a todas partes. Ahora con más opciones... y más caos.",
+    description: "Si no puedes abandonar tus hábitos ludópatas, ¿por qué no llevártelos a tamaño real?",
     upgrades: [
       "[R] lanza un dado gigante que aplasta a los jugadores cercanos.",
       "El dado tiene más opciones de resultado favorables.",
-      "Cooldown del dado reducido."
+      "El dado manda; a quien le toque, tendrá que recorrer las casillas marcadas."
     ],
     missions: [
-      { text: "Consigue 500 sixes (6s) con el dado",          target: 500,  isBool: false },
-      { text: "Golpea a 1000 personas usando efectos del dado", target: 1000, isBool: false },
-      { text: "Usa la habilidad del dado 750 veces",           target: 750,  isBool: false }
+      { text: "Golpea 400 personas tras lanzarlos con numeros bajos",          target: 400,  isBool: false },
+      { text: "Mata 150 personas con resultados altos",                         target: 150, isBool: false },
+      { text: "Obtén el logro RNGod",                                           target: 1,  isBool: true, badgeUrl: "https://www.roblox.com/badges/2130031244/RNGod" }
     ]
   },
 
@@ -1343,14 +1343,14 @@ const MASTERIES = [
     name: "Chain",
     description: "Encadenado. Literalmente. Ahora puedes atar a varios enemigos a la vez y dominarlos a todos.",
     upgrades: [
-      "[R] activa Whiplash: tiras de la cadena con fuerza hacia ti.",
-      "Puedes encadenar a múltiples jugadores simultáneamente.",
+      "[E] Lanza un orbe tesla que electrocuta a quien toca",
+      "Golpea gente para cargar tu tesla.",
       "La cadena tiene mayor alcance."
     ],
     missions: [
-      { text: "Encadena a 1000 personas",                       target: 1000, isBool: false },
-      { text: "Encadena a 3 personas a la vez",                  target: 3,    isBool: false },
-      { text: "Lanza a 500 personas al vacío con la cadena",     target: 500,  isBool: false }
+      { text: "Encadena a 1250 personas",                       target: 1000, isBool: false },
+      { text: "Encadena a 3 personas a la vez 200 veces",                  target: 200,    isBool: false },
+      { text: "Electrocuta 6 personas simultaniamente",     target: 1,  isBool: true }
     ]
   },
 
@@ -1360,12 +1360,12 @@ const MASTERIES = [
     name: "Obby",
     description: "Has construido tantos obstáculos que ya puedes hacerlo incluso en el aire. Tu mente de ingeniero no tiene límites.",
     upgrades: [
-      "Puedes colocar partes en el aire (midair placement).",
+      "Puedes colocar partes en el aire.",
       "Puedes colocar un 50% más de partes.",
       "El cooldown de la habilidad se reduce de 3s a 1.5s."
     ],
     missions: [
-      { text: "Golpea a 1000 enemigos con el obby",             target: 1000, isBool: false },
+      { text: "Golpea a 1000 enemigos",             target: 1000, isBool: false },
       { text: "Mata a 500 personas con kill bricks",            target: 500,  isBool: false },
       { text: "Coloca 2000 partes de obby",                     target: 2000, isBool: false }
     ]
@@ -1375,14 +1375,14 @@ const MASTERIES = [
   {
     id: "cloud",
     name: "Cloud",
-    description: "\"The One Piece is real\" — y tu nube también lo es. Más grande, más rápida y con asientos VIP para tus amigos (o enemigos).",
+    description: "\"The One Piece is real\" — y tu nube también lo es. Más grande, más rápida y con asientos extra para tus amigos (o enemigos).",
     upgrades: [
       "La nube se vuelve más grande y gana un tercer asiento.",
       "La nube se mueve más rápido.",
       "[R] expulsa a todos los pasajeros, incluyéndote a ti."
     ],
     missions: [
-      { text: "Realiza 50 slaps 'death from above' exitosos",  target: 50,     isBool: false },
+      { text: "Realiza 50 slaps tras salir de tu nube",  target: 50,     isBool: false },
       { text: "Pasa 200 minutos en el aire sobre la nube",     target: 200,    isBool: false },
       { text: "Viaja 200,000 studs en tu nube",                target: 200000, isBool: false },
       { text: "Recoge a 100 personas en tu nube",              target: 100,    isBool: false }
@@ -1393,7 +1393,7 @@ const MASTERIES = [
   {
     id: "wormhole",
     name: "Wormhole",
-    description: "Has dominado el arte del espacio y el tiempo. Ahora los portales obedecen tu voluntad... y puedes teletransportarte a ellos a voluntad.",
+    description: "Sé uno con los portales, y los portales lo serán contigo. Controla los portales aunque no puedas hacerlo con la salida de Portal 3.",
     upgrades: [
       "[R] te teletransporta al portal más cercano.",
       "Los boost de velocidad de los portales duran más.",
@@ -1417,7 +1417,7 @@ const MASTERIES = [
       "Puedes robar almas a otros usuarios de Killstreak en servidores normales."
     ],
     missions: [
-      { text: "Alcanza la Fase 7 (100 souls acumuladas)",             target: 7,    isBool: false },
+      { text: "Alcanza la Fase de las 100 kills.",             target: 7,    isBool: false },
       { text: "Mata a 1000 personas",                                 target: 1000, isBool: false },
       { text: "Roba 100 almas a otros usuarios de Killstreak",        target: 100,  isBool: false }
     ]
@@ -1427,15 +1427,15 @@ const MASTERIES = [
   {
     id: "run",
     name: "Run",
-    description: "Terry. Ese es el nombre de la leyenda en la que te has convertido. Rápido, imparable, inalcanzable.",
+    description: "Terry. Ese es el nombre de la leyenda en la que te has convertido, rompiendo las cadenas de las catacumbas.",
     upgrades: [
-      "[R] te transforma en TERRY durante 3 segundos en la Normal Arena.",
+      "[R] te transforma en TERRY durante 3 segundos en la Arena.",
       "Velocidad y agilidad enormemente aumentadas en forma TERRY."
     ],
     missions: [
-      { text: "Mata a 7 personas en un solo uso de habilidad en el laberinto", target: 7,   isBool: false },
-      { text: "Consigue 500 kills como Terry",                                  target: 500, isBool: false },
-      { text: "Reubícate 200 veces después de usar la habilidad",               target: 200, isBool: false }
+      { text: "Mata a 3 personas en un solo uso de habilidad en el laberinto", target: 1,   isBool: true },
+      { text: "Reubícate 200 veces después de usar la habilidad",               target: 200, isBool: false },
+      { text: "Consigue 500 kills como Terry",                                  target: 500, isBool: false }
     ]
   },
 
@@ -1447,45 +1447,45 @@ const MASTERIES = [
     upgrades: [
       "La bomba flota más rápido.",
       "Cooldown reducido de 10s a 8s.",
-      "[R] activa la Reversal Bomb: explosión que lanza a todos hacia afuera."
+      "[R] activa la Reversal Bomb: distrae a tus enemigos con una detonación sorpresa por atrás."
     ],
     missions: [
       { text: "Usa la habilidad de bomba 1650 veces",            target: 1650, isBool: false },
-      { text: "Elimina a 250 oponentes con auto-detonación",     target: 250,  isBool: false },
-      { text: "Lanza a 750 personas al vacío (void)",            target: 750,  isBool: false }
+      { text: "Golpea 250 personas con una bomba sin activación manual",     target: 250,  isBool: false },
+      { text: "Lanza a 750 personas al vacío",            target: 750,  isBool: false }
     ]
   },
 
   // ── ROB ───────────────────────────────────────────────────────
   {
     id: "rob",
-    name: "rob",
-    description: "Rob odia a bob.",
+    name: "Rob",
+    description: "Rob odia a bob. Pero Rob no odia el poder, odia que Bob lo posea. Obtenerlo tú es clave, que no te recorten tus alas.",
     upgrades: [
       "La maestria empieza al igual que su forma normal.",
       "Rob tiene un arbol de abilidades que puedes consultar arriba a la izquierda.",
       "Desbloquea una nueva habilidad pasiva por persona absorvida.",
-      "Desbloquea una habilidad activa al final.",
+      "Desbloquea una de 3 habilidades activas al final.",
       "Hay 3 fases, con 3 abilidades a elegir por cada una, pero solo puedes llevarte una."
     ],
     missions: [
       { text: "Crea 3 Null Portals y sobrevívelos",              target: 3,     isBool: false },
       { text: "Viaja 25,000 studs sobre el vacío",               target: 25000, isBool: false },
-      { text: "Mata a 1000 personas con la habilidad rob",       target: 1000,  isBool: false },
+      { text: "Mata a 550 personas con la habilidad rob",       target: 550,  isBool: false },
     ]
   },
 
   // ── MOAI ──────────────────────────────────────────────────────
   {
     id: "moai",
-    name: "🗿 Moai",
-    description: "La estatua te ha elegido. Ahora el 🗿 puede moverse... y no está feliz de que lo hayas despertado.",
+    name: "🗿 (Moai)",
+    description: "\"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
     upgrades: [
       "La estatua 🗿 puede ser movida golpeándola.",
       "La onda de choque tiene más knockback."
     ],
     missions: [
-      { text: "Aturde a 500 personas con la estatua 🗿",  target: 500, isBool: false },
+      { text: "Golpea a 500 personas que estan aturdidas por el 🗿",  target: 500, isBool: false },
       { text: "Aturde a 450 enemigos con la habilidad",   target: 450, isBool: false },
       { text: "Mata a 500 personas con la habilidad",     target: 500, isBool: false }
     ]
@@ -1495,15 +1495,15 @@ const MASTERIES = [
   {
     id: "fort",
     name: "Fort",
-    description: "Cranking 90's activado. Tus muros ahora son fortalezas vivientes con un bonus de salto que desafía la física.",
+    description: "Ya no le tienes miedo a los tryhards; ahora eres parte de ellos. Felicidades por convertirte en un sudoroso.",
     upgrades: [
-      "[R] construye 'stairs' instantáneamente.",
+      "[R] construye escaleras.",
       "Los edificios tienen más durabilidad.",
       "Las construcciones otorgan un boost de salto.",
       "Se puede alcanzar una mayor altura máxima."
     ],
     missions: [
-      { text: "Own the Cranking 90's badge",                           target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/4031317971987872/Cranking-90-s"  },
+      { text: "Obtén el logro Cranking 90's",                           target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/4031317971987872/Cranking-90-s"  },
       { text: "Destruye 500 de tus propios muros golpeando a personas", target: 500, isBool: false },
       { text: "Usa la habilidad de construcción 1500 veces",            target: 1500, isBool: false }
     ]
@@ -1513,7 +1513,7 @@ const MASTERIES = [
   {
     id: "engineer",
     name: "Engineer",
-    description: "Nivel de ingeniería: MÁXIMO. Tu centinela ahora es prácticamente indestructible y lleva artillería pesada.",
+    description: "Puede que, tras esta tortura de maestría, hacerte una ingeniería de verdad te sea más fácil.",
     upgrades: [
       "Tu centinela gana inmunidad al stun.",
       "Módulo extra de guante añadido al centinela.",
@@ -1530,13 +1530,13 @@ const MASTERIES = [
   {
     id: "booster",
     name: "Booster",
-    description: "Strap In. Dos propulsores en la espalda, velocidad al máximo. Tus aliados (y víctimas) nunca han volado tan rápido.",
+    description: "La NASA te observa, usa con precaucion.",
     upgrades: [
       "[E] activa Strap In: adjunta dos propulsores a un jugador durante ~7 segundos.",
       "Los propulsores son más potentes y duran más."
     ],
     missions: [
-      { text: "Adjunta ambos propulsores a un solo jugador 750 veces", target: 750, isBool: false }
+      { text: "Adjunta 2 propulsores a un solo jugador 750 veces", target: 750, isBool: false }
     ]
   },
 
@@ -1544,15 +1544,15 @@ const MASTERIES = [
   {
     id: "space",
     name: "Space",
-    description: "El vacío del espacio te llama. Y ahora tú puedes arrastrar a otros hacia él con tu Gravity Reversal Bubble.",
+    description: "El vacío del espacio te llama. Y ahora tú puedes arrastrar a otros hacia él.",
     upgrades: [
       "Cooldown de la habilidad reducido de 15s a 10s.",
       "[R] activa Gravity Reversal Bubble: lanza a los enemigos cercanos por los aires.",
       "Los jugadores golpeados experimentan gravedad reducida temporalmente."
     ],
     missions: [
-      { text: "Usa la habilidad del cañón 750 veces",                   target: 750, isBool: false },
-      { text: "Own the To the Moon badge",                               target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/2124858899/To-the-moon"  },
+      { text: "Usa la habilidad 750 veces",                   target: 750, isBool: false },
+      { text: "Obtén el logro To the Moon",                               target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/2124858899/To-the-moon"  },
       { text: "Dispárate al árbol de Slapple Island con el cañón",      target: 1,   isBool: true  },
       { text: "Embosca a 500 jugadores justo después de aterrizar",      target: 500, isBool: false }
     ]
@@ -1562,7 +1562,7 @@ const MASTERIES = [
   {
     id: "redacted",
     name: "[REDACTED]",
-    description: "Información clasificada. Lo que los portales ocultan, nadie puede saberlo. Excepto tú.",
+    description: "Arxivo RDC-73D, el portal de █████ muestra señales de peligrosidad, ████ ██ ██ ██████, y ██ ███████. Cualquier cosa que estés buscando, vale la pena.",
     upgrades: [
       "Los portales atraen a personas desde más lejos.",
       "Los portales aparecen más rápido.",
