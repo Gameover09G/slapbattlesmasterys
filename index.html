@@ -242,7 +242,7 @@ body {
 .card-top {
   position: relative;
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 640 / 411;
   overflow: hidden;
   background: #111;
   display: flex;
@@ -480,7 +480,7 @@ body {
   overflow: hidden;
   border: 3px solid #333;
   background: #0d0d0d;
-  aspect-ratio: 16/9;
+  aspect-ratio: 640 / 411;
   flex-shrink: 0;
 }
 #detail-banner-img {
@@ -511,19 +511,32 @@ body {
   flex-shrink: 0;
 }
 #detail-glove-img-wrap {
-  width: 96px; height: 96px;
+  width: 96px;
   background: #0d0d0d;
   border: 3px solid #333;
   border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.8rem;
+  display: block;
+  height: auto;
 }
 #detail-glove-img-wrap img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: auto;
   object-fit: contain;
   display: block;
+}
+#detail-glove-placeholder {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #0d0d0d;
+  font-size: 2.8rem;
+  width: 100%;
+  min-height: 64px;
+}
+#detail-glove-placeholder.show {
+  display: flex;
 }
 #detail-glove-info {
   flex: 1;
@@ -1024,7 +1037,7 @@ body {
     <div id="detail-left">
 
       <div id="detail-banner-wrap">
-        <img id="detail-banner-img" src="" alt="Banner">
+        <img id="detail-banner-img" alt="Banner">
         <div id="detail-banner-placeholder">
           <span class="ph-emoji">🖼️</span>
           <span id="ph-banner-text">Sin banner disponible</span>
@@ -1033,7 +1046,10 @@ body {
 
       <div id="detail-glove-row">
         <div id="detail-glove-img-wrap">
-          <img id="detail-glove-img" src="" alt="Glove">
+          <img id="detail-glove-img" alt="Glove">
+          <div id="detail-glove-placeholder">
+            <span id="detail-glove-placeholder-emoji">🥊</span>
+          </div>
         </div>
         <div id="detail-glove-info">
           <div id="detail-glove-name">Nombre del Guante</div>
@@ -1086,10 +1102,10 @@ body {
 
 const CHANGELOG = [
   "09/06/2026",                                              // <-- FECHA / VERSIÓN (variable 1)
-  "Pagina creada!",                  // <-- cambio 1
-  "Puedes cargar maestrias como 'completadas', el progreso es solo para ti!",     // <-- cambio 2
-  "No estan todos los guantes, pero pronto seran agregados",                 // <-- cambio 3
-  "Los 'emojis' al igual son un placeholder, cuando termine con las maestrias agergare baners y diseño de guantes",
+  "Pagina creada!", 
+  "Puedes cargar maestrias como 'completadas', el progreso es solo para ti!",
+  "No estan todos los guantes, pero pronto seran agregados",
+  "A parte de los guantes, se agregaran mas idiomas, explicaciones a detalle de misiones y mas cosas tambien!",
   "Te volvera a salir esta pantalla cuando haya algun cambio, hasta entonces, disfruta de la pagina!",
   // Agrega más entradas aquí si lo necesitas
 ];
@@ -1178,7 +1194,7 @@ const MASTERIES = [
       "Puede fallar contra jugadores con mucho lag."
     ],
     missions: [
-      { text: "Own the Brick Master badge",               target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI" },
+      { text: "Own the Brick Master badge",               target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/2127567042/Brick-Master" },
       { text: "Haz que 1000 personas tropiecen (Trip)",   target: 1000, isBool: false },
       { text: "Lanza un ladrillo a 200 km/h",             target: 200,  isBool: false }
     ]
@@ -1227,7 +1243,7 @@ const MASTERIES = [
     ],
     missions: [
       { text: "Golpea a 1000 personas con el bus",               target: 1000, isBool: false },
-      { text: "Own the G-Grandson..? badge",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Own the G-Grandson..? badge",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/3335299217032061/G-Grandson"  },
       { text: "Golpea a 750 personas con la habilidad del bus",   target: 750,  isBool: false }
     ]
   },
@@ -1404,17 +1420,18 @@ const MASTERIES = [
   {
     id: "rob",
     name: "rob",
-    description: "Clipped Wings. Has sobrevivido lo insuperable y ahora dominas el vacío. Grab activo.",
+    description: "Rob odia a bob.",
     upgrades: [
-      "La habilidad dura 15 segundos en vez de 10.",
-      "La transformación es más rápida (3s → 1s).",
-      "[R] activa Grab: agarra a un jugador y lo lanza al vacío."
+      "La maestria empieza al igual que su forma normal.",
+      "Rob tiene un arbol de abilidades que puedes consultar arriba a la izquierda.",
+      "Desbloquea una nueva habilidad pasiva por persona absorvida.",
+      "Desbloquea una habilidad activa al final.",
+      "Hay 3 fases, con 3 abilidades a elegir por cada una, pero solo puedes llevarte una."
     ],
     missions: [
       { text: "Crea 3 Null Portals y sobrevívelos",              target: 3,     isBool: false },
       { text: "Viaja 25,000 studs sobre el vacío",               target: 25000, isBool: false },
       { text: "Mata a 1000 personas con la habilidad rob",       target: 1000,  isBool: false },
-      { text: "Own the Clipped Wings badge",                     target: 1,     isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  }
     ]
   },
 
@@ -1446,7 +1463,7 @@ const MASTERIES = [
       "Se puede alcanzar una mayor altura máxima."
     ],
     missions: [
-      { text: "Own the Cranking 90's badge",                           target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Own the Cranking 90's badge",                           target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/4031317971987872/Cranking-90-s"  },
       { text: "Destruye 500 de tus propios muros golpeando a personas", target: 500, isBool: false },
       { text: "Usa la habilidad de construcción 1500 veces",            target: 1500, isBool: false }
     ]
@@ -1495,7 +1512,7 @@ const MASTERIES = [
     ],
     missions: [
       { text: "Usa la habilidad del cañón 750 veces",                   target: 750, isBool: false },
-      { text: "Own the To the Moon badge",                               target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Own the To the Moon badge",                               target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/2124858899/To-the-moon"  },
       { text: "Dispárate al árbol de Slapple Island con el cañón",      target: 1,   isBool: true  },
       { text: "Embosca a 500 jugadores justo después de aterrizar",      target: 500, isBool: false }
     ]
@@ -1802,14 +1819,18 @@ function openDetail(id) {
   // Glove img
   const gloveWrap = document.getElementById('detail-glove-img-wrap');
   const gloveImg  = document.getElementById('detail-glove-img');
+  const glovePH   = document.getElementById('detail-glove-placeholder');
   gloveImg.onload  = null;
   gloveImg.onerror = null;
   gloveImg.style.display   = 'block';
-  gloveWrap.style.fontSize = '';
+  if (glovePH) glovePH.classList.remove('show');
   gloveImg.onerror = () => {
     gloveImg.style.display  = 'none';
-    gloveWrap.textContent   = getGloveEmoji(mastery.id);
-    gloveWrap.style.fontSize = '3rem';
+    if (glovePH) {
+      const emoji = document.getElementById('detail-glove-placeholder-emoji');
+      if (emoji) emoji.textContent = getGloveEmoji(mastery.id);
+      glovePH.classList.add('show');
+    }
   };
   gloveImg.src = 'glove_' + mastery.id + '.png';
 
@@ -1995,10 +2016,11 @@ function handleBannerError(img) {
 
 function handleGloveError(img) {
   img.style.display = 'none';
-  const wrap = document.getElementById('detail-glove-img-wrap');
-  if (wrap) {
-    wrap.textContent  = detailOpen ? getGloveEmoji(detailOpen.id) : '🥊';
-    wrap.style.fontSize = '3rem';
+  const placeholder = document.getElementById('detail-glove-placeholder');
+  const emoji = document.getElementById('detail-glove-placeholder-emoji');
+  if (placeholder) {
+    if (emoji) emoji.textContent = detailOpen ? getGloveEmoji(detailOpen.id) : '🥊';
+    placeholder.classList.add('show');
   }
 }
 
