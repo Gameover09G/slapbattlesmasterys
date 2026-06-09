@@ -565,6 +565,42 @@ body {
   font-style: italic;
 }
 
+/* ============================================================
+   STICK JUMPSCARE
+   ============================================================ */
+#stick-jumpscare-overlay {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.92);
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+}
+#stick-jumpscare-overlay.show {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.12s ease, visibility 0s linear 0s;
+}
+#stick-jumpscare-overlay img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.32));
+  transform: scale(1.02);
+  animation: stickJumpscarePop 0.22s ease-out forwards;
+}
+@keyframes stickJumpscarePop {
+  from { opacity: 0; transform: scale(1.08); }
+  to   { opacity: 1; transform: scale(1.02); }
+}
+
 /* upgrades */
 #detail-upgrades-wrap { flex-shrink: 0; }
 #detail-upgrades-list {
@@ -1082,6 +1118,10 @@ body {
   </div>
 </div>
 
+<div id="stick-jumpscare-overlay" aria-hidden="true">
+  <img id="stick-jumpscare-image" src="banner_stick.png" alt="Stick jumpscare">
+</div>
+
 
 <!-- ========================================================
      JAVASCRIPT
@@ -1536,6 +1576,22 @@ const MASTERIES = [
     ]
   },
 
+  // ── STICK ────────────────────────────────────────────────
+  {
+    id: "stick",
+    name: "Stick",
+    description: "MINECRAFT",
+    upgrades: [
+      "Palo ser morado.",
+      "Palo tirar suelo 0.1 segundos mas.",
+      "Hombre tener palo, hombre ser feliz.",
+      "No, palo no tener knockback 1000",
+    ],
+    missions: [
+      { text: "Golpea 99999 personas con el palo",  target: 99999,    isBool: false },
+    ]
+  },
+
   /* ============================================================
      ╔══════════════════════════════════════════════════════════╗
      ║            PLANTILLA — NUEVA MAESTRÍA                   ║
@@ -1633,6 +1689,10 @@ let progressData   = {};
 let completedSet   = new Set();
 let detailOpen     = null;
 let _detailClosing = false;
+let stickLoopAudio = null;
+let stickJumpscareAudio = null;
+let stickJumpscareTimer = null;
+let stickJumpscareHideTimer = null;
 
 /* Emoji por defecto por id de guante */
 function getGloveEmoji(id) {
@@ -1643,6 +1703,65 @@ function getGloveEmoji(id) {
     engineer:'🤖', flash:'⚡', booster:'🚀', space:'🌌', dice:'🎲', chain:'⛓️'
   };
   return map[id] || '🥊';
+}
+
+function stopStickEgg() {
+  if (stickJumpscareTimer) {
+    clearInterval(stickJumpscareTimer);
+    stickJumpscareTimer = null;
+  }
+  if (stickJumpscareHideTimer) {
+    clearTimeout(stickJumpscareHideTimer);
+    stickJumpscareHideTimer = null;
+  }
+  const overlay = document.getElementById('stick-jumpscare-overlay');
+  if (overlay) overlay.classList.remove('show');
+
+  if (stickLoopAudio) {
+    stickLoopAudio.pause();
+    stickLoopAudio.currentTime = 0;
+    stickLoopAudio = null;
+  }
+  if (stickJumpscareAudio) {
+    stickJumpscareAudio.pause();
+    stickJumpscareAudio.currentTime = 0;
+    stickJumpscareAudio = null;
+  }
+}
+
+function triggerStickJumpscare() {
+  if (!detailOpen || detailOpen.id !== 'stick') return;
+  const overlay = document.getElementById('stick-jumpscare-overlay');
+  const image = document.getElementById('stick-jumpscare-image');
+  if (!overlay || !image) return;
+
+  image.src = 'banner_stick.png';
+  overlay.classList.add('show');
+
+  if (stickJumpscareAudio) {
+    stickJumpscareAudio.pause();
+    stickJumpscareAudio.currentTime = 0;
+  }
+  stickJumpscareAudio = new Audio('stick_jumpscare.mp3');
+  stickJumpscareAudio.volume = 1;
+  stickJumpscareAudio.play().catch(() => {});
+
+  clearTimeout(stickJumpscareHideTimer);
+  stickJumpscareHideTimer = setTimeout(() => {
+    overlay.classList.remove('show');
+  }, 900);
+}
+
+function startStickEgg() {
+  stopStickEgg();
+
+  stickLoopAudio = new Audio('stick.mp3');
+  stickLoopAudio.loop = true;
+  stickLoopAudio.volume = 1;
+  stickLoopAudio.play().catch(() => {});
+
+  triggerStickJumpscare();
+  stickJumpscareTimer = setInterval(triggerStickJumpscare, 5000);
 }
 
 /* ============================================================
@@ -1796,6 +1915,7 @@ function toggleCompleted(id, e) {
 function openDetail(id) {
   const mastery = MASTERIES.find(m => m.id === id);
   if (!mastery) return;
+  stopStickEgg();
   detailOpen = mastery;
 
   // Title
@@ -1851,12 +1971,14 @@ function openDetail(id) {
   // Show
   document.getElementById('detail-view').classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (mastery.id === 'stick') startStickEgg();
 }
 
 /* ============================================================
    CLOSE DETAIL
    ============================================================ */
 function closeDetail() {
+  stopStickEgg();
   document.getElementById('detail-view').classList.remove('open');
   document.body.style.overflow = '';
   detailOpen = null;
