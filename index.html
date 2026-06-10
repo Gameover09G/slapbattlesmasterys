@@ -237,6 +237,13 @@ body {
   animation: cardIn .4s ease both, greenPulse 2.5s ease-in-out .4s infinite;
 }
 .mastery-card.completed .card-top { opacity: 0.7; filter: saturate(0.6); }
+.mastery-card.hidden {
+  border-color: #222 !important;
+  animation: cardIn 0.4s ease both;
+}
+.mastery-card.hidden .card-top { opacity: 0.78; filter: grayscale(0.15) saturate(0.8); }
+.mastery-card.hidden .completed-badge { display: none; }
+.mastery-card.hidden .mastered-ribbon { display: none; }
 
 /* card top: thumbnail */
 .card-top {
@@ -282,6 +289,22 @@ body {
 }
 .mastery-card.completed .mastered-ribbon { opacity: 1; }
 
+.hidden-ribbon {
+  position: absolute;
+  top: 12px; left: -26px;
+  background: linear-gradient(180deg, #9ad1ff, #4fa3ff);
+  color: #06101a;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  padding: 4px 36px;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  opacity: 1;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 2;
+}
+
 .new-ribbon {
   position: absolute;
   top: 12px; right: -26px;
@@ -296,10 +319,6 @@ body {
   opacity: 1;
   transition: opacity .2s ease, transform .2s ease;
   z-index: 2;
-}
-.mastery-card:hover .new-ribbon {
-  opacity: 0;
-  transform: rotate(45deg) scale(0.92);
 }
 
 .completed-badge {
@@ -375,6 +394,7 @@ body {
   display: flex;
   gap: 8px;
   padding: 0 13px 11px;
+  align-items: stretch;
 }
 
 /* ============================================================
@@ -410,17 +430,31 @@ body {
 .btn-done {
   background: #222;
   color: var(--text-muted);
-  padding: 8px 12px;
+  padding: 0;
   border: 3px solid #444;
   box-shadow: 0 3px 0 #000;
   font-size: 1rem;
   transition: background .2s, color .2s, border-color .2s, box-shadow .2s;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
 }
 .btn-done.active {
   background: #0b220b;
   color: var(--green-done);
   border-color: var(--green-done);
   box-shadow: 0 0 10px rgba(57,255,20,0.35), 0 3px 0 #000;
+}
+.btn-done:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+.btn-hide.active {
+  background: #0e2230;
+  color: #8ad6ff;
+  border-color: #4fa3ff;
+  box-shadow: 0 0 10px rgba(79,163,255,0.28), 0 3px 0 #000;
 }
 
 /* ============================================================
@@ -507,6 +541,7 @@ body {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
+  cursor: pointer;
 }
 #detail-banner-placeholder {
   position: absolute;
@@ -545,6 +580,7 @@ body {
   height: auto;
   object-fit: contain;
   display: block;
+  cursor: pointer;
 }
 #detail-glove-placeholder {
   display: none;
@@ -583,6 +619,38 @@ body {
   color: var(--text-light);
   line-height: 1.55;
   font-style: italic;
+}
+
+.detail-hide-wrap {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+.detail-hide-btn {
+  min-width: 146px;
+  padding: 7px 14px;
+  background: #151515;
+  border: 2px solid #3d3d3d;
+  border-radius: 999px;
+  color: #8a8a8a;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.8rem;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: filter .15s, transform .1s, background .2s, color .2s, border-color .2s;
+  align-self: flex-start;
+  box-shadow: 0 2px 0 #000;
+}
+.detail-hide-btn:hover { filter: brightness(1.15); }
+.detail-hide-btn.active {
+  background: #0e2230;
+  color: #8ad6ff;
+  border-color: #4fa3ff;
+}
+.detail-hide-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
 }
 
 /* ============================================================
@@ -628,7 +696,7 @@ body {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 910;
+  z-index: 920;
   background: #000;
   pointer-events: none;
 }
@@ -642,6 +710,9 @@ body {
   display: block;
 }
 
+/* ============================================================
+   FOXY FULLSCREEN VIDEO
+   ============================================================ */
 /* upgrades */
 #detail-upgrades-wrap { flex-shrink: 0; }
 #detail-upgrades-list {
@@ -1178,6 +1249,56 @@ body {
 }
 #video-placeholder .vph-emoji  { font-size: 3.2rem; display: none; }
 #video-placeholder .vph-text   { font-size: 1rem; color: #555; letter-spacing: .5px; }
+
+/* ============================================================
+   IMAGE LIGHTBOX
+   ============================================================ */
+#image-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 850;
+  background: rgba(0,0,0,0.92);
+  align-items: center;
+  justify-content: center;
+  animation: fadeInDetail .2s ease;
+}
+#image-modal-overlay.open { display: flex; }
+
+#image-modal-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 96vw;
+  max-height: 92vh;
+  padding: 10px;
+  border: 4px solid var(--yellow-bright);
+  background: #111;
+  box-shadow: var(--shadow-glow), 0 16px 50px rgba(0,0,0,0.85);
+  border-radius: 16px;
+}
+
+#image-modal-img {
+  display: block;
+  max-width: calc(96vw - 20px);
+  max-height: calc(92vh - 20px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+#image-modal-title {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 12px rgba(255,215,0,0.5), 1px 1px 0 #000;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -1248,7 +1369,7 @@ body {
     <div id="detail-left">
 
       <div id="detail-banner-wrap">
-        <img id="detail-banner-img" alt="Banner">
+        <img id="detail-banner-img" alt="Banner" onclick="openImageModal(this.src, this.alt)">
         <div id="detail-banner-placeholder">
           <span class="ph-emoji">🖼️</span>
           <span id="ph-banner-text">Sin banner disponible</span>
@@ -1258,7 +1379,7 @@ body {
 
       <div id="detail-glove-row">
         <div id="detail-glove-img-wrap">
-          <img id="detail-glove-img" alt="Glove">
+          <img id="detail-glove-img" alt="Glove" onclick="openImageModal(this.src, this.alt)">
           <div id="detail-glove-placeholder">
             <span id="detail-glove-placeholder-emoji">🥊</span>
           </div>
@@ -1267,6 +1388,14 @@ body {
           <div id="detail-glove-name">Nombre del Guante</div>
           <div class="detail-section-label">DESCRIPCIÓN</div>
           <div id="detail-description-text"></div>
+          <div class="detail-hide-wrap">
+            <button id="detail-hide-btn"
+                    class="detail-hide-btn"
+                    data-action="toggle-hide-detail"
+                    title="Ocultar maestría">
+              (ocultar)
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1314,8 +1443,19 @@ body {
   </div>
 </div>
 
+<div id="image-modal-overlay" onclick="if(event.target===this)closeImageModal()">
+  <div id="image-modal-frame">
+    <img id="image-modal-img" alt="Expanded image">
+  </div>
+  <div id="image-modal-title"></div>
+</div>
+
 <div id="stick-jumpscare-overlay" aria-hidden="true">
   <img id="stick-jumpscare-image" src="banner_stick.png" alt="Stick jumpscare">
+</div>
+
+<div id="foxy-video-overlay" aria-hidden="true">
+  <video id="foxy-video" playsinline preload="auto"></video>
 </div>
 
 
@@ -1444,7 +1584,7 @@ const MASTERIES = [
     id: "spin",
     name: "Spin",
     previewUrl: "",
-    description: "10 horas girando. Diez. Horas. No hay palabras para describir tu dedicación (ni tu mareo).",
+    description: "¡ESTO ES UNA REVELACIÓN! SPIN AHORA ROTA… ¡¡¡¡MÁS RÁPIDO!!!!!",
     upgrades: [
       "La velocidad de giro aumenta significativamente.",
       "Asciendes lentamente mientras giras.",
@@ -1461,7 +1601,7 @@ const MASTERIES = [
     id: "ultrainstinct",
     name: "Ultra Instinct",
     previewUrl: "",
-    description: "Has esquivado tantos golpes que tu cuerpo actúa solo. La verdadera Ultra Instinct no se piensa — simplemente ocurre.",
+    description: "Y esto... es... para ir... al infinito y más allá!",
     upgrades: [
       "Tu barra de esquive se duplica, con un máximo de 80% de esquive.",
       "[E] te teletransporta instantáneamente a un lugar aleatorio de la isla principal. a cambio de 6 puntos de tu barra de esquive.",
@@ -1478,7 +1618,7 @@ const MASTERIES = [
     id: "bus",
     name: "Bus",
     previewUrl: "",
-    description: "El autobús no discrimina. Ahora tampoco discrimina la dirección en la que ataca.",
+    description: "Atropellaron a mi abuela con un autobús.",
     upgrades: [
       "Los buses salen desde todas las direcciones.",
       "El bus ya no te daña a ti mismo.",
@@ -1496,7 +1636,7 @@ const MASTERIES = [
     id: "flash",
     name: "Flash",
     previewUrl: "",
-    description: "Undo. La velocidad sin consecuencias. Teletransportarte ya no te deja vulnerable — ahora es un arte.",
+    description: "¿¡FLASH NEGRO!?",
     upgrades: [
       "[R] activa Undo después de teletransportarte, pero asegúrate de acertar el golpe para poder usarlo.",
       "Carga del teletransporte reducido."
@@ -1513,7 +1653,7 @@ const MASTERIES = [
     id: "glovel",
     name: "Glovel",
     previewUrl: "",
-    description: "En busca de tesoros, te encuentras con el verdadero motivo de todo, una pala dorada que ya no tiene críticos mejorados.",
+    description: "Yo no he hecho nada más que transportar pan por 3 días.",
     upgrades: [
       "[R] activa el Market Gardening: sal volando con poco control de a dónde vas..",
       "Mayor velocidad bajo tierra."
@@ -1530,7 +1670,7 @@ const MASTERIES = [
     id: "dice",
     name: "Dice",
     previewUrl: "",
-    description: "Si no puedes abandonar tus hábitos ludópatas, ¿por qué no llevártelos a tamaño real?",
+    description: "Si saco un 12, tú te mueres instantáneamente.",
     upgrades: [
       "[R] lanza un dado gigante que aplasta a los jugadores cercanos.",
       "El dado tiene más opciones de resultado favorables.",
@@ -1548,7 +1688,7 @@ const MASTERIES = [
     id: "chain",
     name: "Chain",
     previewUrl: "",
-    description: "Encadenado. Literalmente. Ahora puedes atar a varios enemigos a la vez y dominarlos a todos.",
+    description: "¡Tú no puedes CONCEBIR de lo que soy capaz! ¡Estoy muy por encima de ti! ¡Soy como un dios con ropa humana! ¡RASHOS LÁSER APARECEN DE MIS DEDOS!",
     upgrades: [
       "[E] Lanza un orbe tesla que electrocuta a quien toca",
       "Golpea gente para cargar tu tesla.",
@@ -1566,7 +1706,7 @@ const MASTERIES = [
     id: "obby",
     name: "Obby",
     previewUrl: "",
-    description: "Has construido tantos obstáculos que ya puedes hacerlo incluso en el aire. Tu mente de ingeniero no tiene límites.",
+    description: "En la Slap Battles civilization, nadie decide si saltar por un fragmento de null.",
     upgrades: [
       "Puedes colocar partes en el aire.",
       "Puedes colocar un 50% más de partes.",
@@ -1584,7 +1724,7 @@ const MASTERIES = [
     id: "cloud",
     name: "Cloud",
     previewUrl: "",
-    description: "\"The One Piece is real\" — y tu nube también lo es. Más grande, más rápida y con asientos extra para tus amigos (o enemigos).",
+    description: "¿Podemos llegar más alto?",
     upgrades: [
       "La nube se vuelve más grande y gana un tercer asiento.",
       "La nube se mueve más rápido.",
@@ -1603,7 +1743,7 @@ const MASTERIES = [
     id: "wormhole",
     name: "Wormhole",
     previewUrl: "",
-    description: "Sé uno con los portales, y los portales lo serán contigo. Controla los portales aunque no puedas hacerlo con la salida de Portal 3.",
+    description: "Masteriza la teletransportación molecular y forja un vínculo directo entre ti y tus portales.",
     upgrades: [
       "[R] te teletransporta al portal más cercano.",
       "Los boost de velocidad de los portales duran más.",
@@ -1621,7 +1761,7 @@ const MASTERIES = [
     id: "killstreak",
     name: "Killstreak",
     previewUrl: "",
-    description: "Cien almas. Mil víctimas. Y aún tienes hambre. Tu sed de poder no conoce límites.",
+    description: "¿Qué significa ser un Rey para un Dios?",
     upgrades: [
       "Puedes almacenar hasta 10 almas sin perderlas al morir.",
       "Ganas un alma instantáneamente al spawnear.",
@@ -1639,7 +1779,7 @@ const MASTERIES = [
     id: "run",
     name: "Run",
     previewUrl: "",
-    description: "Terry. Ese es el nombre de la leyenda en la que te has convertido, rompiendo las cadenas de las catacumbas.",
+    description: "¿Y QUIÉN DIJO QUE TENÍA QUE ESTAR EN UNA CATACUMBA PARA ASUSTARTE?",
     upgrades: [
       "[R] te transforma en TERRY durante 3 segundos en la Arena.",
       "Velocidad y agilidad enormemente aumentadas en forma TERRY."
@@ -1656,7 +1796,7 @@ const MASTERIES = [
     id: "bomb",
     name: "Bomb",
     previewUrl: "",
-    description: "¿Una bomba normal? No, tú eres el maestro de la detonación. La Reversal Bomb lo cambia todo.",
+    description: "¡TIO, TIENES UNA BOMBA JUSTO DETRÁS DE TI! 'Si claro, como si alguien fuese a caer por e-'",
     upgrades: [
       "La bomba flota más rápido.",
       "Cooldown reducido de 10s a 8s.",
@@ -1674,7 +1814,7 @@ const MASTERIES = [
     id: "rob",
     name: "Rob",
     previewUrl: "",
-    description: "Rob odia a bob. Pero Rob no odia el poder, odia que Bob lo posea. Obtenerlo tú es clave, que no te recorten tus alas.",
+    description: "Sientes que tu vínculo se estrecha con firmeza. Los ojos de Rob brillan con determinación.",
     upgrades: [
       "La maestria empieza al igual que su forma normal.",
       "Rob tiene un arbol de abilidades que puedes consultar arriba a la izquierda.",
@@ -1694,7 +1834,7 @@ const MASTERIES = [
     id: "moai",
     name: "🗿 (Moai)",
     previewUrl: "",
-    description: "\"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
+    description: "🗿 \"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
     upgrades: [
       "La estatua 🗿 puede ser movida golpeándola.",
       "La onda de choque tiene más knockback."
@@ -1711,7 +1851,7 @@ const MASTERIES = [
     id: "fort",
     name: "Fort",
     previewUrl: "",
-    description: "Ya no le tienes miedo a los tryhards; ahora eres parte de ellos. Felicidades por convertirte en un sudoroso.",
+    description: "Me contrataron de constructor.",
     upgrades: [
       "[R] construye escaleras.",
       "Los edificios tienen más durabilidad.",
@@ -1730,7 +1870,7 @@ const MASTERIES = [
     id: "engineer",
     name: "Engineer",
     previewUrl: "",
-    description: "Puede que, tras esta tortura de maestría, hacerte una ingeniería de verdad te sea más fácil.",
+    description: "Coloca un guante, y si no funciona... Agrega otro guante.",
     upgrades: [
       "Tu centinela gana inmunidad al stun.",
       "Módulo extra de guante añadido al centinela.",
@@ -1748,7 +1888,7 @@ const MASTERIES = [
     id: "booster",
     name: "Booster",
     previewUrl: "",
-    description: "La NASA te observa, usa con precaucion.",
+    description: "VAMOOOOOOS WUUUUUUUUUUHUUUUU",
     upgrades: [
       "[E] activa Strap In: adjunta dos propulsores a un jugador durante ~7 segundos.",
       "Los propulsores son más potentes y duran más."
@@ -1763,7 +1903,7 @@ const MASTERIES = [
     id: "space",
     name: "Space",
     previewUrl: "",
-    description: "El vacío del espacio te llama. Y ahora tú puedes arrastrar a otros hacia él.",
+    description: "Una pequeña bofetada por el hombre, una gran hostia para la humanidad.",
     upgrades: [
       "Cooldown de la habilidad reducido de 15s a 10s.",
       "[R] activa Gravity Reversal Bubble: lanza a los enemigos cercanos por los aires.",
@@ -1782,7 +1922,7 @@ const MASTERIES = [
     id: "redacted",
     name: "[REDACTED]",
     previewUrl: "",
-    description: "Arxivo RDC-73D, el portal de █████ muestra señales de peligrosidad, ████ ██ ██ ██████, y ██ ███████. Cualquier cosa que estés buscando, vale la pena.",
+    description: "Cierra tantas puertas como quieras... no te salvarán...",
     upgrades: [
       "Los portales atraen a personas desde más lejos.",
       "Los portales aparecen más rápido.",
@@ -1800,9 +1940,8 @@ const MASTERIES = [
   {
     id: "stick",
     name: "Stick",
-    isNew: true,
     previewUrl: "",
-    description: "MINECRAFT",
+    description: "Si te preguntas si esta maestría vale la pena, totalmente.",
     upgrades: [
       "Palo ser morado.",
       "Palo tirar suelo 0.1 segundos mas.",
@@ -1818,8 +1957,7 @@ const MASTERIES = [
   {
     id: "shard",              // ← sin espacios, solo minúsculas/números
     name: "Shard",   // ← tal como aparece en el juego
-    isNew: true,
-    description: "Si hay 'guerra sin ningún motivo', simplemente [+PARRY] y solucionado.",
+    description: "Un fuego tan helado que quema.",
     upgrades: [
       "Golpea tus shards para aplicarle efecto de fuego",
       "Los shards de fuego tienen menos alcance pero mas knockback y velocidad.",
@@ -1839,8 +1977,7 @@ const MASTERIES = [
   {
     id: "phase",              // ← sin espacios, solo minúsculas/números
     name: "Phase",   // ← tal como aparece en el juego
-    isNew: true,
-    description: "Siempre prioriza el alma antes que el cuerpo; adéntrate en la oscuridad y aprende sus trucos.",
+    description: "Profundizando en las sombras, convirtiéndote en uno con la oscuridad. Tu mente parpadea, pero después de todo, sigues siendo tú.",
     upgrades: [
       "[R] Cancela el vuelo en cualquier momento.",
       "Golpea nada más salir del estado permeable; golpea a los enemigos.",
@@ -1859,8 +1996,7 @@ const MASTERIES = [
   {
     id: "tycoon",              // ← sin espacios, solo minúsculas/números
     name: "Tycoon",   // ← tal como aparece en el juego
-    isNew: true,
-    description: "Magnate de 2 jugadores de capitalismo imperial.",
+    description: "¡MI REINADO CAPITALISTA NO HA HECHO NADA MÁS QUE EMPEZAR!",
     upgrades: [
       "El tycoon es mucho más grande.",
       "Puedes comprar mejoras para hacerte tu propia base a cambio de dinero de tu Tycoon.",
@@ -1878,8 +2014,7 @@ const MASTERIES = [
   {
     id: "hive",              // ← sin espacios, solo minúsculas/números
     name: "Hive",   // ← tal como aparece en el juego
-    isNew: true,
-    description: "El castigo de ser atacado por miles de abejas es doloroso, pero más lo es ver Bee Movie en x0.5 de velocidad.",
+    description: "¡NO, LAS ABEJAS NO! ¡¡NO LAS ABEJAS!! AAAAHHHH.",
     upgrades: [
       "Las piscinas de miel son un 50% más grandes.",
       "Vas más rápido si viajas por encima de tu miel.",
@@ -1899,8 +2034,7 @@ const MASTERIES = [
   {
     id: "defense",              // ← sin espacios, solo minúsculas/números
     name: "Defense",   // ← tal como aparece en el juego
-    isNew: true,
-    description: "El cubo de la justicia solo permite el paso a conocidos; dentro de tu dominio eres imparable.",
+    description: "La mejor defensa es la ofensa.",
     upgrades: [
       "La barrera es mas grande.",
       "El cubo tiene tu hermosa cara.",
@@ -1920,8 +2054,7 @@ const MASTERIES = [
   {
     id: "carkeys",              // ← sin espacios, solo minúsculas/números
     name: "Car Keys",   // ← tal como aparece en el juego
-    isNew: true,
-    description: "Conduciendo en mi coche tras un botellón, bebí tanto que ese bache parece un ciervo.",
+    description: "No todo es lo que parece. ;)",
     upgrades: [
       "Ganas un 25% más de experiencia.",
       "Puedes mejorar todavía más cada estadística.",
@@ -1931,6 +2064,21 @@ const MASTERIES = [
       { text: "Maxea tus estadisticas 5 vezes.",  target: 5, isBool: false },
       { text: "Gana 100000XP en total",          target: 100000,   isBool: false},
       { text: "Atropella a 750 personas con tu coche.",  target: 750, isBool: false }
+    ]
+  },
+
+  // ── Car Keys ────────────────────────────────────────────────
+  {
+    id: "voodoo",              // ← sin espacios, solo minúsculas/números
+    name: "Voodoo",   // ← tal como aparece en el juego
+    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    upgrades: [
+      "POR AGREGAR.",
+    ],
+    missions: [
+      { text: "POR AGREGAR.",  target: 5, isBool: false },
+      { text: "POR AGREGAR",          target: 100000,   isBool: false},
+      { text: "POR AGREGAR",  target: 750, isBool: false }
     ]
   },
   /* ============================================================
@@ -1968,13 +2116,16 @@ const MASTERIES = [
    ============================================================ */
 const STORAGE_KEY_PROGRESS  = 'slap_battles_progress_v2';
 const STORAGE_KEY_COMPLETED = 'slap_battles_completed_v2';
-const STORAGE_KEY_SEEN_MASTERY_IDS = 'slap_battles_seen_masteries_v1';
+const STORAGE_KEY_HIDDEN     = 'slap_battles_hidden_v1';
+const STORAGE_KEY_MASTERY_SNAPSHOT = 'slap_battles_mastery_snapshot_v1';
 
 function saveProgress() {
   try {
     const completedArr = Array.from(completedSet);
+    const hiddenArr = Array.from(hiddenSet);
     localStorage.setItem(STORAGE_KEY_PROGRESS,  JSON.stringify(progressData));
     localStorage.setItem(STORAGE_KEY_COMPLETED, JSON.stringify(completedArr));
+    localStorage.setItem(STORAGE_KEY_HIDDEN,    JSON.stringify(hiddenArr));
   } catch(e) { console.warn('No se pudo guardar:', e); }
 }
 
@@ -1982,6 +2133,7 @@ function loadProgress() {
   try {
     const rawProg = localStorage.getItem(STORAGE_KEY_PROGRESS);
     const rawComp = localStorage.getItem(STORAGE_KEY_COMPLETED);
+    const rawHidden = localStorage.getItem(STORAGE_KEY_HIDDEN);
     if (rawProg) {
       const stored = JSON.parse(rawProg);
       // Fusionar con datos actuales (por si se agregan nuevas maestrías)
@@ -1997,38 +2149,61 @@ function loadProgress() {
         if (MASTERIES.find(m => m.id === id)) completedSet.add(id);
       });
     }
+    if (rawHidden) {
+      const arr = JSON.parse(rawHidden);
+      arr.forEach(id => {
+        if (MASTERIES.find(m => m.id === id)) hiddenSet.add(id);
+      });
+    }
+    hiddenSet.forEach(id => {
+      if (completedSet.has(id)) completedSet.delete(id);
+    });
   } catch(e) { console.warn('No se pudo cargar progreso:', e); }
 }
 
-function loadSeenMasteries() {
-  try {
-    const rawSeen = localStorage.getItem(STORAGE_KEY_SEEN_MASTERY_IDS);
-    if (rawSeen) {
-      const seenIds = JSON.parse(rawSeen);
-      if (Array.isArray(seenIds)) return new Set(seenIds.filter(id => MASTERIES.some(m => m.id === id)));
-    }
-  } catch(e) { console.warn('No se pudo cargar maestrías vistas:', e); }
-
-  const initialSeen = new Set(MASTERIES.map(m => m.id));
-  saveSeenMasteries(initialSeen);
-  return initialSeen;
+function buildMasterySnapshot() {
+  return MASTERIES.map(m => m.id);
 }
 
-function saveSeenMasteries(seenSet) {
+function loadMasterySnapshot() {
   try {
-    localStorage.setItem(STORAGE_KEY_SEEN_MASTERY_IDS, JSON.stringify(Array.from(seenSet)));
-  } catch(e) { console.warn('No se pudo guardar maestrías vistas:', e); }
+    const rawSnapshot = localStorage.getItem(STORAGE_KEY_MASTERY_SNAPSHOT);
+    if (rawSnapshot) {
+      const snapshotIds = JSON.parse(rawSnapshot);
+      if (Array.isArray(snapshotIds)) {
+        return new Set(snapshotIds.filter(id => MASTERIES.some(m => m.id === id)));
+      }
+    }
+  } catch(e) { console.warn('No se pudo cargar el snapshot de maestrías:', e); }
+
+  const initialSnapshot = new Set(buildMasterySnapshot());
+  saveMasterySnapshot(initialSnapshot);
+  return initialSnapshot;
+}
+
+function saveMasterySnapshot(snapshotSet) {
+  try {
+    localStorage.setItem(STORAGE_KEY_MASTERY_SNAPSHOT, JSON.stringify(Array.from(snapshotSet)));
+  } catch(e) { console.warn('No se pudo guardar el snapshot de maestrías:', e); }
+}
+
+function saveHiddenMasteries() {
+  try {
+    localStorage.setItem(STORAGE_KEY_HIDDEN, JSON.stringify(Array.from(hiddenSet)));
+  } catch(e) { console.warn('No se pudo guardar maestrías ocultas:', e); }
 }
 
 function resetAllProgress() {
   if (!confirm('¿Seguro que quieres borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
   progressData = {};
   completedSet.clear();
+  hiddenSet.clear();
   MASTERIES.forEach(m => {
     progressData[m.id] = {};
     m.missions.forEach((_, i) => { progressData[m.id][i] = 0; });
   });
   saveProgress();
+  saveHiddenMasteries();
   renderGrid(document.getElementById('search-input').value);
   showToast('🗑️ Progreso reseteado');
 }
@@ -2043,6 +2218,17 @@ function showToast(msg) {
   toast.classList.add('visible');
   clearTimeout(toast._t);
   toast._t = setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+
+function dismissNewRibbon(id, cardElement) {
+  if (!newMasteries.has(id)) return;
+  newMasteries.delete(id);
+  masterySnapshot.add(id);
+  saveMasterySnapshot(masterySnapshot);
+  if (cardElement) {
+    const ribbon = cardElement.querySelector('.new-ribbon');
+    if (ribbon) ribbon.remove();
+  }
 }
 
 function applyPreviewPlaceholder(img, fit = 'contain') {
@@ -2060,13 +2246,16 @@ function applyPreviewPlaceholder(img, fit = 'contain') {
    ============================================================ */
 let progressData   = {};
 let completedSet   = new Set();
-let seenMasteries  = new Set();
+let hiddenSet      = new Set();
+let newMasteries   = new Set();
+let masterySnapshot = new Set();
 let detailOpen     = null;
 let _detailClosing = false;
 let stickLoopAudio = null;
 let stickJumpscareAudio = null;
 let stickJumpscareTimer = null;
 let stickJumpscareHideTimer = null;
+let foxyVideoActive = false;
 
 /* Emoji por defecto por id de guante */
 function getGloveEmoji(id) {
@@ -2080,13 +2269,7 @@ function getGloveEmoji(id) {
 }
 
 function isNewMastery(id) {
-  return !seenMasteries.has(id);
-}
-
-function markMasterySeen(id) {
-  if (seenMasteries.has(id)) return;
-  seenMasteries.add(id);
-  saveSeenMasteries(seenMasteries);
+  return newMasteries.has(id);
 }
 
 function stopStickEgg() {
@@ -2148,6 +2331,40 @@ function startStickEgg() {
   stickJumpscareTimer = setInterval(triggerStickJumpscare, 5000);
 }
 
+function stopFoxyEgg() {
+  const overlay = document.getElementById('foxy-video-overlay');
+  const video = document.getElementById('foxy-video');
+  if (overlay) overlay.classList.remove('show');
+  if (video) {
+    video.onended = null;
+    video.onerror = null;
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  }
+  foxyVideoActive = false;
+}
+
+function startFoxyEgg() {
+  const overlay = document.getElementById('foxy-video-overlay');
+  const video = document.getElementById('foxy-video');
+  if (!overlay || !video) return;
+
+  stopFoxyEgg();
+  foxyVideoActive = true;
+
+  video.src = 'foxy.webm';
+  video.loop = false;
+  video.controls = false;
+  video.muted = false;
+  video.playsInline = true;
+  video.onended = () => stopFoxyEgg();
+  video.onerror = () => stopFoxyEgg();
+
+  overlay.classList.add('show');
+  video.play().catch(() => stopFoxyEgg());
+}
+
 /* ============================================================
    INIT
    ============================================================ */
@@ -2159,12 +2376,19 @@ function init() {
   });
   // Cargar datos guardados encima
   loadProgress();
-  seenMasteries = loadSeenMasteries();
+  masterySnapshot = loadMasterySnapshot();
+  newMasteries = new Set(buildMasterySnapshot().filter(id => !masterySnapshot.has(id)));
   renderGrid();
   updateStats();
   setupEventDelegation();
+  window.addEventListener('pagehide', persistMasterySnapshot, { once: false });
+  window.addEventListener('beforeunload', persistMasterySnapshot, { once: false });
   // Mostrar changelog si hay cambios nuevos
   checkChangelog();
+}
+
+function persistMasterySnapshot() {
+  saveMasterySnapshot(masterySnapshot);
 }
 
 /* ============================================================
@@ -2174,7 +2398,7 @@ function updateStats() {
   const total     = MASTERIES.length;
   const completed = completedSet.size;
   const inprogress = MASTERIES.filter(m => {
-    if (completedSet.has(m.id)) return false;
+    if (completedSet.has(m.id) || hiddenSet.has(m.id)) return false;
     return getMasteryProgress(m) > 0;
   }).length;
 
@@ -2192,8 +2416,8 @@ function renderGrid(filter = '') {
   grid.innerHTML = '';
 
   const query  = filter.toLowerCase().trim();
-  const active = MASTERIES.filter(m => !completedSet.has(m.id) && m.name.toLowerCase().includes(query));
-  const done   = MASTERIES.filter(m =>  completedSet.has(m.id) && m.name.toLowerCase().includes(query));
+  const active = MASTERIES.filter(m => !completedSet.has(m.id) && !hiddenSet.has(m.id) && m.name.toLowerCase().includes(query));
+  const done   = MASTERIES.filter(m => (completedSet.has(m.id) || hiddenSet.has(m.id)) && m.name.toLowerCase().includes(query));
 
   if (active.length === 0 && done.length === 0) {
     empty.style.display = 'block';
@@ -2229,11 +2453,12 @@ function filterMasteries() {
    ============================================================ */
 function createCard(mastery) {
   const isDone = completedSet.has(mastery.id);
+  const isHidden = hiddenSet.has(mastery.id);
   const pct    = getMasteryProgress(mastery);
   const isNew  = isNewMastery(mastery.id);
 
   const card = document.createElement('div');
-  card.className = 'mastery-card' + (isDone ? ' completed' : '');
+  card.className = 'mastery-card' + (isHidden ? ' hidden' : isDone ? ' completed' : '');
   card.dataset.id = mastery.id;
 
   card.innerHTML = `
@@ -2244,7 +2469,7 @@ function createCard(mastery) {
            onerror="if(this.dataset.previewFallback==='1'){this.style.display='none'; this.nextElementSibling.style.display='flex';}else{this.dataset.previewFallback='1'; this.onerror=null; this.src='preview_placeholder.png'; this.style.objectFit='contain'; this.style.background='#111';}">
       <div class="card-banner-fallback" style="display:none">${getGloveEmoji(mastery.id)}</div>
       ${isNew ? '<div class="new-ribbon">NEW</div>' : ''}
-      <div class="mastered-ribbon">MASTERED</div>
+      ${isHidden ? '<div class="hidden-ribbon">OCULTO</div>' : '<div class="mastered-ribbon">MASTERED</div>'}
       <div class="completed-badge">✓</div>
     </div>
 
@@ -2263,21 +2488,12 @@ function createCard(mastery) {
       <button class="btn btn-primary" data-action="open" data-id="${mastery.id}">📖 VER MÁS</button>
       <button class="btn btn-done ${isDone ? 'active' : ''}"
               data-action="toggle" data-id="${mastery.id}"
-              title="${isDone ? 'Desmarcar completada' : 'Marcar como completada'}">
+              title="${isDone ? 'Desmarcar completada' : 'Marcar como completada'}"
+              ${isHidden ? 'disabled' : ''}>
         ${isDone ? '✓' : '○'}
       </button>
     </div>
   `;
-
-  if (isNew) {
-    card.addEventListener('mouseenter', () => {
-      if (isNewMastery(mastery.id)) {
-        markMasterySeen(mastery.id);
-        const ribbon = card.querySelector('.new-ribbon');
-        if (ribbon) ribbon.remove();
-      }
-    }, { once: true });
-  }
 
   return card;
 }
@@ -2299,11 +2515,48 @@ function getMasteryProgress(mastery) {
    ============================================================ */
 function toggleCompleted(id, e) {
   if (e) e.stopPropagation();
-  if (completedSet.has(id)) completedSet.delete(id);
-  else                       completedSet.add(id);
+  if (hiddenSet.has(id) && !completedSet.has(id)) {
+    showToast('Primero quita oculto');
+    return;
+  }
+  const wasCompleted = completedSet.has(id);
+  if (wasCompleted) {
+    completedSet.delete(id);
+  } else {
+    completedSet.add(id);
+    hiddenSet.delete(id);
+  }
   saveProgress();
-  showToast('💾 Guardado');
+  saveHiddenMasteries();
+  showToast('Guardado');
   renderGrid(document.getElementById('search-input').value);
+  updateDetailHideButton();
+  if (id === 'stick') {
+    if (wasCompleted) stopFoxyEgg();
+    else startFoxyEgg();
+  }
+}
+
+/* ============================================================
+   TOGGLE HIDDEN
+   ============================================================ */
+function toggleHidden(id, e) {
+  if (e) e.stopPropagation();
+  if (completedSet.has(id) && !hiddenSet.has(id)) {
+    showToast('Primero quita completado');
+    return;
+  }
+  if (hiddenSet.has(id)) {
+    hiddenSet.delete(id);
+  } else {
+    hiddenSet.add(id);
+    completedSet.delete(id);
+  }
+  saveProgress();
+  saveHiddenMasteries();
+  showToast('Guardado');
+  renderGrid(document.getElementById('search-input').value);
+  updateDetailHideButton();
 }
 
 /* ============================================================
@@ -2313,6 +2566,7 @@ function openDetail(id) {
   const mastery = MASTERIES.find(m => m.id === id);
   if (!mastery) return;
   stopStickEgg();
+  stopFoxyEgg();
   detailOpen = mastery;
 
   // Title
@@ -2364,7 +2618,19 @@ function openDetail(id) {
   // Show
   document.getElementById('detail-view').classList.add('open');
   document.body.style.overflow = 'hidden';
+  updateDetailHideButton();
   if (mastery.id === 'stick') startStickEgg();
+}
+
+function updateDetailHideButton() {
+  const button = document.getElementById('detail-hide-btn');
+  if (!button || !detailOpen) return;
+  const isHidden = hiddenSet.has(detailOpen.id);
+  const isCompleted = completedSet.has(detailOpen.id);
+  button.classList.toggle('active', isHidden);
+  button.disabled = isCompleted && !isHidden;
+  button.textContent = '(ocultar)';
+  button.title = isHidden ? 'Mostrar maestría' : 'Ocultar maestría';
 }
 
 /* ============================================================
@@ -2372,6 +2638,7 @@ function openDetail(id) {
    ============================================================ */
 function closeDetail() {
   stopStickEgg();
+  stopFoxyEgg();
   document.getElementById('detail-view').classList.remove('open');
   document.body.style.overflow = '';
   detailOpen = null;
@@ -2545,6 +2812,10 @@ function handleGloveError(img) {
 function setupEventDelegation() {
   // Grid: click en botones de tarjeta
   document.getElementById('masteries-grid').addEventListener('click', function(e) {
+    const card = e.target.closest('.mastery-card');
+    if (card && card.dataset.id) {
+      dismissNewRibbon(card.dataset.id, card);
+    }
     if (_detailClosing) return;   // ignorar el click que acaba de cerrar el detalle
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -2553,6 +2824,7 @@ function setupEventDelegation() {
     const id     = btn.dataset.id;
     if (action === 'open')         openDetail(id);
     if (action === 'toggle')       toggleCompleted(id);
+    if (action === 'toggle-hide')  toggleHidden(id);
   });
 
   // Detail: misiones
@@ -2561,6 +2833,14 @@ function setupEventDelegation() {
     if (!el) return;
     if (el.dataset.action === 'toggle-mission') {
       toggleMission(el.dataset.mastery, parseInt(el.dataset.index));
+    }
+  });
+
+  document.getElementById('detail-left').addEventListener('click', function(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    if (el.dataset.action === 'toggle-hide-detail' && detailOpen) {
+      toggleHidden(detailOpen.id, e);
     }
   });
 
@@ -2577,8 +2857,11 @@ function setupEventDelegation() {
    KEYBOARD: ESC to close
    ============================================================ */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && detailOpen) closeDetail();
-  if (e.key === 'Escape' && document.getElementById('video-modal-overlay').classList.contains('open')) closeVideoModal();
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('image-modal-overlay').classList.contains('open')) { closeImageModal(); return; }
+  if (document.getElementById('video-modal-overlay').classList.contains('open')) { closeVideoModal(); return; }
+  if (foxyVideoActive) { stopFoxyEgg(); return; }
+  if (detailOpen) closeDetail();
 });
 
 /* ============================================================
@@ -2670,6 +2953,30 @@ function closeVideoModal() {
   document.body.style.overflow = '';
 }
 
+function openImageModal(src, title) {
+  const overlay = document.getElementById('image-modal-overlay');
+  const frame   = document.getElementById('image-modal-frame');
+  const image   = document.getElementById('image-modal-img');
+  const titleEl = document.getElementById('image-modal-title');
+  if (!overlay || !frame || !image || !titleEl) return;
+
+  image.src = src || 'preview_placeholder.png';
+  titleEl.textContent = title ? String(title) : '';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+  const overlay = document.getElementById('image-modal-overlay');
+  const image   = document.getElementById('image-modal-img');
+  if (image) image.src = '';
+  if (overlay) overlay.classList.remove('open');
+  const videoOpen = document.getElementById('video-modal-overlay').classList.contains('open');
+  if (!detailOpen && !videoOpen && !foxyVideoActive) {
+    document.body.style.overflow = '';
+  }
+}
+
 /* ============================================================
    START
    ============================================================ */
@@ -2678,3 +2985,5 @@ init();
 
 </body>
 </html>
+
+
