@@ -282,6 +282,26 @@ body {
 }
 .mastery-card.completed .mastered-ribbon { opacity: 1; }
 
+.new-ribbon {
+  position: absolute;
+  top: 12px; right: -26px;
+  background: linear-gradient(180deg, #57ff7a, #20c85a);
+  color: #061a0a;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  padding: 4px 36px;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  opacity: 1;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 2;
+}
+.mastery-card:hover .new-ribbon {
+  opacity: 0;
+  transform: rotate(45deg) scale(0.92);
+}
+
 .completed-badge {
   position: absolute;
   top: 8px; right: 8px;
@@ -1780,6 +1800,7 @@ const MASTERIES = [
   {
     id: "stick",
     name: "Stick",
+    isNew: true,
     previewUrl: "",
     description: "MINECRAFT",
     upgrades: [
@@ -1797,6 +1818,7 @@ const MASTERIES = [
   {
     id: "shard",              // ← sin espacios, solo minúsculas/números
     name: "Shard",   // ← tal como aparece en el juego
+    isNew: true,
     description: "Si hay 'guerra sin ningún motivo', simplemente [+PARRY] y solucionado.",
     upgrades: [
       "Golpea tus shards para aplicarle efecto de fuego",
@@ -1817,6 +1839,7 @@ const MASTERIES = [
   {
     id: "phase",              // ← sin espacios, solo minúsculas/números
     name: "Phase",   // ← tal como aparece en el juego
+    isNew: true,
     description: "Siempre prioriza el alma antes que el cuerpo; adéntrate en la oscuridad y aprende sus trucos.",
     upgrades: [
       "[R] Cancela el vuelo en cualquier momento.",
@@ -1836,6 +1859,7 @@ const MASTERIES = [
   {
     id: "tycoon",              // ← sin espacios, solo minúsculas/números
     name: "Tycoon",   // ← tal como aparece en el juego
+    isNew: true,
     description: "Magnate de 2 jugadores de capitalismo imperial.",
     upgrades: [
       "El tycoon es mucho más grande.",
@@ -1854,6 +1878,7 @@ const MASTERIES = [
   {
     id: "hive",              // ← sin espacios, solo minúsculas/números
     name: "Hive",   // ← tal como aparece en el juego
+    isNew: true,
     description: "El castigo de ser atacado por miles de abejas es doloroso, pero más lo es ver Bee Movie en x0.5 de velocidad.",
     upgrades: [
       "Las piscinas de miel son un 50% más grandes.",
@@ -1874,6 +1899,7 @@ const MASTERIES = [
   {
     id: "defense",              // ← sin espacios, solo minúsculas/números
     name: "Defense",   // ← tal como aparece en el juego
+    isNew: true,
     description: "El cubo de la justicia solo permite el paso a conocidos; dentro de tu dominio eres imparable.",
     upgrades: [
       "La barrera es mas grande.",
@@ -1894,6 +1920,7 @@ const MASTERIES = [
   {
     id: "carkeys",              // ← sin espacios, solo minúsculas/números
     name: "Car Keys",   // ← tal como aparece en el juego
+    isNew: true,
     description: "Conduciendo en mi coche tras un botellón, bebí tanto que ese bache parece un ciervo.",
     upgrades: [
       "Ganas un 25% más de experiencia.",
@@ -1941,6 +1968,7 @@ const MASTERIES = [
    ============================================================ */
 const STORAGE_KEY_PROGRESS  = 'slap_battles_progress_v2';
 const STORAGE_KEY_COMPLETED = 'slap_battles_completed_v2';
+const STORAGE_KEY_SEEN_MASTERY_IDS = 'slap_battles_seen_masteries_v1';
 
 function saveProgress() {
   try {
@@ -1972,6 +2000,26 @@ function loadProgress() {
   } catch(e) { console.warn('No se pudo cargar progreso:', e); }
 }
 
+function loadSeenMasteries() {
+  try {
+    const rawSeen = localStorage.getItem(STORAGE_KEY_SEEN_MASTERY_IDS);
+    if (rawSeen) {
+      const seenIds = JSON.parse(rawSeen);
+      if (Array.isArray(seenIds)) return new Set(seenIds.filter(id => MASTERIES.some(m => m.id === id)));
+    }
+  } catch(e) { console.warn('No se pudo cargar maestrías vistas:', e); }
+
+  const initialSeen = new Set(MASTERIES.map(m => m.id));
+  saveSeenMasteries(initialSeen);
+  return initialSeen;
+}
+
+function saveSeenMasteries(seenSet) {
+  try {
+    localStorage.setItem(STORAGE_KEY_SEEN_MASTERY_IDS, JSON.stringify(Array.from(seenSet)));
+  } catch(e) { console.warn('No se pudo guardar maestrías vistas:', e); }
+}
+
 function resetAllProgress() {
   if (!confirm('¿Seguro que quieres borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
   progressData = {};
@@ -1997,11 +2045,22 @@ function showToast(msg) {
   toast._t = setTimeout(() => toast.classList.remove('visible'), 2000);
 }
 
+function applyPreviewPlaceholder(img, fit = 'contain') {
+  if (!img || img.dataset.previewFallback === '1') return;
+  img.dataset.previewFallback = '1';
+  img.onload = null;
+  img.onerror = null;
+  img.src = 'preview_placeholder.png';
+  img.style.objectFit = fit;
+  img.style.background = '#111';
+}
+
 /* ============================================================
    ESTADO EN MEMORIA
    ============================================================ */
 let progressData   = {};
 let completedSet   = new Set();
+let seenMasteries  = new Set();
 let detailOpen     = null;
 let _detailClosing = false;
 let stickLoopAudio = null;
@@ -2018,6 +2077,16 @@ function getGloveEmoji(id) {
     engineer:'🤖', flash:'⚡', booster:'🚀', space:'🌌', dice:'🎲', chain:'⛓️'
   };
   return map[id] || '🥊';
+}
+
+function isNewMastery(id) {
+  return !seenMasteries.has(id);
+}
+
+function markMasterySeen(id) {
+  if (seenMasteries.has(id)) return;
+  seenMasteries.add(id);
+  saveSeenMasteries(seenMasteries);
 }
 
 function stopStickEgg() {
@@ -2090,6 +2159,7 @@ function init() {
   });
   // Cargar datos guardados encima
   loadProgress();
+  seenMasteries = loadSeenMasteries();
   renderGrid();
   updateStats();
   setupEventDelegation();
@@ -2160,6 +2230,7 @@ function filterMasteries() {
 function createCard(mastery) {
   const isDone = completedSet.has(mastery.id);
   const pct    = getMasteryProgress(mastery);
+  const isNew  = isNewMastery(mastery.id);
 
   const card = document.createElement('div');
   card.className = 'mastery-card' + (isDone ? ' completed' : '');
@@ -2170,8 +2241,9 @@ function createCard(mastery) {
       <img class="card-banner-img"
            src="banner_${mastery.id}.png"
            alt="${mastery.name}"
-           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+           onerror="if(this.dataset.previewFallback==='1'){this.style.display='none'; this.nextElementSibling.style.display='flex';}else{this.dataset.previewFallback='1'; this.onerror=null; this.src='preview_placeholder.png'; this.style.objectFit='contain'; this.style.background='#111';}">
       <div class="card-banner-fallback" style="display:none">${getGloveEmoji(mastery.id)}</div>
+      ${isNew ? '<div class="new-ribbon">NEW</div>' : ''}
       <div class="mastered-ribbon">MASTERED</div>
       <div class="completed-badge">✓</div>
     </div>
@@ -2196,6 +2268,16 @@ function createCard(mastery) {
       </button>
     </div>
   `;
+
+  if (isNew) {
+    card.addEventListener('mouseenter', () => {
+      if (isNewMastery(mastery.id)) {
+        markMasterySeen(mastery.id);
+        const ribbon = card.querySelector('.new-ribbon');
+        if (ribbon) ribbon.remove();
+      }
+    }, { once: true });
+  }
 
   return card;
 }
@@ -2241,13 +2323,12 @@ function openDetail(id) {
   const bannerPH  = document.getElementById('detail-banner-placeholder');
   bannerPH.style.display  = 'none';
   bannerImg.style.display = 'block';
+  bannerImg.dataset.previewFallback = '0';
   bannerImg.onload  = null;
   bannerImg.onerror = null;
   bannerImg.onerror = () => {
-    bannerImg.style.display = 'none';
-    bannerPH.style.display  = 'flex';
-    const ph = document.getElementById('ph-banner-text');
-    if (ph) ph.textContent = 'Sin banner disponible';
+    applyPreviewPlaceholder(bannerImg, 'contain');
+    bannerPH.style.display  = 'none';
   };
   bannerImg.src = 'banner_' + mastery.id + '.png';
 
@@ -2255,17 +2336,14 @@ function openDetail(id) {
   const gloveWrap = document.getElementById('detail-glove-img-wrap');
   const gloveImg  = document.getElementById('detail-glove-img');
   const glovePH   = document.getElementById('detail-glove-placeholder');
+  gloveImg.dataset.previewFallback = '0';
   gloveImg.onload  = null;
   gloveImg.onerror = null;
   gloveImg.style.display   = 'block';
   if (glovePH) glovePH.classList.remove('show');
   gloveImg.onerror = () => {
-    gloveImg.style.display  = 'none';
-    if (glovePH) {
-      const emoji = document.getElementById('detail-glove-placeholder-emoji');
-      if (emoji) emoji.textContent = getGloveEmoji(mastery.id);
-      glovePH.classList.add('show');
-    }
+    applyPreviewPlaceholder(gloveImg, 'contain');
+    if (glovePH) glovePH.classList.remove('show');
   };
   gloveImg.src = 'glove_' + mastery.id + '.png';
 
