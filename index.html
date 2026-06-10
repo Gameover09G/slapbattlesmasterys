@@ -601,6 +601,27 @@ body {
   to   { opacity: 1; transform: scale(1.02); }
 }
 
+/* ============================================================
+   FOXY FULLSCREEN VIDEO
+   ============================================================ */
+#foxy-video-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 910;
+  background: #000;
+  pointer-events: none;
+}
+#foxy-video-overlay.show {
+  display: block;
+}
+#foxy-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* upgrades */
 #detail-upgrades-wrap { flex-shrink: 0; }
 #detail-upgrades-list {
@@ -1296,10 +1317,12 @@ body {
    ╚══════════════════════════════════════════════════════════╝ */
 
 const CHANGELOG = [
-  "10/06/2026",                                              // <-- FECHA / VERSIÓN (variable 1)
-  "Arreglado algunas misiones incorrectas",
-  "Palo",
-  "Re-hecho todo Ultra instinct ya que no sabia que havia un rework del guante."
+  "10/06/2026, upd 2 del dia",                                              // <-- FECHA / VERSIÓN (variable 1)
+  "He agregado 6 nuevas maestrias en total",
+  "Se ha agregado para futuras actualizaciones la capacidad de colocar videos para visualizar las maestrias",
+  "Arreglado un bug que palo no se podia agregar a completado, probadlo a ver si ya funciona",
+  "Andy es un 0.00001% mas inteligente"
+
   
   // Agrega más entradas aquí si lo necesitas
 ];
@@ -1389,9 +1412,10 @@ const MASTERIES = [
       "Aún requieres de técnica: cuanto mejor lo lanzes, más rápido irá y más veces acertará."
     ],
     missions: [
-      { text: "Obtén el logro Brick Master",               target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/2127567042/Brick-Master" },
-      { text: "Haz que 1000 personas tropiecen (Trip)",   target: 1000, isBool: false },
-      { text: "Lanza un ladrillo a 200 km/h",             target: 200,  isBool: false }
+      { text: "Obtén el logro Brick Master",                                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/2127567042/Brick-Master" },
+      { text: "Haz que 1000 personas tropiecen (Trip)",                           target: 1000, isBool: false },
+      { text: "Lanza un ladrillo a 200 km/h",                                     target: 200,  isBool: false },
+      { text: "Haz que 300 se tropiecen con ladrillos en movimiento",             target: 300,  isBool: false },
     ]
   },
 
@@ -1769,6 +1793,119 @@ const MASTERIES = [
     ]
   },
 
+  // ── SHARD ────────────────────────────────────────────────
+  {
+    id: "shard",              // ← sin espacios, solo minúsculas/números
+    name: "Shard",   // ← tal como aparece en el juego
+    description: "Si hay 'guerra sin ningún motivo', simplemente [+PARRY] y solucionado.",
+    upgrades: [
+      "Golpea tus shards para aplicarle efecto de fuego",
+      "Los shards de fuego tienen menos alcance pero mas knockback y velocidad.",
+      "[+PARRY].",
+      "Los shards normales relentizan mucho mas"
+    ],
+    missions: [
+      { text: "Haz un combo de slap y shard 500 veces",  target: 500, isBool: false },
+      { text: "Golpea a 1000 personas usando shards",          target: 1000,   isBool: false},
+      { text: "Lanza shards a personas desde más de 150 studs un total de 250 veces.",  target: 250, isBool: false },
+      { text: "Apaga el fuego de 75 overkills.",  target: 75, isBool: false },
+      { text: "Golpea a 350 personas relentizadas.",  target: 350, isBool: false }
+    ]
+  },
+
+  // ── PHASE ────────────────────────────────────────────────
+  {
+    id: "phase",              // ← sin espacios, solo minúsculas/números
+    name: "Phase",   // ← tal como aparece en el juego
+    description: "Siempre prioriza el alma antes que el cuerpo; adéntrate en la oscuridad y aprende sus trucos.",
+    upgrades: [
+      "[R] Cancela el vuelo en cualquier momento.",
+      "Golpea nada más salir del estado permeable; golpea a los enemigos.",
+      "Velocidad del estado permeable augmentada.",
+      "Duras más tiempo transformado.",
+      "Salta mientras estás transformado para subir, pero ve con cuidado que no puedes bajar."
+    ],
+    missions: [
+      { text: "Transformate tras golpear a alguien 500 veces.",  target: 500, isBool: false },
+      { text: "Visita todas las islas en menos de 200 segundos tras entrar por el portal.",          target: 1,   isBool: true,},
+      { text: "Golpea a 500 personas en menos de 2 segundos tras destransformarte.",  target: 500, isBool: false }
+    ]
+  },
+
+  // ── TYCOON ────────────────────────────────────────────────
+  {
+    id: "tycoon",              // ← sin espacios, solo minúsculas/números
+    name: "Tycoon",   // ← tal como aparece en el juego
+    description: "Magnate de 2 jugadores de capitalismo imperial.",
+    upgrades: [
+      "El tycoon es mucho más grande.",
+      "Puedes comprar mejoras para hacerte tu propia base a cambio de dinero de tu Tycoon.",
+      "Obtén mejoras tanto decorativas como defensivas.",
+      "Comprar mejoras te quita dinero, y con eso también las mejoras de tu tycoon básico si tu cartera baja sobre el dinero requerido para ellas."
+    ],
+    missions: [
+      { text: "Golpea a 500 personas mientras están cerca de tu tycoon.",  target: 500, isBool: false },
+      { text: "Consigue 15k de dinero con tu tycoon situada en la isla principal.",          target: 15000,   isBool: false},
+      { text: "Mata 200 personas mientras tu tycoon está en la mejora de DIOS.",  target: 200, isBool: false }
+    ]
+  },
+
+  // ── HIVE ────────────────────────────────────────────────
+  {
+    id: "hive",              // ← sin espacios, solo minúsculas/números
+    name: "Hive",   // ← tal como aparece en el juego
+    description: "El castigo de ser atacado por miles de abejas es doloroso, pero más lo es ver Bee Movie en x0.5 de velocidad.",
+    upgrades: [
+      "Las piscinas de miel son un 50% más grandes.",
+      "Vas más rápido si viajas por encima de tu miel.",
+      "Los jugadores con miel irán soltando gotas de miel en el suelo.",
+      "Tu guante se regenera 0.5 s más rápido.",
+      "[R] Lanza granadas de abejas que aplican efecto de enjambre en contacto a cualquier persona que se acerque a la zona donde ha caido la granada."
+    ],
+    missions: [
+      { text: "Mata a 50 personas mientras tienen un enjambre.",  target: 50, isBool: false },
+      { text: "Aplica un enjambre a 5 personas a la vez con un solo uso de la habilidad.",          target: 1,   isBool: true},
+      { text: "Aplica enjambre a 750 personas.",  target: 750, isBool: false },
+      { text: "Llena 1250 personas con miel.",  target: 1250, isBool: false }
+    ]
+  },
+
+  // ── DEFENSE ────────────────────────────────────────────────
+  {
+    id: "defense",              // ← sin espacios, solo minúsculas/números
+    name: "Defense",   // ← tal como aparece en el juego
+    description: "El cubo de la justicia solo permite el paso a conocidos; dentro de tu dominio eres imparable.",
+    upgrades: [
+      "La barrera es mas grande.",
+      "El cubo tiene tu hermosa cara.",
+      "Mientras estás dentro, su tamaño no disminuye.",
+      "Permite a tus amigos entrar, o incluso a todo el mundo; cámbialo saltando dos veces.",
+      "[R] Usa tu habilidad para viajar rápidamente a tu cubo."
+    ],
+    missions: [
+      { text: "Golpea a 20 personas en menos de 100 segundos tras entrar a la arena.",  target: 1, isBool: true },
+      { text: "Mata a 250 jugadores mientras están cerca de tu cubo.",          target: 1,   isBool: false},
+      { text: "Golpea a 600 jugadores que están demasiado cerca de tu cubo.",  target: 600, isBool: false },
+      { text: "Lanza 400 personas a las paredes de tu cubo.",  target: 400, isBool: false }
+    ]
+  },
+
+  // ── Car Keys ────────────────────────────────────────────────
+  {
+    id: "carkeys",              // ← sin espacios, solo minúsculas/números
+    name: "Car Keys",   // ← tal como aparece en el juego
+    description: "Conduciendo en mi coche tras un botellón, bebí tanto que ese bache parece un ciervo.",
+    upgrades: [
+      "Ganas un 25% más de experiencia.",
+      "Puedes mejorar todavía más cada estadística.",
+      "[R] Cuando mejoras un atributo al máximo, desbloqueas una habilidad activa, pero solo puedes elegir una."
+    ],
+    missions: [
+      { text: "Maxea tus estadisticas 5 vezes.",  target: 5, isBool: false },
+      { text: "Gana 100000XP en total",          target: 100000,   isBool: false},
+      { text: "Atropella a 750 personas con tu coche.",  target: 750, isBool: false }
+    ]
+  },
   /* ============================================================
      ╔══════════════════════════════════════════════════════════╗
      ║            PLANTILLA — NUEVA MAESTRÍA                   ║
@@ -1777,6 +1914,7 @@ const MASTERIES = [
      ║  todos los campos. Guarda el archivo y recarga.         ║
      ╚══════════════════════════════════════════════════════════╝
 
+  // ── NOMBRE DEL GUANTE ────────────────────────────────────────────────
   {
     id: "nombreid",              // ← sin espacios, solo minúsculas/números
     name: "Nombre del Guante",   // ← tal como aparece en el juego
