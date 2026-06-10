@@ -1112,6 +1112,7 @@ body {
   height: 100%;
   display: block;
   background: #000;
+  border: none;
 }
 
 #video-placeholder {
@@ -1262,7 +1263,7 @@ body {
       <button id="btn-close-video" onclick="closeVideoModal()" title="Cerrar">✕</button>
     </div>
     <div id="video-modal-body">
-      <video id="video-player" controls autoplay></video>
+      <iframe id="video-player" allowfullscreen allow="autoplay; encrypted-media" frameborder="0"></iframe>
       <div id="video-placeholder">
         <img id="video-placeholder-img" src="preview_placeholder.png" alt="Sin preview">
         <span class="vph-emoji">🎬</span>
@@ -1380,6 +1381,7 @@ const MASTERIES = [
   {
     id: "brick",
     name: "Brick",
+    previewUrl: "https://youtu.be/ElOxj3XPezk",
     description: "¿Cansado de fallar tus lanzamientos de ladrillo? No te preocupes, con tanta práctica ¡el ladrillo ha ganado memoria muscular!",
     upgrades: [
       "Los ladrillos dejan un rastro blanco al volar.",
@@ -1397,6 +1399,7 @@ const MASTERIES = [
   {
     id: "spin",
     name: "Spin",
+    previewUrl: "",
     description: "10 horas girando. Diez. Horas. No hay palabras para describir tu dedicación (ni tu mareo).",
     upgrades: [
       "La velocidad de giro aumenta significativamente.",
@@ -1413,6 +1416,7 @@ const MASTERIES = [
   {
     id: "ultrainstinct",
     name: "Ultra Instinct",
+    previewUrl: "",
     description: "Has esquivado tantos golpes que tu cuerpo actúa solo. La verdadera Ultra Instinct no se piensa — simplemente ocurre.",
     upgrades: [
       "Tu barra de esquive se duplica, con un máximo de 80% de esquive.",
@@ -1429,6 +1433,7 @@ const MASTERIES = [
   {
     id: "bus",
     name: "Bus",
+    previewUrl: "",
     description: "El autobús no discrimina. Ahora tampoco discrimina la dirección en la que ataca.",
     upgrades: [
       "Los buses salen desde todas las direcciones.",
@@ -1446,6 +1451,7 @@ const MASTERIES = [
   {
     id: "flash",
     name: "Flash",
+    previewUrl: "",
     description: "Undo. La velocidad sin consecuencias. Teletransportarte ya no te deja vulnerable — ahora es un arte.",
     upgrades: [
       "[R] activa Undo después de teletransportarte, pero asegúrate de acertar el golpe para poder usarlo.",
@@ -1462,6 +1468,7 @@ const MASTERIES = [
   {
     id: "glovel",
     name: "Glovel",
+    previewUrl: "",
     description: "En busca de tesoros, te encuentras con el verdadero motivo de todo, una pala dorada que ya no tiene críticos mejorados.",
     upgrades: [
       "[R] activa el Market Gardening: sal volando con poco control de a dónde vas..",
@@ -1478,6 +1485,7 @@ const MASTERIES = [
   {
     id: "dice",
     name: "Dice",
+    previewUrl: "",
     description: "Si no puedes abandonar tus hábitos ludópatas, ¿por qué no llevártelos a tamaño real?",
     upgrades: [
       "[R] lanza un dado gigante que aplasta a los jugadores cercanos.",
@@ -1495,6 +1503,7 @@ const MASTERIES = [
   {
     id: "chain",
     name: "Chain",
+    previewUrl: "",
     description: "Encadenado. Literalmente. Ahora puedes atar a varios enemigos a la vez y dominarlos a todos.",
     upgrades: [
       "[E] Lanza un orbe tesla que electrocuta a quien toca",
@@ -1512,6 +1521,7 @@ const MASTERIES = [
   {
     id: "obby",
     name: "Obby",
+    previewUrl: "",
     description: "Has construido tantos obstáculos que ya puedes hacerlo incluso en el aire. Tu mente de ingeniero no tiene límites.",
     upgrades: [
       "Puedes colocar partes en el aire.",
@@ -1529,6 +1539,7 @@ const MASTERIES = [
   {
     id: "cloud",
     name: "Cloud",
+    previewUrl: "",
     description: "\"The One Piece is real\" — y tu nube también lo es. Más grande, más rápida y con asientos extra para tus amigos (o enemigos).",
     upgrades: [
       "La nube se vuelve más grande y gana un tercer asiento.",
@@ -1547,6 +1558,7 @@ const MASTERIES = [
   {
     id: "wormhole",
     name: "Wormhole",
+    previewUrl: "",
     description: "Sé uno con los portales, y los portales lo serán contigo. Controla los portales aunque no puedas hacerlo con la salida de Portal 3.",
     upgrades: [
       "[R] te teletransporta al portal más cercano.",
@@ -1564,6 +1576,7 @@ const MASTERIES = [
   {
     id: "killstreak",
     name: "Killstreak",
+    previewUrl: "",
     description: "Cien almas. Mil víctimas. Y aún tienes hambre. Tu sed de poder no conoce límites.",
     upgrades: [
       "Puedes almacenar hasta 10 almas sin perderlas al morir.",
@@ -1581,6 +1594,7 @@ const MASTERIES = [
   {
     id: "run",
     name: "Run",
+    previewUrl: "",
     description: "Terry. Ese es el nombre de la leyenda en la que te has convertido, rompiendo las cadenas de las catacumbas.",
     upgrades: [
       "[R] te transforma en TERRY durante 3 segundos en la Arena.",
@@ -1597,6 +1611,7 @@ const MASTERIES = [
   {
     id: "bomb",
     name: "Bomb",
+    previewUrl: "",
     description: "¿Una bomba normal? No, tú eres el maestro de la detonación. La Reversal Bomb lo cambia todo.",
     upgrades: [
       "La bomba flota más rápido.",
@@ -1614,6 +1629,7 @@ const MASTERIES = [
   {
     id: "rob",
     name: "Rob",
+    previewUrl: "",
     description: "Rob odia a bob. Pero Rob no odia el poder, odia que Bob lo posea. Obtenerlo tú es clave, que no te recorten tus alas.",
     upgrades: [
       "La maestria empieza al igual que su forma normal.",
@@ -1633,6 +1649,7 @@ const MASTERIES = [
   {
     id: "moai",
     name: "🗿 (Moai)",
+    previewUrl: "",
     description: "\"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
     upgrades: [
       "La estatua 🗿 puede ser movida golpeándola.",
@@ -1649,6 +1666,7 @@ const MASTERIES = [
   {
     id: "fort",
     name: "Fort",
+    previewUrl: "",
     description: "Ya no le tienes miedo a los tryhards; ahora eres parte de ellos. Felicidades por convertirte en un sudoroso.",
     upgrades: [
       "[R] construye escaleras.",
@@ -1667,6 +1685,7 @@ const MASTERIES = [
   {
     id: "engineer",
     name: "Engineer",
+    previewUrl: "",
     description: "Puede que, tras esta tortura de maestría, hacerte una ingeniería de verdad te sea más fácil.",
     upgrades: [
       "Tu centinela gana inmunidad al stun.",
@@ -1684,6 +1703,7 @@ const MASTERIES = [
   {
     id: "booster",
     name: "Booster",
+    previewUrl: "",
     description: "La NASA te observa, usa con precaucion.",
     upgrades: [
       "[E] activa Strap In: adjunta dos propulsores a un jugador durante ~7 segundos.",
@@ -1698,6 +1718,7 @@ const MASTERIES = [
   {
     id: "space",
     name: "Space",
+    previewUrl: "",
     description: "El vacío del espacio te llama. Y ahora tú puedes arrastrar a otros hacia él.",
     upgrades: [
       "Cooldown de la habilidad reducido de 15s a 10s.",
@@ -1716,6 +1737,7 @@ const MASTERIES = [
   {
     id: "redacted",
     name: "[REDACTED]",
+    previewUrl: "",
     description: "Arxivo RDC-73D, el portal de █████ muestra señales de peligrosidad, ████ ██ ██ ██████, y ██ ███████. Cualquier cosa que estés buscando, vale la pena.",
     upgrades: [
       "Los portales atraen a personas desde más lejos.",
@@ -1734,6 +1756,7 @@ const MASTERIES = [
   {
     id: "stick",
     name: "Stick",
+    previewUrl: "",
     description: "MINECRAFT",
     upgrades: [
       "Palo ser morado.",
@@ -2346,42 +2369,65 @@ document.addEventListener('keydown', e => {
    VIDEO PREVIEW MODAL
    ============================================================ */
 function openVideoModal(gloveId) {
-  const overlay    = document.getElementById('video-modal-overlay');
-  const player     = document.getElementById('video-player');
+  const overlay     = document.getElementById('video-modal-overlay');
+  const player      = document.getElementById('video-player');
   const placeholder = document.getElementById('video-placeholder');
-  const phImg      = document.getElementById('video-placeholder-img');
-  const phEmoji    = document.querySelector('#video-placeholder .vph-emoji');
-  const titleEl    = document.getElementById('video-modal-title');
-  const mastery    = MASTERIES.find(m => m.id === gloveId);
+  const phImg       = document.getElementById('video-placeholder-img');
+  const phEmoji     = document.querySelector('#video-placeholder .vph-emoji');
+  const titleEl     = document.getElementById('video-modal-title');
+  const mastery     = MASTERIES.find(m => m.id === gloveId);
 
   titleEl.textContent = '▶ PREVIEW — ' + (mastery ? mastery.name.toUpperCase() : gloveId.toUpperCase());
 
-  // Reset state
-  player.style.display      = 'block';
+  // Reset
+  player.src = '';
+  player.style.display      = 'none';
   placeholder.style.display = 'none';
-  player.pause();
-  player.removeAttribute('src');
-  player.load();
 
-  // Probar si el .mp4 existe con fetch (anti-error silencioso)
-  const videoSrc = 'preview_' + gloveId + '.mp4';
-  fetch(videoSrc, { method: 'HEAD' })
-    .then(res => {
-      if (res.ok) {
-        player.src = videoSrc;
-        player.style.display      = 'block';
-        placeholder.style.display = 'none';
-        player.play().catch(() => {}); // autoplay puede bloquearse
-      } else {
-        showVideoPlaceholder(player, placeholder, phImg, phEmoji);
-      }
-    })
-    .catch(() => {
+  const url = mastery && mastery.previewUrl ? mastery.previewUrl.trim() : '';
+
+  if (url) {
+    const embedUrl = youtubeToEmbed(url);
+    if (embedUrl) {
+      player.src            = embedUrl;
+      player.style.display  = 'block';
+    } else {
       showVideoPlaceholder(player, placeholder, phImg, phEmoji);
-    });
+    }
+  } else {
+    showVideoPlaceholder(player, placeholder, phImg, phEmoji);
+  }
 
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+/* Convierte cualquier URL de YouTube a su versión embed con autoplay */
+function youtubeToEmbed(url) {
+  try {
+    // Formatos soportados:
+    //   https://www.youtube.com/watch?v=ID
+    //   https://youtu.be/ID
+    //   https://www.youtube.com/embed/ID   (ya embed)
+    //   https://youtube.com/shorts/ID
+    let id = null;
+    const u = new URL(url);
+    if (u.hostname.includes('youtu.be')) {
+      id = u.pathname.slice(1).split('/')[0];
+    } else if (u.hostname.includes('youtube.com')) {
+      if (u.pathname.startsWith('/embed/')) {
+        id = u.pathname.split('/embed/')[1].split('/')[0];
+      } else if (u.pathname.startsWith('/shorts/')) {
+        id = u.pathname.split('/shorts/')[1].split('/')[0];
+      } else {
+        id = u.searchParams.get('v');
+      }
+    }
+    if (!id) return null;
+    return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+  } catch {
+    return null;
+  }
 }
 
 function showVideoPlaceholder(player, placeholder, phImg, phEmoji) {
@@ -2403,8 +2449,7 @@ function showVideoPlaceholder(player, placeholder, phImg, phEmoji) {
 function closeVideoModal() {
   const overlay = document.getElementById('video-modal-overlay');
   const player  = document.getElementById('video-player');
-  player.pause();
-  player.src = '';
+  player.src = '';   // detiene el video / audio de YouTube
   overlay.classList.remove('open');
   document.body.style.overflow = '';
 }
