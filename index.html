@@ -59,6 +59,17 @@ body {
 ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--yellow-dark); }
 
+/* ── Mastery date ── */
+#detail-date-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.72rem;
+  color: #3a3a3a;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+  min-height: 0;
+}
+#detail-date-text:empty { display: none; }
+
 /* ============================================================
    ANIMATIONS
    ============================================================ */
@@ -633,6 +644,13 @@ body {
   color: var(--text-light);
   line-height: 1.55;
   font-style: italic;
+}
+#detail-date-text {
+  font-size: 0.78rem;
+  color: #8a8a8a;
+  line-height: 1.3;
+  font-style: italic;
+  margin-top: -2px;
 }
 
 .detail-hide-wrap {
@@ -2286,6 +2304,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
           <div id="detail-glove-name">Nombre del Guante</div>
           <div class="detail-section-label">DESCRIPCIÓN</div>
           <div id="detail-description-text"></div>
+          <div id="detail-date-text"></div>
           <div class="detail-hide-wrap">
             <button id="detail-hide-btn"
                     class="detail-hide-btn"
@@ -2483,6 +2502,7 @@ const CHANGELOGS = [
       { emoji: "✨", color: "#FFD700",  text: "Procrastinador final boss: he agregado 2 maestrias y subido el banner de las que faltavan" },
       { emoji: "📰", color: "#FFffff",  text: "Juntamente al boton de changelog, tambien hay un 'To do list', alli puedes agregar las maestrias que quieras y ordenarlas, y pulsando un boton se eliminan de la lista y se marcan como completadas." },
       { emoji: "🔐", color: "#5e5e5e",  text: "Para ya marcar todas las maestrias, ahora estan TODAS, pero solo puedes ver las misiones de las que estan ya programadas, las otras solo estan bloqueadas con candado. Esto servira para marcar maestrias futuras antes de que salgan." },
+      { emoji: "📆", color: "#a78bfa",  text: "Un pequeño detalle extra, debajo de las descripciones ahora salen en que dia salio la maestria, para que te vayas notando mas viejo poco a poco" },
     ]
   },
   
@@ -2627,7 +2647,8 @@ function updateFabVisibility() {
    {
      id:          string  → único, minúsculas, sin espacios (sirve para nombres de imagen)
      name:        string  → nombre tal como aparece en el juego
-     description: string  → texto de descripción de la maestría
+     date: "",
+    description: string  → texto de descripción de la maestría
      locked:      bool    → true si la maestría está bloqueada (no se puede completar)
      upgrades:    string[] → lista de mejoras que otorga la maestría
      missions: [
@@ -2654,6 +2675,7 @@ const MASTERIES = [
     id: "brick",
     name: "Brick",
     previewUrl: "https://youtu.be/ElOxj3XPezk",
+    date: "17/01/2025",
     description: "¿Cansado de fallar tus lanzamientos de ladrillo? No te preocupes, con tanta práctica ¡el ladrillo ha ganado memoria muscular!",
     upgrades: [
       "Los ladrillos dejan un rastro blanco al volar.",
@@ -2674,34 +2696,12 @@ const MASTERIES = [
     locked: false
   },
 
-  // ── SPIN ──────────────────────────────────────────────────────
-  {
-    id: "spin",
-    name: "Spin",
-    previewUrl: "",
-    description: "¡ESTO ES UNA REVELACIÓN! SPIN AHORA ROTA… ¡¡¡¡MÁS RÁPIDO!!!!!",
-    upgrades: [
-      "La velocidad de giro aumenta significativamente.",
-      "Asciendes lentamente mientras giras.",
-      "Los slaps ocurren automáticamente.",
-      "El poder de slap aumenta a ~50."
-    ],
-    missions: [
-      { text: "Gira durante 36,000 segundos (10 horas)", target: 36000, isBool: false }
-    ]
-  ,
-    difficulty: 1,
-    time: 5,
-    fun: 5,
-    worth: 4,
-    locked: false
-  },
-
   // ── ULTRA INSTINCT ────────────────────────────────────────────
   {
     id: "ultrainstinct",
     name: "Ultra Instinct",
     previewUrl: "",
+    date: "17/01/2025",
     description: "Y esto... es... para ir... al infinito y más allá!",
     upgrades: [
       "Tu barra de esquive se duplica, con un máximo de 80% de esquive.",
@@ -2720,129 +2720,12 @@ const MASTERIES = [
     locked: false
   },
 
-  // ── BUS ───────────────────────────────────────────────────────
-  {
-    id: "bus",
-    name: "Bus",
-    previewUrl: "",
-    description: "Atropellaron a mi abuela con un autobús.",
-    upgrades: [
-      "Los buses salen desde todas las direcciones.",
-      "El bus ya no te daña a ti mismo.",
-      "[R] activa el Bus Ride: te montas en el bus y puedes conducirlo."
-    ],
-    missions: [
-      { text: "Golpea a 1000 personas.",                          target: 1000, isBool: false },
-      { text: "Obtén el logro G-Grandson..?",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/3335299217032061/G-Grandson"  },
-      { text: "Golpea a 750 personas con la habilidad del bus",   target: 750,  isBool: false }
-    ]
-  ,
-    difficulty: 2,
-    time: 2,
-    fun: 2,
-    worth: 3,
-    locked: false
-  },
-
-  // ── FLASH ─────────────────────────────────────────────────────
-  {
-    id: "flash",
-    name: "Flash",
-    previewUrl: "",
-    description: "¿¡FLASH NEGRO!?",
-    upgrades: [
-      "[R] activa Undo después de teletransportarte, pero asegúrate de acertar el golpe para poder usarlo.",
-      "Carga del teletransporte reducido."
-    ],
-    missions: [
-      { text: "Usa la habilidad 100 veces seguidas sin recibir golpes o morir", target: 100,  isBool: false },
-      { text: "Embosca a 750 enemigos tras la teletransportación",               target: 750,  isBool: false },
-      { text: "Usa la habilidad 1500 veces en total",                            target: 1500, isBool: false }
-    ]
-  ,
-    difficulty: 3,
-    time: 3,
-    fun: 2,
-    worth: 4,
-    locked: false
-  },
-
-  // ── GLOVEL ────────────────────────────────────────────────────
-  {
-    id: "glovel",
-    name: "Glovel",
-    previewUrl: "",
-    description: "Yo no he hecho nada más que transportar pan por 3 días.",
-    upgrades: [
-      "[R] activa el Market Gardening: sal volando con poco control de a dónde vas..",
-      "Mayor velocidad bajo tierra."
-    ],
-    missions: [
-      { text: "Usa la habilidad Dig 350 veces",               target: 350,  isBool: false },
-      { text: "Consigue 1000 golpes críticos (crit hits)",    target: 1000, isBool: false },
-      { text: "Realiza 20 golpes críticos seguidos sin fallar", target: 20, isBool: false }
-    ]
-  ,
-    difficulty: 3,
-    time: 4,
-    fun: 1,
-    worth: 5,
-    locked: false
-  },
-
-  // ── DICE ──────────────────────────────────────────────────────
-  {
-    id: "dice",
-    name: "Dice",
-    previewUrl: "",
-    description: "Si saco un 12, tú te mueres instantáneamente.",
-    upgrades: [
-      "[R] lanza un dado gigante que aplasta a los jugadores cercanos.",
-      "El dado tiene más opciones de resultado favorables.",
-      "El dado manda; a quien le toque, tendrá que recorrer las casillas marcadas."
-    ],
-    missions: [
-      { text: "Golpea 400 personas tras lanzarlos con numeros bajos",          target: 400,  isBool: false },
-      { text: "Mata 150 personas con resultados altos",                         target: 150, isBool: false },
-      { text: "Obtén el logro RNGod",                                           target: 1,  isBool: true, badgeUrl: "https://www.roblox.com/badges/2130031244/RNGod" }
-    ]
-  ,
-    difficulty: 1,
-    time: 2,
-    fun: 2,
-    worth: 2,
-    locked: false
-  },
-
-  // ── CHAIN ─────────────────────────────────────────────────────
-  {
-    id: "chain",
-    name: "Chain",
-    previewUrl: "",
-    description: "¡Tú no puedes CONCEBIR de lo que soy capaz! ¡Estoy muy por encima de ti! ¡Soy como un dios con ropa humana! ¡RASHOS LÁSER APARECEN DE MIS DEDOS!",
-    upgrades: [
-      "[E] Lanza un orbe tesla que electrocuta a quien toca",
-      "Golpea gente para cargar tu tesla.",
-      "La cadena tiene mayor alcance."
-    ],
-    missions: [
-      { text: "Encadena a 1250 personas",                       target: 1000, isBool: false },
-      { text: "Encadena a 3 personas a la vez 200 veces",                  target: 200,    isBool: false },
-      { text: "Electrocuta 6 personas simultaniamente",     target: 1,  isBool: true }
-    ]
-  ,
-    difficulty: 2,
-    time: 4,
-    fun: 3,
-    worth: 3,
-    locked: false
-  },
-
   // ── OBBY ──────────────────────────────────────────────────────
   {
     id: "obby",
     name: "Obby",
     previewUrl: "",
+    date: "17/01/2025",
     description: "En la Slap Battles civilization, nadie decide si saltar por un fragmento de null.",
     upgrades: [
       "Puedes colocar partes en el aire.",
@@ -2867,6 +2750,7 @@ const MASTERIES = [
     id: "cloud",
     name: "Cloud",
     previewUrl: "",
+    date: "17/01/2025",
     description: "¿Podemos llegar más alto?",
     upgrades: [
       "La nube se vuelve más grande y gana un tercer asiento.",
@@ -2892,6 +2776,7 @@ const MASTERIES = [
     id: "wormhole",
     name: "Wormhole",
     previewUrl: "",
+    date: "17/01/2025",
     description: "Masteriza la teletransportación molecular y forja un vínculo directo entre ti y tus portales.",
     upgrades: [
       "[R] te teletransporta al portal más cercano.",
@@ -2916,6 +2801,7 @@ const MASTERIES = [
     id: "killstreak",
     name: "Killstreak",
     previewUrl: "",
+    date: "17/01/2025",
     description: "¿Qué significa ser un Rey para un Dios?",
     upgrades: [
       "Puedes almacenar hasta 10 almas sin perderlas al morir.",
@@ -2940,6 +2826,7 @@ const MASTERIES = [
     id: "run",
     name: "Run",
     previewUrl: "",
+    date: "17/01/2025",
     description: "¿Y QUIÉN DIJO QUE TENÍA QUE ESTAR EN UNA CATACUMBA PARA ASUSTARTE?",
     upgrades: [
       "[R] te transforma en TERRY durante 3 segundos en la Arena.",
@@ -2958,11 +2845,111 @@ const MASTERIES = [
     locked: false
   },
 
+  // ── GLOVEL ────────────────────────────────────────────────────
+  {
+    id: "glovel",
+    name: "Glovel",
+    previewUrl: "",
+    date: "24/01/2025",
+    description: "Yo no he hecho nada más que transportar pan por 3 días.",
+    upgrades: [
+      "[R] activa el Market Gardening: sal volando con poco control de a dónde vas..",
+      "Mayor velocidad bajo tierra."
+    ],
+    missions: [
+      { text: "Usa la habilidad Dig 350 veces",               target: 350,  isBool: false },
+      { text: "Consigue 1000 golpes críticos (crit hits)",    target: 1000, isBool: false },
+      { text: "Realiza 20 golpes críticos seguidos sin fallar", target: 20, isBool: false }
+    ]
+  ,
+    difficulty: 3,
+    time: 4,
+    fun: 1,
+    worth: 5,
+    locked: false
+  },
+
+  // ── BUS ───────────────────────────────────────────────────────
+  {
+    id: "bus",
+    name: "Bus",
+    previewUrl: "",
+    date: "31/01/2025",
+    description: "Atropellaron a mi abuela con un autobús.",
+    upgrades: [
+      "Los buses salen desde todas las direcciones.",
+      "El bus ya no te daña a ti mismo.",
+      "[R] activa el Bus Ride: te montas en el bus y puedes conducirlo."
+    ],
+    missions: [
+      { text: "Golpea a 1000 personas.",                          target: 1000, isBool: false },
+      { text: "Obtén el logro G-Grandson..?",                      target: 1,    isBool: true,  badgeUrl: "https://www.roblox.com/badges/3335299217032061/G-Grandson"  },
+      { text: "Golpea a 750 personas con la habilidad del bus",   target: 750,  isBool: false }
+    ]
+  ,
+    difficulty: 2,
+    time: 2,
+    fun: 2,
+    worth: 3,
+    locked: false
+  },
+
+  // ── [REDACTED] ────────────────────────────────────────────────
+  {
+    id: "redacted",
+    name: "[REDACTED]",
+    previewUrl: "",
+    date: "31/01/2025",
+    description: "Cierra tantas puertas como quieras... no te salvarán...",
+    upgrades: [
+      "Los portales atraen a personas desde más lejos.",
+      "Los portales aparecen más rápido.",
+      "Cooldown reducido de 11s a 9s.",
+      "[R] activa Muck: efecto de ralentización en área."
+    ],
+    missions: [
+      { text: "Captura a 6 personas con un solo portal",  target: 6,    isBool: false },
+      { text: "Captura a 1000 personas en total",          target: 1000, isBool: false },
+      { text: "Coloca 500 portales",                       target: 500,  isBool: false }
+    ]
+  ,
+    difficulty: 3,
+    time: 4,
+    fun: 2,
+    worth: 1,
+    locked: false
+  },
+
+  // ── MOAI ──────────────────────────────────────────────────────
+  {
+    id: "moai",
+    name: "🗿 (Moai)",
+    previewUrl: "",
+    date: "07/02/2025",
+    description: "🗿 \"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
+    upgrades: [
+      "La estatua 🗿 puede ser movida golpeándola.",
+      "La onda de choque tiene más knockback."
+    ],
+    missions: [
+      { text: "Golpea a 500 personas que estan aturdidas por el 🗿",  target: 500, isBool: false },
+      { text: "Aturde a 450 enemigos con la habilidad",   target: 450, isBool: false },
+      { text: "Mata a 500 personas con la habilidad",     target: 500, isBool: false }
+    ]
+  ,
+    difficulty: 5,
+    time: 5,
+    fun: 5,
+    worth: 3,
+    locked: false
+  },
+
   // ── BOMB ──────────────────────────────────────────────────────
   {
     id: "bomb",
     name: "Bomb",
     previewUrl: "",
+    date: "21/02/2025",
     description: "¡TIO, TIENES UNA BOMBA JUSTO DETRÁS DE TI! 'Si claro, como si alguien fuese a caer por e-'",
     upgrades: [
       "La bomba flota más rápido.",
@@ -2987,6 +2974,7 @@ const MASTERIES = [
     id: "rob",
     name: "Rob",
     previewUrl: "",
+    date: "28/02/2025",
     description: "Sientes que tu vínculo se estrecha con firmeza. Los ojos de Rob brillan con determinación.",
     upgrades: [
       "La maestria empieza al igual que su forma normal.",
@@ -3008,26 +2996,27 @@ const MASTERIES = [
     locked: false
   },
 
-  // ── MOAI ──────────────────────────────────────────────────────
+  // ── SPIN ──────────────────────────────────────────────────────
   {
-    id: "moai",
-    name: "🗿 (Moai)",
+    id: "spin",
+    name: "Spin",
     previewUrl: "",
-    description: "🗿 \"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
+    date: "28/02/2025",
+    description: "¡ESTO ES UNA REVELACIÓN! SPIN AHORA ROTA… ¡¡¡¡MÁS RÁPIDO!!!!!",
     upgrades: [
-      "La estatua 🗿 puede ser movida golpeándola.",
-      "La onda de choque tiene más knockback."
+      "La velocidad de giro aumenta significativamente.",
+      "Asciendes lentamente mientras giras.",
+      "Los slaps ocurren automáticamente.",
+      "El poder de slap aumenta a ~50."
     ],
     missions: [
-      { text: "Golpea a 500 personas que estan aturdidas por el 🗿",  target: 500, isBool: false },
-      { text: "Aturde a 450 enemigos con la habilidad",   target: 450, isBool: false },
-      { text: "Mata a 500 personas con la habilidad",     target: 500, isBool: false }
+      { text: "Gira durante 36,000 segundos (10 horas)", target: 36000, isBool: false }
     ]
   ,
-    difficulty: 5,
+    difficulty: 1,
     time: 5,
     fun: 5,
-    worth: 3,
+    worth: 4,
     locked: false
   },
 
@@ -3036,6 +3025,7 @@ const MASTERIES = [
     id: "fort",
     name: "Fort",
     previewUrl: "",
+    date: "08/03/2025",
     description: "Me contrataron de constructor.",
     upgrades: [
       "[R] construye escaleras.",
@@ -3061,6 +3051,7 @@ const MASTERIES = [
     id: "engineer",
     name: "Engineer",
     previewUrl: "",
+    date: "14/03/2025",
     description: "Coloca un guante, y si no funciona... Agrega otro guante.",
     upgrades: [
       "Tu centinela gana inmunidad al stun.",
@@ -3080,11 +3071,36 @@ const MASTERIES = [
     locked: false
   },
 
+  // ── FLASH ─────────────────────────────────────────────────────
+  {
+    id: "flash",
+    name: "Flash",
+    previewUrl: "",
+    date: "28/03/2025",
+    description: "¿¡FLASH NEGRO!?",
+    upgrades: [
+      "[R] activa Undo después de teletransportarte, pero asegúrate de acertar el golpe para poder usarlo.",
+      "Carga del teletransporte reducido."
+    ],
+    missions: [
+      { text: "Usa la habilidad 100 veces seguidas sin recibir golpes o morir", target: 100,  isBool: false },
+      { text: "Embosca a 750 enemigos tras la teletransportación",               target: 750,  isBool: false },
+      { text: "Usa la habilidad 1500 veces en total",                            target: 1500, isBool: false }
+    ]
+  ,
+    difficulty: 3,
+    time: 3,
+    fun: 2,
+    worth: 4,
+    locked: false
+  },
+
   // ── BOOSTER ───────────────────────────────────────────────────
   {
     id: "booster",
     name: "Booster",
     previewUrl: "",
+    date: "04/04/2025",
     description: "VAMOOOOOOS WUUUUUUUUUUHUUUUU",
     upgrades: [
       "[E] activa Strap In: adjunta dos propulsores a un jugador durante ~7 segundos.",
@@ -3106,6 +3122,7 @@ const MASTERIES = [
     id: "space",
     name: "Space",
     previewUrl: "",
+    date: "11/04/2025",
     description: "Una pequeña bofetada por el hombre, una gran hostia para la humanidad.",
     upgrades: [
       "Cooldown de la habilidad reducido de 15s a 10s.",
@@ -3126,59 +3143,12 @@ const MASTERIES = [
     locked: false
   },
 
-  // ── [REDACTED] ────────────────────────────────────────────────
-  {
-    id: "redacted",
-    name: "[REDACTED]",
-    previewUrl: "",
-    description: "Cierra tantas puertas como quieras... no te salvarán...",
-    upgrades: [
-      "Los portales atraen a personas desde más lejos.",
-      "Los portales aparecen más rápido.",
-      "Cooldown reducido de 11s a 9s.",
-      "[R] activa Muck: efecto de ralentización en área."
-    ],
-    missions: [
-      { text: "Captura a 6 personas con un solo portal",  target: 6,    isBool: false },
-      { text: "Captura a 1000 personas en total",          target: 1000, isBool: false },
-      { text: "Coloca 500 portales",                       target: 500,  isBool: false }
-    ]
-  ,
-    difficulty: 3,
-    time: 4,
-    fun: 2,
-    worth: 1,
-    locked: false
-  },
-
-  // ── STICK ────────────────────────────────────────────────
-  {
-    id: "stick",
-    name: "Stick",
-    previewUrl: "",
-    description: "Si te preguntas si esta maestría vale la pena, totalmente.",
-    upgrades: [
-      "Palo ser morado.",
-      "Palo tirar suelo 0.1 segundos mas.",
-      "Hombre tener palo, hombre ser feliz.",
-      "No, palo no tener knockback 10.000",
-    ],
-    missions: [
-      { text: "Golpea 99999 personas con el palo",  target: 99999,    isBool: false },
-    ]
-  ,
-    difficulty: 6,
-    time: 6,
-    fun: 6,
-    worth: 6,
-    locked: false
-  },
-
   // ── SHARD ────────────────────────────────────────────────
   {
     id: "shard",              // ← sin espacios, solo minúsculas/números
     name: "Shard",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "25/04/2025",
     description: "Un fuego tan helado que quema.",
     upgrades: [
       "Golpea tus shards para aplicarle efecto de fuego",
@@ -3206,6 +3176,7 @@ const MASTERIES = [
     id: "phase",              // ← sin espacios, solo minúsculas/números
     name: "Phase",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "09/05/2025",
     description: "Profundizando en las sombras, convirtiéndote en uno con la oscuridad. Tu mente parpadea, pero después de todo, sigues siendo tú.",
     upgrades: [
       "[R] Cancela el vuelo en cualquier momento.",
@@ -3232,6 +3203,7 @@ const MASTERIES = [
     id: "tycoon",              // ← sin espacios, solo minúsculas/números
     name: "Tycoon",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "06/06/2025",
     description: "¡MI REINADO CAPITALISTA NO HA HECHO NADA MÁS QUE EMPEZAR!",
     upgrades: [
       "El tycoon es mucho más grande.",
@@ -3257,6 +3229,7 @@ const MASTERIES = [
     id: "hive",              // ← sin espacios, solo minúsculas/números
     name: "Hive",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "06/06/2025",
     description: "¡NO, LAS ABEJAS NO! ¡¡NO LAS ABEJAS!! AAAAHHHH.",
     upgrades: [
       "Las piscinas de miel son un 50% más grandes.",
@@ -3284,6 +3257,7 @@ const MASTERIES = [
     id: "defense",              // ← sin espacios, solo minúsculas/números
     name: "Defense",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "20/06/2025",
     description: "La mejor defensa es la ofensa.",
     upgrades: [
       "La barrera es mas grande.",
@@ -3311,6 +3285,7 @@ const MASTERIES = [
     id: "carkeys",              // ← sin espacios, solo minúsculas/números
     name: "Car Keys",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "27/06/2025",
     description: "No todo es lo que parece. ;)",
     upgrades: [
       "Ganas un 25% más de experiencia.",
@@ -3335,6 +3310,7 @@ const MASTERIES = [
     id: "voodoo",              // ← sin espacios, solo minúsculas/números
     name: "Voodoo",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "04/07/2025",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "El muñeco es morado.",
@@ -3359,6 +3335,7 @@ const MASTERIES = [
     id: "cherry",              // ← sin espacios, solo minúsculas/números
     name: "Cherry",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "18/07/2025",
     description: "La mitosis es el proceso en el que una célula replica sus cromosomas y se segregan, produciendo dos núcleos idénticos en preparación de una división celular.",
     upgrades: [
       "El rango de duplicación es 10 studs más grande.",
@@ -3379,11 +3356,36 @@ const MASTERIES = [
     locked: false
   },
 
+  // ── STICK ────────────────────────────────────────────────
+  {
+    id: "stick",
+    name: "Stick",
+    previewUrl: "",
+    date: "",
+    description: "Si te preguntas si esta maestría vale la pena, totalmente.",
+    upgrades: [
+      "Palo ser morado.",
+      "Palo tirar suelo 0.1 segundos mas.",
+      "Hombre tener palo, hombre ser feliz.",
+      "No, palo no tener knockback 10.000",
+    ],
+    missions: [
+      { text: "Golpea 99999 personas con el palo",  target: 99999,    isBool: false },
+    ]
+  ,
+    difficulty: 6,
+    time: 6,
+    fun: 6,
+    worth: 6,
+    locked: false
+  },
+
   // ── BONK ────────────────────────────────────────────────
   {
     id: "bonk",              // ← sin espacios, solo minúsculas/números
     name: "Bonk",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3401,11 +3403,37 @@ const MASTERIES = [
     locked: true
   },
 
+  // ── CHAIN ─────────────────────────────────────────────────────
+  {
+    id: "chain",
+    name: "Chain",
+    previewUrl: "",
+    date: "",
+    description: "¡Tú no puedes CONCEBIR de lo que soy capaz! ¡Estoy muy por encima de ti! ¡Soy como un dios con ropa humana! ¡RASHOS LÁSER APARECEN DE MIS DEDOS!",
+    upgrades: [
+      "[E] Lanza un orbe tesla que electrocuta a quien toca",
+      "Golpea gente para cargar tu tesla.",
+      "La cadena tiene mayor alcance."
+    ],
+    missions: [
+      { text: "Encadena a 1250 personas",                       target: 1000, isBool: false },
+      { text: "Encadena a 3 personas a la vez 200 veces",                  target: 200,    isBool: false },
+      { text: "Electrocuta 6 personas simultaniamente",     target: 1,  isBool: true }
+    ]
+  ,
+    difficulty: 2,
+    time: 4,
+    fun: 3,
+    worth: 3,
+    locked: false
+  },
+
   // ── MOON ────────────────────────────────────────────────
   {
     id: "moon",              // ← sin espacios, solo minúsculas/números
     name: "Moon",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3428,6 +3456,7 @@ const MASTERIES = [
     id: "stalker",              // ← sin espacios, solo minúsculas/números
     name: "stalker",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3450,6 +3479,7 @@ const MASTERIES = [
     id: "rage",              // ← sin espacios, solo minúsculas/números
     name: "Rage",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3472,6 +3502,7 @@ const MASTERIES = [
     id: "plank",              // ← sin espacios, solo minúsculas/números
     name: "Plank",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3494,6 +3525,7 @@ const MASTERIES = [
     id: "bubble",              // ← sin espacios, solo minúsculas/números
     name: "Bubble",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3516,6 +3548,7 @@ const MASTERIES = [
     id: "phantom",              // ← sin espacios, solo minúsculas/números
     name: "Phantom",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3538,6 +3571,7 @@ const MASTERIES = [
     id: "acrobat",              // ← sin espacios, solo minúsculas/números
     name: "Acrobat",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3560,6 +3594,7 @@ const MASTERIES = [
     id: "spring",              // ← sin espacios, solo minúsculas/números
     name: "Spring",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3582,6 +3617,7 @@ const MASTERIES = [
     id: "soul",              // ← sin espacios, solo minúsculas/números
     name: "Soul",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3604,6 +3640,7 @@ const MASTERIES = [
     id: "thanos",              // ← sin espacios, solo minúsculas/números
     name: "Thanos",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3626,6 +3663,7 @@ const MASTERIES = [
     id: "eggler",              // ← sin espacios, solo minúsculas/números
     name: "Eggler",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3648,6 +3686,7 @@ const MASTERIES = [
     id: "hexa",              // ← sin espacios, solo minúsculas/números
     name: "Hexa",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3670,6 +3709,7 @@ const MASTERIES = [
     id: "frostbite",              // ← sin espacios, solo minúsculas/números
     name: "Frostbite",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3692,6 +3732,7 @@ const MASTERIES = [
     id: "mace",              // ← sin espacios, solo minúsculas/números
     name: "Mace",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
       "POR AGREGAR.",
@@ -3709,6 +3750,55 @@ const MASTERIES = [
     locked: true
   },
 
+  // ── DICE ──────────────────────────────────────────────────────
+  {
+    id: "dice",
+    name: "Dice",
+    previewUrl: "",
+    date: "",
+    description: "Si saco un 12, tú te mueres instantáneamente.",
+    upgrades: [
+      "[R] lanza un dado gigante que aplasta a los jugadores cercanos.",
+      "El dado tiene más opciones de resultado favorables.",
+      "El dado manda; a quien le toque, tendrá que recorrer las casillas marcadas."
+    ],
+    missions: [
+      { text: "Golpea 400 personas tras lanzarlos con numeros bajos",          target: 400,  isBool: false },
+      { text: "Mata 150 personas con resultados altos",                         target: 150, isBool: false },
+      { text: "Obtén el logro RNGod",                                           target: 1,  isBool: true, badgeUrl: "https://www.roblox.com/badges/2130031244/RNGod" }
+    ]
+  ,
+    difficulty: 1,
+    time: 2,
+    fun: 2,
+    worth: 2,
+    locked: false
+  },
+
+  {
+    id: "comingsoon",              // ← sin espacios, solo minúsculas/números
+    name: "Proximamente",   // ← tal como aparece en el juego
+    previewUrl: "",
+    date: "",
+    description: "Descripción de la maestría tal como aparece en el juego.",
+    upgrades: [
+      "Primera mejora que otorga la maestría.",
+      "Segunda mejora.",
+      "[R] activa la habilidad secundaria especial."
+    ],
+    missions: [
+      { text: "Descripción de la misión 1",  target: 100, isBool: false },
+      { text: "Obtén el badge XYZ",          target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
+      { text: "Descripción de la misión 3",  target: 500, isBool: false }
+    ]
+  ,
+    difficulty: 4,
+    time: 4,
+    fun: 3,
+    worth: 3,
+    locked: true
+  },
+
   /* ============================================================
      ╔══════════════════════════════════════════════════════════╗
      ║            PLANTILLA — NUEVA MAESTRÍA                   ║
@@ -3722,6 +3812,7 @@ const MASTERIES = [
     id: "nombreid",              // ← sin espacios, solo minúsculas/números
     name: "Nombre del Guante",   // ← tal como aparece en el juego
     previewUrl: "",
+    date: "",
     description: "Descripción de la maestría tal como aparece en el juego.",
     upgrades: [
       "Primera mejora que otorga la maestría.",
@@ -4283,6 +4374,8 @@ function openDetail(id) {
   // Name + description
   document.getElementById('detail-glove-name').textContent       = mastery.name;
   document.getElementById('detail-description-text').textContent = mastery.description;
+  const dateEl = document.getElementById('detail-date-text');
+  if (dateEl) dateEl.textContent = mastery.date || '';
 
   // ── Ratings ──
   const RLABELS = {
