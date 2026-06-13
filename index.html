@@ -59,6 +59,146 @@ body {
 ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--yellow-dark); }
 
+/* ============================================================
+   MASTERY COMPLETE ANIMATION OVERLAY
+   ============================================================ */
+#mastery-complete-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: transparent;
+}
+#mastery-complete-overlay.active {
+  pointer-events: all;
+  opacity: 1;
+}
+#mastery-complete-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  transition: background 0.35s ease;
+}
+#mastery-complete-overlay.active #mastery-complete-backdrop {
+  background: rgba(0,0,0,0.82);
+}
+#mastery-complete-stage {
+  position: relative;
+  width: min(700px, 92vw);
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px #222, 0 20px 60px rgba(0,0,0,0.8);
+}
+#mc-img-default,
+#mc-img-banner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+#mc-img-default {
+  z-index: 1;
+  filter: saturate(0.4) brightness(0.7);
+}
+#mc-img-banner {
+  z-index: 2;
+  opacity: 0;
+}
+#mc-light-beam {
+  position: absolute;
+  top: -20%;
+  left: -30%;
+  width: 22%;
+  height: 140%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255,255,255,0.08) 30%,
+    rgba(255,240,160,0.95) 50%,
+    rgba(255,255,255,0.08) 70%,
+    transparent 100%
+  );
+  filter: blur(4px);
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transform: skewX(-12deg);
+}
+#mc-flash-burst {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(255,255,220,1) 0%,
+    rgba(255,220,80,0.6) 35%,
+    transparent 70%
+  );
+  z-index: 9;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 16px;
+}
+#mc-label {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  padding: 14px 20px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  font-family: 'Fredoka One', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.75rem);
+  letter-spacing: 1.5px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 18px rgba(255,215,0,0.9), 0 2px 6px rgba(0,0,0,0.8);
+  z-index: 11;
+  opacity: 0;
+  transform: translateY(12px);
+}
+#mastery-complete-stage.glow-ring {
+  animation: mcRingPulse 0.9s ease-out forwards;
+}
+@keyframes mcRingPulse {
+  0%   { box-shadow: 0 0 0 3px #222, 0 0 0px rgba(255,215,0,0); }
+  40%  { box-shadow: 0 0 0 3px #ffd700, 0 0 60px rgba(255,215,0,0.7); }
+  100% { box-shadow: 0 0 0 3px #ffd700, 0 0 24px rgba(255,215,0,0.35); }
+}
+#mc-dismiss-hint {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.5px;
+  z-index: 12;
+  opacity: 0;
+  transition: opacity 0.4s ease 1.8s;
+  pointer-events: none;
+}
+#mastery-complete-overlay.active #mc-dismiss-hint {
+  opacity: 1;
+}
+
+/* ── Star outro canvas ── */
+#mc-star-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+#mc-star-canvas.visible { opacity: 1; }
+
 /* ── Mastery date ── */
 #detail-date-text {
   font-family: 'Fredoka', sans-serif;
@@ -652,6 +792,14 @@ body {
   font-style: italic;
   margin-top: -2px;
 }
+#detail-completed-text {
+  font-size: 0.8rem;
+  color: #7e7e7e;
+  line-height: 1.3;
+  font-style: italic;
+  margin-top: 2px;
+}
+#detail-completed-text:empty { display: none; }
 
 .detail-hide-wrap {
   margin-top: 8px;
@@ -706,6 +854,10 @@ body {
   visibility: visible;
   transition: opacity 0.12s ease, visibility 0s linear 0s;
 }
+#stick-jumpscare-overlay.show,
+#stick-jumpscare-overlay.glitching {
+  pointer-events: auto;
+}
 #stick-jumpscare-overlay img {
   position: absolute;
   inset: 0;
@@ -715,6 +867,33 @@ body {
   filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.32));
   transform: scale(1.02);
   animation: stickJumpscarePop 0.22s ease-out forwards;
+}
+@keyframes stickGlitchFlicker {
+  0%   { transform: translate(0,0) skew(0deg); filter: hue-rotate(0deg) contrast(1.2); }
+  20%  { transform: translate(-8px,2px) skew(-2deg); filter: hue-rotate(18deg) contrast(1.6); }
+  40%  { transform: translate(7px,-3px) skew(2deg); filter: hue-rotate(-12deg) contrast(1.8); }
+  60%  { transform: translate(-5px,1px) skew(-1deg); filter: hue-rotate(24deg) contrast(1.4); }
+  80%  { transform: translate(4px,-1px) skew(1deg); filter: hue-rotate(-18deg) contrast(1.7); }
+  100% { transform: translate(0,0) skew(0deg); filter: hue-rotate(0deg) contrast(1.2); }
+}
+#stick-jumpscare-overlay.glitching {
+  background: #000;
+}
+#stick-jumpscare-overlay.glitching::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(90deg, rgba(255,0,0,0.12) 0 3px, transparent 3px 7px),
+    linear-gradient(180deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2));
+  mix-blend-mode: screen;
+  animation: stickGlitchFlicker 0.12s steps(2, end) infinite;
+  pointer-events: none;
+}
+#stick-jumpscare-overlay.glitching img {
+  opacity: 0;
+  animation: none;
 }
 @keyframes stickJumpscarePop {
   from { opacity: 0; transform: scale(1.08); }
@@ -1184,6 +1363,79 @@ body {
 }
 
 /* ── Reset button ── */
+/* ── Page nav selector ── */
+#page-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 0 2px;
+}
+.page-nav-btn {
+  background: #2a2a2a;
+  border: 2px solid #383838;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 6px 14px 6px 10px;
+  transition: border-color .18s, background .18s, transform .12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.page-nav-btn img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+  filter: saturate(0.5) brightness(0.75);
+  transition: filter .18s;
+}
+.page-nav-btn:hover {
+  border-color: var(--yellow-mid);
+  background: #333;
+}
+.page-nav-btn:hover img { filter: saturate(1) brightness(1); }
+.page-nav-btn.active {
+  border-color: var(--yellow-bright);
+  background: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(255,215,0,0.25);
+}
+.page-nav-btn.active img { filter: saturate(1) brightness(1.1); }
+.page-nav-btn span {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: #666;
+  letter-spacing: 0.5px;
+  transition: color .18s;
+  white-space: nowrap;
+}
+.page-nav-btn:hover span { color: var(--yellow-mid); }
+.page-nav-btn.active span { color: var(--yellow-bright); }
+
+/* ── Slap page placeholder ── */
+#slap-view {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 22px;
+  padding: 40px 20px;
+}
+#slap-view img {
+  width: min(320px, 70vw);
+  opacity: 0.55;
+}
+#slap-view p {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.05rem;
+  color: #555;
+  text-align: center;
+  max-width: 340px;
+  line-height: 1.5;
+}
+
 #btn-reset {
   background: transparent;
   border: 2px solid #444;
@@ -1628,6 +1880,456 @@ body {
   color: var(--yellow-bright);
   text-shadow: 0 0 12px rgba(255,215,0,0.5), 1px 1px 0 #000;
   pointer-events: none;
+}
+
+/* ============================================================
+   RANDOM SELECTOR — CINEMATIC REEL
+   ============================================================ */
+@keyframes rsmIn {
+  0%   { opacity:0; transform:scale(0.82) translateY(28px) rotateX(6deg); }
+  55%  { opacity:1; transform:scale(1.04) translateY(-4px) rotateX(0); }
+  75%  { transform:scale(0.98) translateY(1px); }
+  100% { transform:scale(1) translateY(0); }
+}
+@keyframes rsmOverlayIn {
+  from { opacity:0; backdrop-filter:blur(0px); }
+  to   { opacity:1; backdrop-filter:blur(6px); }
+}
+@keyframes rsmTitlePulse {
+  0%,100% { text-shadow: 0 0 14px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.2), 1px 1px 0 #000; }
+  50%     { text-shadow: 0 0 28px rgba(255,215,0,0.9), 0 0 60px rgba(255,215,0,0.4), 1px 1px 0 #000; }
+}
+@keyframes rsmBorderGlow {
+  0%,100% { box-shadow: 0 0 18px rgba(255,215,0,0.25), 0 24px 70px rgba(0,0,0,0.9); }
+  50%     { box-shadow: 0 0 40px rgba(255,215,0,0.55), 0 24px 70px rgba(0,0,0,0.9); }
+}
+@keyframes rsmWinGlow {
+  0%   { box-shadow: 0 0 0   rgba(255,215,0,0),   0 24px 70px rgba(0,0,0,0.9); border-color:#FFD700; }
+  30%  { box-shadow: 0 0 80px rgba(255,215,0,0.8), 0 24px 70px rgba(0,0,0,0.9); border-color:#fff8c0; }
+  100% { box-shadow: 0 0 32px rgba(255,215,0,0.4), 0 24px 70px rgba(0,0,0,0.9); border-color:#FFD700; }
+}
+@keyframes rsmWinName {
+  0%   { opacity:0; transform:scale(0.7) translateY(10px); letter-spacing:12px; color:#fff; }
+  50%  { opacity:1; transform:scale(1.08) translateY(-2px); letter-spacing:4px; color:#ffe066; }
+  100% { opacity:1; transform:scale(1)   translateY(0);    letter-spacing:1.5px; }
+}
+@keyframes rsmConfettiDrop {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity:1; }
+  80%  { opacity:1; }
+  100% { transform: translateY(120px) rotate(var(--r,360deg)); opacity:0; }
+}
+@keyframes rsmScanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes rsmTickerBounce {
+  0%,100% { transform: scaleY(1); }
+  40%     { transform: scaleY(1.35); }
+  60%     { transform: scaleY(0.85); }
+}
+@keyframes rsmReelFlash {
+  0%,100% { opacity:0; }
+  50%     { opacity:1; }
+}
+@keyframes rsmArrowBounce {
+  0%,100% { transform: translateX(0); }
+  50%     { transform: translateX(5px); }
+}
+@keyframes rsmArrowBounceL {
+  0%,100% { transform: translateX(0); }
+  50%     { transform: translateX(-5px); }
+}
+
+#random-selector-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 860;
+  background: rgba(0,0,0,0.92);
+  align-items: center;
+  justify-content: center;
+  animation: rsmOverlayIn .3s ease both;
+}
+#random-selector-overlay.open { display: flex; }
+
+#random-selector-modal {
+  width: min(580px, 94vw);
+  background: #0c0c0c;
+  border: 4px solid #FFD700;
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  animation: rsmIn .5s cubic-bezier(.34,1.36,.64,1) both, rsmBorderGlow 2.2s ease-in-out 0.5s infinite;
+  perspective: 600px;
+}
+#random-selector-modal.rsm-winning {
+  animation: rsmWinGlow 0.8s ease-out both !important;
+}
+
+/* Top chrome stripe */
+#random-selector-modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    transparent 0%, #ffd700 20%, #fff8a0 50%, #ffd700 80%, transparent 100%
+  );
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* ── Header ── */
+#random-selector-header {
+  padding: 14px 20px 11px;
+  background: linear-gradient(180deg, #111000 0%, #0c0c00 100%);
+  border-bottom: 2px solid #2a2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  position: relative;
+}
+/* decorative side lines */
+#random-selector-header::before,
+#random-selector-header::after {
+  content: '◆';
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  font-size: 0.65rem;
+  color: rgba(255,215,0,0.4);
+}
+#random-selector-header::before { left: 16px; }
+#random-selector-header::after  { right: 16px; }
+
+#random-selector-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  color: #FFD700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  animation: rsmTitlePulse 2.4s ease-in-out infinite;
+}
+#random-selector-state {
+  font-size: 0.8rem;
+  color: #666;
+  font-family: 'Fredoka', sans-serif;
+  letter-spacing: 0.8px;
+  min-height: 1.1em;
+  transition: color .4s, text-shadow .4s;
+}
+#random-selector-modal.rsm-winning #random-selector-state {
+  color: #39ff14;
+  text-shadow: 0 0 14px rgba(57,255,20,0.6);
+  letter-spacing: 1.5px;
+}
+
+/* ── Reel stage ── */
+#random-selector-body {
+  padding: 16px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  background: #080808;
+}
+
+/* The main reel canvas wrapper */
+#rsm-reel-wrap {
+  width: 100%;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid #222;
+  aspect-ratio: 640 / 380;
+}
+#random-selector-modal.rsm-winning #rsm-reel-wrap {
+  border-color: #FFD700;
+  box-shadow: 0 0 0 2px #000, 0 0 30px rgba(255,215,0,0.6);
+}
+
+/* The canvas that draws the reel */
+#rsm-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* Scanline CRT overlay */
+#rsm-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px
+  );
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: multiply;
+}
+
+/* Moving light sweep */
+#rsm-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    transparent 0%, rgba(255,255,255,0.04) 48%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 52%, transparent 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+  animation: rsmScanline 2s linear infinite;
+  opacity: 0;
+}
+#random-selector-modal.rsm-spinning #rsm-sweep { opacity: 1; }
+
+/* Edge vignette */
+#rsm-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Center crosshair / ticker */
+#rsm-ticker {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 3px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+}
+#rsm-ticker-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(255,215,0,0.5) 20%, rgba(255,215,0,0.9) 50%, rgba(255,215,0,0.5) 80%, transparent 100%
+  );
+  transition: opacity .3s;
+}
+#random-selector-modal.rsm-winning #rsm-ticker-line {
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(57,255,20,0.6) 20%, rgba(57,255,20,1) 50%, rgba(57,255,20,0.6) 80%, transparent 100%
+  );
+}
+/* Arrow pointers on sides */
+#rsm-arrow-l, #rsm-arrow-r {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: rgba(255,215,0,0.8);
+  pointer-events: none;
+  z-index: 9;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(255,215,0,0.8);
+}
+#rsm-arrow-l { left: 6px;  animation: rsmArrowBounceL 0.8s ease-in-out infinite; }
+#rsm-arrow-r { right: 6px; animation: rsmArrowBounce  0.8s ease-in-out infinite; }
+#random-selector-modal:not(.rsm-spinning) #rsm-arrow-l,
+#random-selector-modal:not(.rsm-spinning) #rsm-arrow-r { opacity: 0; }
+
+/* Flash burst on each tick */
+#rsm-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 10px;
+  mix-blend-mode: screen;
+  transition: background 0.04s ease;
+}
+
+/* Confetti canvas (full-overlay) */
+#rsm-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0;
+  transition: opacity .2s;
+}
+#rsm-confetti.visible { opacity: 1; }
+
+/* Win stamp */
+#rsm-win-stamp {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 14px;
+  pointer-events: none;
+  z-index: 11;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.2s;
+}
+#random-selector-modal.rsm-winning #rsm-win-stamp { opacity: 1; }
+#rsm-win-badge {
+  background: linear-gradient(135deg, #FFD700 0%, #ff8c00 100%);
+  color: #000;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  padding: 5px 18px;
+  border-radius: 30px;
+  border: 2px solid #000;
+  box-shadow: 0 3px 0 #000, 0 0 20px rgba(255,215,0,0.7);
+  text-transform: uppercase;
+}
+
+/* ── Name plate ── */
+#rsm-name-plate {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px 6px;
+  position: relative;
+}
+#random-selector-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.5rem;
+  color: #bbb;
+  text-align: center;
+  text-shadow: 1px 1px 0 #000;
+  letter-spacing: 1.5px;
+  transition: color .15s, text-shadow .15s;
+  line-height: 1.15;
+}
+#random-selector-modal.rsm-spinning #random-selector-name {
+  color: #666;
+  letter-spacing: 2.5px;
+}
+#random-selector-modal.rsm-winning #random-selector-name {
+  color: #FFD700;
+  text-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 10px rgba(255,215,0,0.5), 1px 1px 0 #000;
+  animation: rsmWinName .6s cubic-bezier(.2,.8,.4,1) both;
+}
+
+/* ── Time remaining removed ── */
+
+/* ── Actions ── */
+#random-selector-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 4px 16px 16px;
+  background: #0a0a0a;
+  border-top: 1px solid #1a1a00;
+}
+#random-selector-actions button {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.92rem;
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 12px 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #000;
+  transition: filter .12s, transform .1s, box-shadow .1s;
+  letter-spacing: 0.4px;
+}
+#random-selector-actions button:hover  { filter: brightness(1.2); transform: translateY(-1px); }
+#random-selector-actions button:active { transform: translateY(3px); box-shadow: 0 1px 0 #000; }
+#btn-random-open   { background: linear-gradient(180deg, #ffe040 0%, #ffa500 100%); color: #111; }
+#btn-random-cancel { background: #1a1a1a; color: #999; border-color: #333; }
+#btn-random-reroll { background: linear-gradient(180deg, #1a3a1a 0%, #0d1f0d 100%); color: #5dff5d; border-color: #2a5a2a; }
+#btn-random-skip   {
+  background: linear-gradient(180deg, #ffe040 0%, #ffa500 100%);
+  color: #111;
+  border-color: #ffd700;
+  font-weight: 700;
+  box-shadow: 0 0 0 0 rgba(255,215,0,0.6);
+  animation: rsmSkipPulse 1.4s ease-in-out infinite;
+}
+#btn-random-skip:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px) scale(1.04);
+}
+@keyframes rsmSkipPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.55); }
+  50%      { box-shadow: 0 0 0 8px rgba(255,215,0,0); }
+}
+#random-selector-modal.rsm-spinning #random-selector-actions {
+  opacity: 0.35;
+  pointer-events: none;
+}
+#random-selector-modal.rsm-spinning #btn-random-skip,
+#random-selector-modal.rsm-spinning #btn-random-cancel {
+  opacity: 1;
+  pointer-events: auto;
+}
+#random-selector-modal.rsm-spinning #btn-random-cancel {
+  background: #2a1414;
+  color: #ff8c8c;
+  border-color: #ff4444;
+  box-shadow: 0 0 0 0 rgba(255,68,68,0.5);
+  animation: rsmCancelPulse 1.4s ease-in-out infinite;
+}
+#random-selector-modal.rsm-spinning #btn-random-cancel:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px) scale(1.04);
+}
+@keyframes rsmCancelPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,68,68,0.45); }
+  50%      { box-shadow: 0 0 0 8px rgba(255,68,68,0); }
+}
+#random-selector-modal.rsm-winning #btn-random-skip,
+#random-selector-modal:not(.rsm-spinning) #btn-random-skip {
+  display: none !important;
+}
+#random-selector-modal.error #random-selector-state { color: #ff8c8c; }
+
+/* ============================================================
+   RANDOM FAB (dedicated button)
+   ============================================================ */
+#random-fab {
+  position: fixed;
+  bottom: 106px;
+  right: 18px;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, opacity .2s, border-color .2s;
+  font-family: 'Fredoka One', cursive;
+  animation: fabAppear .35s cubic-bezier(.34,1.56,.64,1) both;
+  opacity: 0.45;
+}
+#random-fab:hover {
+  opacity: 1;
+  transform: scale(1.12);
+  border-color: #ffd700;
+  box-shadow: 0 0 14px rgba(255,215,0,0.35), 0 4px 12px rgba(0,0,0,0.6);
+}
+#random-fab:active { transform: scale(0.93); }
+#random-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+#random-fab.spinning {
+  animation: randomFabSpin 0.6s linear infinite;
+  opacity: 1;
+  border-color: #ffd700;
+  box-shadow: 0 0 18px rgba(255,215,0,0.55);
+}
+@keyframes randomFabSpin {
+  from { transform: rotate(0deg) scale(1.08); }
+  to   { transform: rotate(360deg) scale(1.08); }
 }
 
 /* ============================================================
@@ -2190,6 +2892,16 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   <div class="stat-chip">En progreso: <span id="val-inprogress" style="color:#ff8c00">0</span></div>
 </div>
 <div id="autosave-badge">💾 Progreso guardado automáticamente en este navegador</div>
+<div id="page-nav">
+  <button class="page-nav-btn active" id="nav-masteries" onclick="switchPage('masteries')" title="Maestrías">
+    <img src="masteryicon.png" alt="Maestrías" onerror="this.style.display='none';this.parentElement.insertAdjacentText('beforeend','⚔️')">
+    <span>Maestrías</span>
+  </button>
+  <button class="page-nav-btn" id="nav-slap" onclick="switchPage('slap')" title="Slap">
+    <img src="slapicon.png" alt="Slap" onerror="this.style.display='none';this.parentElement.insertAdjacentText('beforeend','👋')">
+    <span>Guantes</span>
+  </button>
+</div>
 <div style="text-align:center;padding:4px 0 0;">
   <button id="btn-reset" onclick="resetAllProgress()">🗑️ Resetear todo el progreso</button>
 </div>
@@ -2205,6 +2917,21 @@ body.todo-selecting #grid-view { padding-top: 72px; }
     <div id="empty-state">No se encontraron maestrías 😔</div>
   </div>
 </div>
+
+<!-- ========================================================
+     SLAP PAGE (placeholder)
+     ======================================================== -->
+<div id="slap-view">
+  <img src="preview_placeholder.png" alt="Próximamente">
+  <p>Falta mucho por hacer aquí,<br>vuelve más tarde cuando esté listo 🔧</p>
+</div>
+
+<!-- ========================================================
+     RANDOM FAB (fixed, dedicated button)
+     ======================================================== -->
+<button id="random-fab" onclick="startRandomSelector()" title="Selector random de maestría">
+  <span class="fab-icon">🎲</span>
+</button>
 
 <!-- ========================================================
      TODO FAB (fixed bottom-right, above changelog)
@@ -2253,6 +2980,45 @@ body.todo-selecting #grid-view { padding-top: 72px; }
     <button id="btn-todo-cancel-select" onclick="cancelTodoSelection()">✕ Cancelar</button>
   </div>
   <button id="btn-todo-confirm" onclick="confirmTodoSelection()">✅ Agregar</button>
+</div>
+
+<!-- ========================================================
+     RANDOM SELECTOR MODAL
+     ======================================================== -->
+<div id="random-selector-overlay" onclick="if(event.target===this)closeRandomSelector()">
+  <div id="random-selector-modal">
+    <div id="random-selector-header">
+      <span id="random-selector-title">🎰 SELECTOR RANDOM</span>
+      <span id="random-selector-state">Listo para girar...</span>
+    </div>
+    <div id="random-selector-body">
+      <div id="rsm-reel-wrap">
+        <canvas id="rsm-canvas"></canvas>
+        <div id="rsm-scanlines"></div>
+        <div id="rsm-sweep"></div>
+        <div id="rsm-vignette"></div>
+        <div id="rsm-ticker">
+          <span id="rsm-arrow-l">▶</span>
+          <div id="rsm-ticker-line"></div>
+          <span id="rsm-arrow-r">◀</span>
+        </div>
+        <div id="rsm-flash"></div>
+        <canvas id="rsm-confetti"></canvas>
+        <div id="rsm-win-stamp">
+          <div id="rsm-win-badge">✦ SELECCIONADA ✦</div>
+        </div>
+      </div>
+      <div id="rsm-name-plate">
+        <div id="random-selector-name">—</div>
+      </div>
+    </div>
+    <div id="random-selector-actions">
+      <button id="btn-random-open" onclick="openRandomSelected()">📖 Ver más</button>
+      <button id="btn-random-cancel" onclick="closeRandomSelector()">✕ Cancelar</button>
+      <button id="btn-random-skip" style="display:none;">⏩ Saltar giro</button>
+      <button id="btn-random-reroll" onclick="rerollRandomSelector()">🔁 Rerolear</button>
+    </div>
+  </div>
 </div>
 
 <!-- ========================================================
@@ -2305,6 +3071,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
           <div class="detail-section-label">DESCRIPCIÓN</div>
           <div id="detail-description-text"></div>
           <div id="detail-date-text"></div>
+          <div id="detail-completed-text"></div>
           <div class="detail-hide-wrap">
             <button id="detail-hide-btn"
                     class="detail-hide-btn"
@@ -2490,10 +3257,21 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
+  {
+    version: "0.4.0 - Maestrias completadas",
+    date: "13/06/2026",
+    entries: [
+      { emoji: "✨", color: "#FFD700",  text: "Todas las maestrias ya estan completas" },
+      { emoji: "✅", color: "#39ff14",  text: "Se ejecuta una animacion cada vez que completas una maestria, mostrando el cambio entre el antiguo banner y el nuevo. Puedes saltarla solo haciendo clic." },
+      { emoji: "🕛", color: "#a78bfa",  text: "Ahora muestra la fecha y hora de complecion de la maestria." },
+      { emoji: "📋", color: "#5e5e5e",  text: "Ahora completar todas las misiones te auto-completan la maestria, desmarcar una maestria como completa reinicia el progreso de misiones y completar una maestria que completa todas las misiones." },
+      { emoji: "👀", color: "#FFffff",  text: "Nuevo selector de modo, entre maestria y ¿guantes? (Proximamente)" },
+    ]
+  },
 
   {
     version: "0.3.0 - Cambios pequeños pero notorios",
-    date: "11/06/2026",
+    date: "12/06/2026",
     entries: [
       { emoji: "🔥", color: "#FF0800",  text: "Ahora cada maestria tiene un indicador de dificultad y que tan bueno es, si estas indeciso, guiate con esto" },
       { emoji: "🆕", color: "#69DEF5",  text: "Para destacar que hay de nuevo, ahora en cada maestria nueva aparece un texto marcandolo. ¡No muy util ahora pero lo sera en la proxima update!" },
@@ -2622,6 +3400,7 @@ function openChangelogFab() {
 function updateFabVisibility() {
   const fab        = document.getElementById('changelog-fab');
   const todoFab    = document.getElementById('todo-fab');
+  const randomFab  = document.getElementById('random-fab');
   if (!fab) return;
   const detailOpen   = document.getElementById('detail-view')?.classList.contains('open');
   const changelogOpen= document.getElementById('changelog-overlay')?.classList.contains('open');
@@ -2629,9 +3408,11 @@ function updateFabVisibility() {
   const nukeOpen     = document.getElementById('reset-nuke-overlay')?.classList.contains('open');
   const videoOpen    = document.getElementById('video-modal-overlay')?.classList.contains('open');
   const imgOpen      = document.getElementById('img-zoom-overlay')?.classList.contains('open');
-  const hideFab = !!(detailOpen || changelogOpen || nukeOpen || videoOpen || imgOpen);
+  const randomOpen   = document.getElementById('random-selector-overlay')?.classList.contains('open');
+  const hideFab = !!(detailOpen || changelogOpen || nukeOpen || videoOpen || imgOpen || randomOpen);
   fab.classList.toggle('hidden', hideFab || !!todoPanelOpen);
-  if (todoFab) todoFab.classList.toggle('hidden', hideFab || !!todoPanelOpen);
+  if (todoFab)   todoFab.classList.toggle('hidden',   hideFab || !!todoPanelOpen);
+  if (randomFab) randomFab.classList.toggle('hidden', !!(detailOpen || changelogOpen || nukeOpen || videoOpen || imgOpen || todoPanelOpen || randomOpen));
 }
 
 /* ============================================================
@@ -3059,8 +3840,8 @@ const MASTERIES = [
       "[R] activa módulo de defensa con cañón (como Track)."
     ],
     missions: [
-      { text: "Golpea a 2000 personas con tu centinela",          target: 2000, isBool: false },
-      { text: "Lanza a 1000 personas al vacío con el centinela",  target: 1000, isBool: false },
+      { text: "Golpea a 750 personas con tu centinela",          target: 750, isBool: false },
+      { text: "Lanza a 350 personas al vacío con el centinela",  target: 350, isBool: false },
       { text: "Coloca 750 centinelas",                            target: 750,  isBool: false }
     ]
   ,
@@ -3361,7 +4142,7 @@ const MASTERIES = [
     id: "stick",
     name: "Stick",
     previewUrl: "",
-    date: "",
+    date: "01/08/2025",
     description: "Si te preguntas si esta maestría vale la pena, totalmente.",
     upgrades: [
       "Palo ser morado.",
@@ -3385,22 +4166,25 @@ const MASTERIES = [
     id: "bonk",              // ← sin espacios, solo minúsculas/números
     name: "Bonk",   // ← tal como aparece en el juego
     previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    date: "29/08/2025",
+    description: "Puede que no hayas captado la broma, pero estás a punto de sentir el remate.",
     upgrades: [
-      "POR AGREGAR.",
+      "El martillo es MUCHO más grande.",
+      "El área de knockback es mucho más grande.",
+      "Puedes saltar encima de otras personas.",
+      "Con suficiente altura puedes aplastarlos."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Golpea a 500 personas aplastadas.",  target: 500, isBool: false },
+      { text: "Mata a 10 personas aplastadas sin morir.",          target: 1,   isBool: true},
+      { text: "Aplasta a 800 personas.",  target: 900, isBool: false }
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    difficulty: 2,
+    time: 2,
+    fun: 1,
+    worth: 4,
+    locked: false
   },
 
   // ── CHAIN ─────────────────────────────────────────────────────
@@ -3408,7 +4192,7 @@ const MASTERIES = [
     id: "chain",
     name: "Chain",
     previewUrl: "",
-    date: "",
+    date: "26/09/2025",
     description: "¡Tú no puedes CONCEBIR de lo que soy capaz! ¡Estoy muy por encima de ti! ¡Soy como un dios con ropa humana! ¡RASHOS LÁSER APARECEN DE MIS DEDOS!",
     upgrades: [
       "[E] Lanza un orbe tesla que electrocuta a quien toca",
@@ -3433,45 +4217,49 @@ const MASTERIES = [
     id: "moon",              // ← sin espacios, solo minúsculas/números
     name: "Moon",   // ← tal como aparece en el juego
     previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    date: "17/10/2025",
+    description: "¿Puedo tener vuestra atención, ciudadanos de Slap Battles? ¡Esta noche, ROBAMOS LA LUNA!",
     upgrades: [
-      "POR AGREGAR.",
+      "Al aterrizar, lanzas polvo lunar que aturde brevemente a las personas cerca.",
+      "[E] Activa Moonduction: Púlsalo en el pico de altura para abducir a personas debajo de ti y mantenerte más rato en el aire.",
+      "El polvo estelar es más potente tras aterrizar de un Moonduction."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Desequípate tu guante mientras estás ragdoleado 100 veces.",  target: 100, isBool: false },
+      { text: "Golpea a 700 personas nada más aterrizar.",          target: 700,   isBool: false},
+      { text: "Golpea a 30 personas seguidas sin morir.",  target: 1, isBool: true }
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    difficulty: 1,
+    time: 1,
+    fun: 1,
+    worth: 5,
+    locked: false
   },
 
   // ── STALKER ────────────────────────────────────────────────
   {
     id: "stalker",              // ← sin espacios, solo minúsculas/números
-    name: "stalker",   // ← tal como aparece en el juego
+    name: "Stalker",   // ← tal como aparece en el juego
     previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    date: "14/11/2025",
+    description: "No puedes dormir, hay monstruos cerca.",
     upgrades: [
-      "POR AGREGAR.",
+      "La mejora de velocidad dura más.",
+      "[E] Activa Stalk: Colócate en primera persona y vigila a tu objetivo, marcándolo cada vez más rojo.",
+      "Si golpeas a tu víctima completamente marcada mientras tienes la mejora de velocidad, revelarás tu verdadera forma.",
+      "Durante tu forma verdadera, puedes mantener a tu víctima tanto como quieras, y la lanzarás tan pronto se termine el efecto."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Embosca a 10 personas seguidas sin morir.",  target: 1, isBool: true },
+      { text: "Embosca a 1000 personas.",          target: 1000,   isBool: false},
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    difficulty: 3,
+    time: 5,
+    fun: 5,
+    worth: 5,
+    locked: false
   },
 
   // ── RAGE ────────────────────────────────────────────────
@@ -3571,22 +4359,27 @@ const MASTERIES = [
     id: "acrobat",              // ← sin espacios, solo minúsculas/números
     name: "Acrobat",   // ← tal como aparece en el juego
     previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    date: "06/02/2026",
+    description: "¿Qué tal, peligro?",
     upgrades: [
-      "POR AGREGAR.",
+      "El poder del guante pasa de 40 a 48.",
+      "Ahora hay una barra de estilo, rellenándose haciendo combos.",
+      "Desbloquea el triple salto: salta 3 veces seguidas, cada vez ganando más altura. Esta habilidad tiene su propio cooldown independiente marcado encima de la barra de estilo.",
+      "El Roll ahora puede ejecutarse hacia atras tambien.",
+      "[R] Activa el Wall Hop: coloca una pared gastando parte de tu barra de estilo. Puedes usarla para saltar, ganar inercia y llegar mas alto.",
+      "Posibles combos: Tripe salto > Slap > Roll (Exelente) / Slap > Roll > Slap (Exelente) / Roll > Slap (Genial) / Slap > Slap (Bueno)"
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Realiza un combo excelente 200 veces (Slap > Roll > Slap).",  target: 200, isBool: false },
+      { text: "Realiza un combo genial 600 veces (Roll > Slap).",          target: 600,   isBool: false},
+      { text: "Golpea a 350 personas en medio de un Roll.",  target: 350, isBool: false }
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    difficulty: 3,
+    time: 3,
+    fun: 2,
+    worth: 4,
+    locked: false
   },
 
   // ── SPRING ────────────────────────────────────────────────
@@ -3617,22 +4410,26 @@ const MASTERIES = [
     id: "soul",              // ← sin espacios, solo minúsculas/números
     name: "Soul",   // ← tal como aparece en el juego
     previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    date: "06/03/2026",
+    description: "Debes sellar la luz cegadora que plaga sus sueños. Tú eres la vasija. Tú eres el Hollow Knight.",
     upgrades: [
-      "POR AGREGAR.",
+      "[R] Transfórmate en el vacío, con un nuevo set de habilidades y velocidad aumentada. Vuelve a tu estado de vasija en cualquier momento.",
+      "Con tu habilidad en el suelo, realiza un ataque de tentáculos que mantiene agarrado temporalmente a quien acierte el golpe justo antes de ser lanzado. La duración, el knockback y la velocidad dependen del número de almas.",
+      "Con tu habilidad en el aire, lanza una ronda de aguijones a tu alrededor. La cantidad de aguijones lanzados depende del numero de almas.",
+      "Mientras estas en estado de vacio, cada vez que seas ragdoleado, recibiras 25 de daño."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Mata a 3 personas seguidas con tu habilidad aérea sin ser golpeado.",  target: 1, isBool: true },
+      { text: "Mata 75 personas usando habilidades con las almas al máximo.",          target: 75,   isBool: false},
+      { text: "Mata a 150 personas usando tu habilidad aérea.",  target: 150, isBool: false },
+      { text: "Haz un combo a 300 personas de slap + habilidad.",  target: 300, isBool: false }
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    difficulty: 3,
+    time: 2,
+    fun: 1,
+    worth: 3,
+    locked: false
   },
 
   // ── THANOS ────────────────────────────────────────────────
@@ -3732,22 +4529,26 @@ const MASTERIES = [
     id: "mace",              // ← sin espacios, solo minúsculas/números
     name: "Mace",   // ← tal como aparece en el juego
     previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    date: "15/05/2026",
+    description: "Fice girar e vencí.",
     upgrades: [
-      "POR AGREGAR.",
+      "[E] Activa Momentum: Lánzate en dirección a tu maza dependiendo de la inercia que tenía.",
+      "La velocidad de giro máxima es mayor.",
+      "Cuanto más tiempo mantengas la maza girando a velocidad máxima, más knockback realizará, marcándose con colores.",
+      "Los golpes a la cabeza hacen todavía más knockback, demostrándose con brillos rojos cuando se ejecuta."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Golpea 5 personas seguidos sin que tu maza pierda demasiada velocidad.",  target: 1, isBool: true },
+      { text: "Golpea a 100 personas poco después de que tu maza esté parada.",          target: 100,   isBool: false},
+      { text: "Golpea a 600 personas.",  target: 600, isBool: false },
+      { text: "Mata a 250 personas.",  target: 250, isBool: false },
     ]
   ,
-    difficulty: 4,
-    time: 4,
+    difficulty: 2,
+    time: 2,
     fun: 3,
-    worth: 1,
-    locked: true
+    worth: 2,
+    locked: false
   },
 
   // ── DICE ──────────────────────────────────────────────────────
@@ -3777,7 +4578,7 @@ const MASTERIES = [
 
   {
     id: "comingsoon",              // ← sin espacios, solo minúsculas/números
-    name: "Proximamente",   // ← tal como aparece en el juego
+    name: "Proximamente (19/06)",   // ← tal como aparece en el juego
     previewUrl: "",
     date: "",
     description: "Descripción de la maestría tal como aparece en el juego.",
@@ -3842,6 +4643,7 @@ const MASTERIES = [
    ============================================================ */
 const STORAGE_KEY_PROGRESS  = 'slap_battles_progress_v2';
 const STORAGE_KEY_COMPLETED = 'slap_battles_completed_v2';
+const STORAGE_KEY_COMPLETED_AT = 'slap_battles_completed_at_v1';
 const STORAGE_KEY_HIDDEN     = 'slap_battles_hidden_v1';
 const STORAGE_KEY_MASTERY_SNAPSHOT = 'slap_battles_mastery_snapshot_v1';
 
@@ -3851,6 +4653,7 @@ function saveProgress() {
     const hiddenArr = Array.from(hiddenSet);
     localStorage.setItem(STORAGE_KEY_PROGRESS,  JSON.stringify(progressData));
     localStorage.setItem(STORAGE_KEY_COMPLETED, JSON.stringify(completedArr));
+    localStorage.setItem(STORAGE_KEY_COMPLETED_AT, JSON.stringify(completedAtMap));
     localStorage.setItem(STORAGE_KEY_HIDDEN,    JSON.stringify(hiddenArr));
   } catch(e) { console.warn('No se pudo guardar:', e); }
 }
@@ -3875,6 +4678,17 @@ function loadProgress() {
         if (MASTERIES.find(m => m.id === id)) completedSet.add(id);
       });
     }
+    const rawCompletedAt = localStorage.getItem(STORAGE_KEY_COMPLETED_AT);
+    if (rawCompletedAt) {
+      const storedCompletedAt = JSON.parse(rawCompletedAt);
+      if (storedCompletedAt && typeof storedCompletedAt === 'object') {
+        Object.entries(storedCompletedAt).forEach(([id, value]) => {
+          if (MASTERIES.find(m => m.id === id) && typeof value === 'string') {
+            completedAtMap[id] = value;
+          }
+        });
+      }
+    }
     if (rawHidden) {
       const arr = JSON.parse(rawHidden);
       arr.forEach(id => {
@@ -3888,7 +4702,10 @@ function loadProgress() {
 }
 
 function buildMasterySnapshot() {
-  return MASTERIES.map(m => m.id);
+  // Solo se consideran "vistas" las maestrías que están desbloqueadas.
+  // Si una maestría está locked, no se añade al snapshot, así que cuando
+  // se desbloquee aparecerá como "NUEVO" aunque ya existiera antes.
+  return MASTERIES.filter(m => !m.locked).map(m => m.id);
 }
 
 function loadMasterySnapshot() {
@@ -3923,6 +4740,7 @@ function resetAllProgress() {
   if (!confirm('¿Seguro que quieres borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
   progressData = {};
   completedSet.clear();
+  completedAtMap = {};
   hiddenSet.clear();
   MASTERIES.forEach(m => {
     progressData[m.id] = {};
@@ -3972,6 +4790,7 @@ function applyPreviewPlaceholder(img, fit = 'contain') {
    ============================================================ */
 let progressData   = {};
 let completedSet   = new Set();
+let completedAtMap = {};
 let hiddenSet      = new Set();
 let newMasteries   = new Set();
 let masterySnapshot = new Set();
@@ -3981,6 +4800,7 @@ let stickLoopAudio = null;
 let stickJumpscareAudio = null;
 let stickJumpscareTimer = null;
 let stickJumpscareHideTimer = null;
+let foxyFailTimer = null;
 let foxyVideoActive = false;
 
 /* Emoji por defecto por id de guante */
@@ -4008,7 +4828,10 @@ function stopStickEgg() {
     stickJumpscareHideTimer = null;
   }
   const overlay = document.getElementById('stick-jumpscare-overlay');
-  if (overlay) overlay.classList.remove('show');
+  if (overlay) {
+    overlay.classList.remove('show');
+    overlay.classList.remove('glitching');
+  }
 
   if (stickLoopAudio) {
     stickLoopAudio.pause();
@@ -4020,6 +4843,7 @@ function stopStickEgg() {
     stickJumpscareAudio.currentTime = 0;
     stickJumpscareAudio = null;
   }
+  playMasteryCompleteAnim._stickFoxyQueued = false;
 }
 
 function triggerStickJumpscare() {
@@ -4028,6 +4852,7 @@ function triggerStickJumpscare() {
   const image = document.getElementById('stick-jumpscare-image');
   if (!overlay || !image) return;
 
+  overlay.classList.remove('glitching');
   image.src = 'banner_stick.png';
   overlay.classList.add('show');
 
@@ -4042,7 +4867,35 @@ function triggerStickJumpscare() {
   clearTimeout(stickJumpscareHideTimer);
   stickJumpscareHideTimer = setTimeout(() => {
     overlay.classList.remove('show');
+    if (playMasteryCompleteAnim._stickFoxyQueued) {
+      playMasteryCompleteAnim._stickFoxyQueued = false;
+      setTimeout(() => startFoxyEgg(), 140);
+    }
   }, 900);
+}
+
+function startStickGlitchThenJumpscare() {
+  const overlay = document.getElementById('stick-jumpscare-overlay');
+  const image = document.getElementById('stick-jumpscare-image');
+  if (!overlay || !image) return;
+
+  clearTimeout(stickJumpscareHideTimer);
+  if (stickJumpscareAudio) {
+    stickJumpscareAudio.pause();
+    stickJumpscareAudio.currentTime = 0;
+    stickJumpscareAudio = null;
+  }
+
+  overlay.classList.add('show', 'glitching');
+  image.src = 'banner_stick.png';
+  image.style.opacity = '0';
+
+  setTimeout(() => {
+    overlay.classList.remove('glitching');
+    image.style.opacity = '';
+    overlay.classList.remove('show');
+    startFoxyEgg();
+  }, 700);
 }
 
 function startStickEgg() {
@@ -4060,6 +4913,10 @@ function startStickEgg() {
 function stopFoxyEgg() {
   const overlay = document.getElementById('foxy-video-overlay');
   const video = document.getElementById('foxy-video');
+  if (foxyFailTimer) {
+    clearTimeout(foxyFailTimer);
+    foxyFailTimer = null;
+  }
   if (overlay) overlay.classList.remove('show');
   if (video) {
     video.onended = null;
@@ -4085,10 +4942,16 @@ function startFoxyEgg() {
   video.muted = false;
   video.playsInline = true;
   video.onended = () => stopFoxyEgg();
-  video.onerror = () => stopFoxyEgg();
+  video.onerror = () => {
+    if (foxyFailTimer) clearTimeout(foxyFailTimer);
+    foxyFailTimer = setTimeout(() => stopFoxyEgg(), 5000);
+  };
 
   overlay.classList.add('show');
-  video.play().catch(() => stopFoxyEgg());
+  video.play().catch(() => {
+    if (foxyFailTimer) clearTimeout(foxyFailTimer);
+    foxyFailTimer = setTimeout(() => stopFoxyEgg(), 5000);
+  });
 }
 
 /* ============================================================
@@ -4113,6 +4976,18 @@ function init() {
   window.addEventListener('beforeunload', persistMasterySnapshot, { once: false });
   // Mostrar changelog si hay cambios nuevos
   checkChangelog();
+  // Overlay de animación de maestría completada
+  const mcOverlay = document.getElementById('mastery-complete-overlay');
+  if (mcOverlay) mcOverlay.addEventListener('pointerdown', handleMasterySkipClick);
+  document.addEventListener('pointerdown', handleMasterySkipClick, true);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (playMasteryCompleteAnim._phase === 'playing' || playMasteryCompleteAnim._phase === 'revealed') {
+        clearTimeout(playMasteryCompleteAnim._autoClose);
+        startStarOutro();
+      }
+    }
+  });
 }
 
 function persistMasterySnapshot() {
@@ -4193,7 +5068,7 @@ function createCard(mastery) {
   const isHidden = hiddenSet.has(mastery.id);
   const isLocked = !!mastery.locked;
   const pct      = getMasteryProgress(mastery);
-  const isNew    = isNewMastery(mastery.id);
+  const isNew    = !isLocked && isNewMastery(mastery.id);
 
   const card = document.createElement('div');
   let cls = 'mastery-card';
@@ -4270,11 +5145,15 @@ function toggleCompleted(id, e) {
   const wasCompleted = completedSet.has(id);
   if (wasCompleted) {
     completedSet.delete(id);
+    clearCompletedTimestamp(id);
+    resetMissions(id);
   } else {
     completedSet.add(id);
+    setCompletedTimestamp(id);
     hiddenSet.delete(id);
     // Auto-complete all missions
     autoCompleteMissions(id);
+    playMasteryCompleteAnim(id);
   }
   saveProgress();
   saveHiddenMasteries();
@@ -4283,8 +5162,30 @@ function toggleCompleted(id, e) {
   updateDetailHideButton();
   if (id === 'stick') {
     if (wasCompleted) stopFoxyEgg();
-    else startFoxyEgg();
   }
+}
+
+function resetMissions(id) {
+  const mastery = MASTERIES.find(m => m.id === id);
+  if (!mastery) return;
+  if (!progressData[id]) progressData[id] = {};
+  mastery.missions.forEach((mission, index) => {
+    progressData[id][index] = 0;
+  });
+}
+
+function setCompletedTimestamp(id) {
+  completedAtMap[id] = new Date().toLocaleString('es-ES', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function clearCompletedTimestamp(id) {
+  delete completedAtMap[id];
 }
 
 /* Auto-completes every mission for a mastery */
@@ -4295,6 +5196,27 @@ function autoCompleteMissions(id) {
   mastery.missions.forEach((mission, i) => {
     progressData[id][i] = mission.isBool ? 1 : mission.target;
   });
+}
+
+function maybeFinalizeMastery(masteryId, fromTodoList = false) {
+  const mastery = MASTERIES.find(m => m.id === masteryId);
+  if (!mastery || completedSet.has(masteryId)) return;
+  const prog = progressData[masteryId] || {};
+  const allDone = mastery.missions.every((mission, index) => {
+    const cur = prog[index] || 0;
+    return mission.isBool ? cur >= 1 : cur >= mission.target;
+  });
+  if (!allDone) return;
+
+  completedSet.add(masteryId);
+  setCompletedTimestamp(masteryId);
+  hiddenSet.delete(masteryId);
+  saveProgress();
+  saveHiddenMasteries();
+  renderGrid(document.getElementById('search-input').value);
+  updateDetailHideButton();
+  if (detailOpen && detailOpen.id === masteryId) closeDetail();
+  playMasteryCompleteAnim(masteryId);
 }
 
 /* Lock denied feedback: shake lock icon + red border flash */
@@ -4375,7 +5297,17 @@ function openDetail(id) {
   document.getElementById('detail-glove-name').textContent       = mastery.name;
   document.getElementById('detail-description-text').textContent = mastery.description;
   const dateEl = document.getElementById('detail-date-text');
+  const completedEl = document.getElementById('detail-completed-text');
   if (dateEl) dateEl.textContent = mastery.date || '';
+  if (completedEl) {
+    if (completedSet.has(mastery.id)) {
+      completedEl.textContent = completedAtMap[mastery.id]
+        ? `Completada: ${completedAtMap[mastery.id]}`
+        : 'Completada';
+    } else {
+      completedEl.textContent = '';
+    }
+  }
 
   // ── Ratings ──
   const RLABELS = {
@@ -4531,6 +5463,7 @@ function toggleMission(masteryId, missionIndex) {
   saveProgress();
   showToast('💾 Guardado');
   renderMissions(mastery);
+  maybeFinalizeMastery(masteryId);
 }
 
 /* ============================================================
@@ -4568,6 +5501,7 @@ function updateCounter(masteryId, missionIndex, value) {
   }
 
   updateOverallProgress(mastery);
+  maybeFinalizeMastery(masteryId);
 
   // Guardar con debounce para no saturar localStorage
   clearTimeout(_saveTimer);
@@ -4672,6 +5606,7 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (document.getElementById('image-modal-overlay').classList.contains('open')) { closeImageModal(); return; }
   if (document.getElementById('video-modal-overlay').classList.contains('open')) { closeVideoModal(); return; }
+  if (document.getElementById('random-selector-overlay').classList.contains('open')) { closeRandomSelector(); return; }
   if (foxyVideoActive) { stopFoxyEgg(); return; }
   if (todoSelectMode) { cancelTodoSelection(); return; }
   if (document.getElementById('todo-panel').classList.contains('open')) { closeTodoPanel(); return; }
@@ -4799,6 +5734,10 @@ const STORAGE_KEY_TODO = 'slapbattles_todo_list';
 let todoList = [];           // array of mastery IDs in order
 let todoSelectMode = false;
 let todoSelectSet  = new Set();
+let randomSelectorTimer = null;
+let randomSelectorStopTimer = null;
+let randomSelectorCurrent = null;
+let randomSelectorCandidates = [];
 
 /* ── Persistence ── */
 function saveTodoList() {
@@ -4906,12 +5845,13 @@ function completeTodoItem(id) {
       // Auto-complete the mastery (with mission auto-fill)
       if (!completedSet.has(id) && !hiddenSet.has(id)) {
         completedSet.add(id);
+        setCompletedTimestamp(id);
         hiddenSet.delete(id);
         autoCompleteMissions(id);
         saveProgress();
         saveHiddenMasteries();
         renderGrid(document.getElementById('search-input').value);
-        if (id === 'stick') startFoxyEgg();
+        playMasteryCompleteAnim(id);
       }
       renderTodoList();
       showToast('✅ ¡Maestría completada!');
@@ -4932,6 +5872,540 @@ function updateTodoFabCount() {
     countEl.style.display = 'none';
     fab.style.opacity = '0.45';
   }
+}
+
+/* ============================================================
+   RANDOM SELECTOR
+   ============================================================ */
+function getRandomSelectorCandidates() {
+  return MASTERIES.filter(m => !completedSet.has(m.id) && !hiddenSet.has(m.id) && !m.locked);
+}
+
+function setRandomSelectorPreview(mastery) {
+  const overlay = document.getElementById('random-selector-overlay');
+  const modal   = document.getElementById('random-selector-modal');
+  const stateEl = document.getElementById('random-selector-state');
+  const imgEl   = document.getElementById('random-selector-img');
+  const nameEl  = document.getElementById('random-selector-name');
+  if (!overlay || !modal || !stateEl || !imgEl || !nameEl || !mastery) return;
+
+  modal.classList.remove('error');
+  stateEl.textContent = randomSelectorCurrent ? 'Buscando...' : 'Buscando una maestría...';
+  nameEl.textContent = mastery.name;
+  imgEl.src = `banner_${mastery.id}.png`;
+  imgEl.onerror = () => { imgEl.src = 'preview_placeholder.png'; };
+}
+
+function openRandomSelectorError() {
+  const overlay = document.getElementById('random-selector-overlay');
+  const modal   = document.getElementById('random-selector-modal');
+  const stateEl = document.getElementById('random-selector-state');
+  const imgEl   = document.getElementById('random-selector-img');
+  const nameEl  = document.getElementById('random-selector-name');
+  const openBtn = document.getElementById('btn-random-open');
+  const rerollBtn = document.getElementById('btn-random-reroll');
+  if (!overlay || !modal || !stateEl || !imgEl || !nameEl || !openBtn || !rerollBtn) return;
+
+  overlay.classList.add('open');
+  modal.classList.add('error');
+  stateEl.textContent = 'Error: no te quedan maestrías disponibles';
+  imgEl.src = 'preview_placeholder.png';
+  nameEl.textContent = 'ERROR';
+  openBtn.style.display = 'none';
+  rerollBtn.style.display = 'none';
+  document.body.style.overflow = 'hidden';
+  updateFabVisibility();
+}
+
+function startRandomSelector() {
+  const candidates = getRandomSelectorCandidates();
+  if (!candidates.length) { openRandomSelectorError(); return; }
+
+  closeRandomSelector(false);
+  randomSelectorCandidates = candidates.slice();
+  randomSelectorCurrent = null;
+
+  const overlay   = document.getElementById('random-selector-overlay');
+  const modal     = document.getElementById('random-selector-modal');
+  const stateEl   = document.getElementById('random-selector-state');
+  const openBtn   = document.getElementById('btn-random-open');
+  const cancelBtn = document.getElementById('btn-random-cancel');
+  const rerollBtn = document.getElementById('btn-random-reroll');
+  const nameEl    = document.getElementById('random-selector-name');
+  const flashEl   = document.getElementById('rsm-flash');
+  const confCanvas= document.getElementById('rsm-confetti');
+  const randomFab = document.getElementById('random-fab');
+  if (!overlay || !modal) return;
+
+  // ── Setup modal state ──
+  overlay.classList.add('open');
+  modal.classList.remove('error','rsm-winning','rsm-spinning');
+  modal.classList.add('rsm-spinning');
+  stateEl.textContent = '🎰 Girando...';
+  openBtn.style.display   = 'none';
+  rerollBtn.style.display = 'none';
+  cancelBtn.style.display = 'inline-flex';
+  document.body.style.overflow = 'hidden';
+  if (randomFab) randomFab.classList.add('spinning');
+
+  // ── Canvas reel setup ──
+  const canvas  = document.getElementById('rsm-canvas');
+  const wrap    = document.getElementById('rsm-reel-wrap');
+  const ctx     = canvas.getContext('2d');
+  const W = wrap.offsetWidth  || 560;
+  const H = wrap.offsetHeight || 350;
+  canvas.width  = W;
+  canvas.height = H;
+
+  // ── State flags ──
+  let running  = true;
+  let skipRequested = false;
+
+  // ── Click to skip ──
+  const skipHandler = () => {
+    if (running) skipRequested = true;
+  };
+  wrap.style.cursor = 'pointer';
+  wrap.title = 'Clic para saltar';
+  wrap.addEventListener('click', skipHandler);
+
+  const skipBtn = document.getElementById('btn-random-skip');
+  if (skipBtn) {
+    skipBtn.style.display = 'inline-flex';
+    skipBtn.onclick = skipHandler;
+  }
+
+  // Preload banner images into Image objects
+  const imgCache = {};
+  const SLOT_H   = H;       // each card is full height
+  const SLOT_W   = W;
+  const VISIBLE  = 3;       // 3 items visible at once (prev, current, next)
+  const ITEM_W   = Math.round(SLOT_W * 0.72);
+  const ITEM_X   = (W - ITEM_W) / 2;
+
+  // Pick final result early
+  const pool = randomSelectorCandidates.slice();
+  const finalPick = pool[Math.floor(Math.random() * pool.length)];
+
+  // Build a shuffled sequence that ends with finalPick
+  const spinList = [];
+  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
+  const SPIN_COUNT = 34;
+  for (let i = 0; i < SPIN_COUNT; i++) spinList.push(shuffled[i % shuffled.length]);
+  spinList.push(finalPick); // always end here
+
+  // Preload all images
+  spinList.forEach(m => {
+    if (!imgCache[m.id]) {
+      const img = new Image();
+      img.src = `banner_${m.id}.png`;
+      img.onerror = () => { img._failed = true; };
+      imgCache[m.id] = img;
+    }
+  });
+
+  // ── Physics ──
+  // Position = index into spinList * SLOT_W, animated by offset
+  const TOTAL_DIST  = SPIN_COUNT * SLOT_W; // pixels to travel
+  const TOTAL_DUR   = 5000;                 // ms
+  let   offset      = 0;                    // current pixel offset
+  let   velocity    = 0;                    // px/ms
+  const MAX_VEL     = (TOTAL_DIST / TOTAL_DUR) * 1.8; // scaled so curve fits TOTAL_DIST in TOTAL_DUR
+  const ACCEL_T     = TOTAL_DUR * 0.12;     // ramp-up time
+  const DECEL_START = TOTAL_DUR * 0.42;     // when to start slowing
+  const DECEL_END   = TOTAL_DUR * 0.92;     // crawl to stop
+  const CRAWL_VEL   = MAX_VEL / 13.5;       // slow crawl, scaled to MAX_VEL
+
+  let rafId    = null;
+  let startTs  = null;
+  let lastTs   = null;
+  let lastIdx  = -1;
+  let lastFlash = 0;
+
+  // ── Draw one frame ──
+  function drawFrame(pxOffset) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Gradient background
+    const bgGrad = ctx.createLinearGradient(0,0,0,H);
+    bgGrad.addColorStop(0,   '#0a0a0a');
+    bgGrad.addColorStop(0.5, '#111108');
+    bgGrad.addColorStop(1,   '#0a0a0a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Determine which items to draw around current position
+    const curF  = pxOffset / SLOT_W;             // float index
+    const base  = Math.floor(curF);
+    const frac  = curF - base;
+
+    // Draw items: base-1, base, base+1 mapped to screen
+    for (let di = -1; di <= 2; di++) {
+      const idx = base + di;
+      if (idx < 0 || idx >= spinList.length) continue;
+      const m   = spinList[idx];
+      const img = imgCache[m.id];
+
+      // Screen X: each slot is SLOT_W wide, di=0 starts at 0 offset
+      const screenX = (di - frac) * SLOT_W;
+
+      // Perspective scale: center item is 1.0, sides shrink
+      const distFromCenter = Math.abs((screenX + SLOT_W/2) - W/2) / (W/2);
+      const scale    = 1 - distFromCenter * 0.28;
+      const alphaVal = 1 - distFromCenter * 0.65;
+
+      const drawW = SLOT_W  * scale;
+      const drawH = H       * scale;
+      const drawX = screenX + (SLOT_W - drawW) / 2;
+      const drawY = (H - drawH) / 2;
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, alphaVal);
+
+      // Rounded rect clip
+      const r = 10;
+      ctx.beginPath();
+      ctx.moveTo(drawX + r, drawY);
+      ctx.lineTo(drawX + drawW - r, drawY);
+      ctx.quadraticCurveTo(drawX + drawW, drawY, drawX + drawW, drawY + r);
+      ctx.lineTo(drawX + drawW, drawY + drawH - r);
+      ctx.quadraticCurveTo(drawX + drawW, drawY + drawH, drawX + drawW - r, drawY + drawH);
+      ctx.lineTo(drawX + r, drawY + drawH);
+      ctx.quadraticCurveTo(drawX, drawY + drawH, drawX, drawY + drawH - r);
+      ctx.lineTo(drawX, drawY + r);
+      ctx.quadraticCurveTo(drawX, drawY, drawX + r, drawY);
+      ctx.closePath();
+      ctx.clip();
+
+      // Draw image or placeholder
+      if (img && img.complete && !img._failed && img.naturalWidth > 0) {
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+      } else {
+        // Placeholder
+        const ph = ctx.createLinearGradient(drawX, drawY, drawX, drawY + drawH);
+        ph.addColorStop(0, '#1e1600');
+        ph.addColorStop(1, '#130f00');
+        ctx.fillStyle = ph;
+        ctx.fillRect(drawX, drawY, drawW, drawH);
+        ctx.fillStyle = '#333';
+        ctx.font = `bold ${Math.round(drawH * 0.35)}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🎯', drawX + drawW/2, drawY + drawH/2);
+      }
+
+      // Dark overlay on non-center cards
+      if (Math.abs(distFromCenter) > 0.05) {
+        ctx.fillStyle = `rgba(0,0,0,${0.5 * distFromCenter})`;
+        ctx.fillRect(drawX, drawY, drawW, drawH);
+      }
+
+      // Name label at bottom
+      if (distFromCenter < 0.5 && scale > 0.8) {
+        const labelH = 38 * scale;
+        const labelGrad = ctx.createLinearGradient(0, drawY + drawH - labelH, 0, drawY + drawH);
+        labelGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        labelGrad.addColorStop(1, 'rgba(0,0,0,0.88)');
+        ctx.fillStyle = labelGrad;
+        ctx.fillRect(drawX, drawY + drawH - labelH, drawW, labelH);
+        ctx.fillStyle = `rgba(255,255,255,${0.92 * (1 - distFromCenter * 1.5)})`;
+        ctx.font = `${Math.round(13 * scale)}px 'Fredoka One', cursive`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        const maxW = drawW - 16;
+        let txt = m.name;
+        while (ctx.measureText(txt).width > maxW && txt.length > 4) txt = txt.slice(0,-1) + '…';
+        ctx.fillText(txt, drawX + drawW/2, drawY + drawH - 5 * scale);
+      }
+
+      ctx.restore();
+    }
+
+    // Center-item highlight frame (golden border for the middle card)
+    const frameScale  = 1 - (Math.abs((frac - 0.5)) * 0) * 0;
+    const frameW = SLOT_W * 0.998;
+    const frameH = H      * 0.998;
+    const frameX = (W - frameW) / 2;
+    const frameY = (H - frameH) / 2;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,215,0,0.55)';
+    ctx.lineWidth   = 3;
+    const fr = 11;
+    ctx.beginPath();
+    ctx.roundRect(frameX, frameY, frameW, frameH, fr);
+    ctx.stroke();
+    ctx.restore();
+
+    // Motion blur lines at top speed
+    const velNorm = Math.min(velocity / MAX_VEL, 1);
+    if (velNorm > 0.3) {
+      ctx.save();
+      const lineCount = Math.round(velNorm * 18);
+      for (let i = 0; i < lineCount; i++) {
+        const y  = (i / lineCount) * H;
+        const a  = velNorm * 0.35 * (1 - Math.abs(i / lineCount - 0.5) * 2);
+        const grad = ctx.createLinearGradient(0, y, W, y);
+        grad.addColorStop(0,   'transparent');
+        grad.addColorStop(0.3, `rgba(255,255,220,${a})`);
+        grad.addColorStop(0.7, `rgba(255,255,220,${a})`);
+        grad.addColorStop(1,   'transparent');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, y, W, H / lineCount * 0.6);
+      }
+      ctx.restore();
+    }
+
+    // Top/bottom vignette
+    const topGrad = ctx.createLinearGradient(0,0,0,H*0.35);
+    topGrad.addColorStop(0, 'rgba(0,0,0,0.82)');
+    topGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 0, W, H * 0.35);
+
+    const botGrad = ctx.createLinearGradient(0, H*0.65, 0, H);
+    botGrad.addColorStop(0, 'transparent');
+    botGrad.addColorStop(1, 'rgba(0,0,0,0.82)');
+    ctx.fillStyle = botGrad;
+    ctx.fillRect(0, H * 0.65, W, H * 0.35);
+  }
+
+  // ── Confetti system ──
+  const confParticles = [];
+  function spawnConfetti() {
+    if (!confCanvas) return;
+    confCanvas.width  = W;
+    confCanvas.height = H;
+    confCanvas.classList.add('visible');
+    const colors = ['#FFD700','#FF4400','#00EEFF','#FF00AA','#39FF14','#FFFFFF','#FF8C00'];
+    for (let i = 0; i < 65; i++) {
+      confParticles.push({
+        x:  W * 0.3 + Math.random() * W * 0.4,
+        y:  H * 0.5,
+        vx: (Math.random()-0.5) * 8,
+        vy: -(3 + Math.random() * 9),
+        r:  2 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot:  Math.random() * 360,
+        rvel: (Math.random()-0.5) * 12,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle',
+        life: 1
+      });
+    }
+  }
+  function drawConfetti() {
+    if (!confCanvas || !confParticles.length) return;
+    const cctx = confCanvas.getContext('2d');
+    cctx.clearRect(0, 0, W, H);
+    for (let i = confParticles.length - 1; i >= 0; i--) {
+      const p = confParticles[i];
+      p.x   += p.vx;
+      p.y   += p.vy;
+      p.vy  += 0.22;
+      p.vx  *= 0.99;
+      p.rot += p.rvel;
+      p.life -= 0.012;
+      if (p.life <= 0 || p.y > H + 10) { confParticles.splice(i,1); continue; }
+      cctx.save();
+      cctx.globalAlpha = Math.min(p.life * 2, 1);
+      cctx.translate(p.x, p.y);
+      cctx.rotate(p.rot * Math.PI / 180);
+      cctx.fillStyle = p.color;
+      cctx.shadowColor = p.color;
+      cctx.shadowBlur  = 4;
+      if (p.shape === 'rect') {
+        cctx.fillRect(-p.r, -p.r * 1.6, p.r * 2, p.r * 3.2);
+      } else {
+        cctx.beginPath();
+        cctx.arc(0, 0, p.r, 0, Math.PI * 2);
+        cctx.fill();
+      }
+      cctx.restore();
+    }
+    if (confParticles.length === 0) {
+      confCanvas.classList.remove('visible');
+    }
+  }
+
+  // ── Tick flash (white frame pop on each card change) ──
+  function doFlash(intensity) {
+    if (!flashEl) return;
+    flashEl.style.background = `rgba(255,255,220,${intensity * 0.55})`;
+    setTimeout(() => { flashEl.style.background = 'rgba(255,255,255,0)'; }, 80);
+  }
+
+  // ── Main animation loop ──
+  // Phase 1 (0..DECEL_START): velocity-integration ramp-up + constant speed.
+  // Phase 2 (DECEL_START..TOTAL_DUR): deterministic ease-out tween from the
+  // offset reached at DECEL_START to exactly TOTAL_DIST. This guarantees a
+  // single smooth deceleration with no extra spins or jumps at the end.
+  let approachStartOffset = null; // offset captured at DECEL_START
+  let approachStartTs = null;
+  let approachDur = null;
+
+  function animate(ts) {
+    if (!running) return;
+    if (!startTs) { startTs = ts; lastTs = ts; }
+    const elapsed = ts - startTs;
+    const dt      = Math.min(ts - lastTs, 50); // clamp dt to avoid big jumps on lag
+    lastTs        = ts;
+
+    if (skipRequested && approachStartOffset === null) {
+      // Skip pressed during ramp-up: begin the approach phase right now.
+      approachStartOffset = offset;
+      approachStartTs = ts;
+      approachDur = 1; // instant finish when skipped
+    }
+
+    if (approachStartOffset !== null) {
+      if (skipRequested && approachDur > 1) {
+        approachDur = 1;
+        approachStartOffset = offset;
+        approachStartTs = ts;
+      }
+      const p = Math.min((ts - approachStartTs) / Math.max(approachDur, 1), 1);
+      const ep = 1 - Math.pow(1 - p, 3); // ease-out cubic
+      const prevOffset = offset;
+      offset = approachStartOffset + (TOTAL_DIST - approachStartOffset) * ep;
+      velocity = (offset - prevOffset) / Math.max(dt, 1);
+      if (p >= 1) offset = TOTAL_DIST;
+    } else {
+      // Ramp-up / constant speed phase
+      if (elapsed < ACCEL_T) {
+        const p = elapsed / ACCEL_T;
+        velocity = MAX_VEL * (p * p);
+      } else {
+        velocity = MAX_VEL;
+      }
+      offset += velocity * dt;
+
+      if (elapsed >= DECEL_START) {
+        approachStartOffset = offset;
+        approachStartTs = ts;
+        approachDur = TOTAL_DUR - elapsed;
+      }
+    }
+
+    // Card index: which card is centred
+    const curIdx = Math.floor(offset / SLOT_W);
+    if (curIdx !== lastIdx && curIdx >= 0 && curIdx < spinList.length) {
+      lastIdx = curIdx;
+      const shown = spinList[Math.min(curIdx, spinList.length - 1)];
+      if (nameEl) nameEl.textContent = shown.name;
+      randomSelectorCurrent = shown;
+      // Flash intensity proportional to speed
+      const speedNorm = Math.min(velocity / MAX_VEL, 1);
+      const flashStr = 0.2 + speedNorm * 0.8;
+      doFlash(flashStr);
+    }
+
+    drawFrame(offset);
+    drawConfetti();
+
+    // Done?
+    if (offset >= TOTAL_DIST) {
+      running = false;
+      offset  = TOTAL_DIST;
+      velocity = 0;
+      drawFrame(offset);
+      finishSelection();
+      return;
+    }
+
+    rafId = requestAnimationFrame(animate);
+  }
+
+  rafId = requestAnimationFrame(animate);
+
+  // Store cancel hook
+  randomSelectorTimer = {
+    _cancelFn: () => {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      if (randomFab) randomFab.classList.remove('spinning');
+    }
+  };
+
+  // ── Reveal sequence ──
+  function finishSelection() {
+    if (wrap) wrap.removeEventListener('click', skipHandler);
+    randomSelectorCurrent = finalPick;
+
+    // Force final image to draw cleanly
+    drawFrame(TOTAL_DIST);
+
+    if (nameEl) nameEl.textContent = finalPick.name;
+
+    // State machine
+    modal.classList.remove('rsm-spinning');
+    modal.classList.add('rsm-winning');
+
+    stateEl.textContent = '✦ ¡MAESTRÍA SELECCIONADA! ✦';
+
+    openBtn.style.display   = 'inline-flex';
+    rerollBtn.style.display = 'inline-flex';
+
+    if (randomFab) randomFab.classList.remove('spinning');
+
+    // Confetti burst
+    spawnConfetti();
+
+    // Keep animating confetti frames
+    function confLoop(ts) {
+      if (confParticles.length === 0) return;
+      drawConfetti();
+      requestAnimationFrame(confLoop);
+    }
+    requestAnimationFrame(confLoop);
+
+    updateFabVisibility();
+  }
+}
+
+function closeRandomSelector(resetState = true) {
+  if (randomSelectorTimer && randomSelectorTimer._cancelFn) {
+    randomSelectorTimer._cancelFn();
+    randomSelectorTimer = null;
+  } else if (randomSelectorTimer) {
+    clearInterval(randomSelectorTimer);
+    randomSelectorTimer = null;
+  }
+  if (randomSelectorStopTimer) {
+    clearTimeout(randomSelectorStopTimer);
+    randomSelectorStopTimer = null;
+  }
+
+  const overlay    = document.getElementById('random-selector-overlay');
+  const modal      = document.getElementById('random-selector-modal');
+  const openBtn    = document.getElementById('btn-random-open');
+  const rerollBtn  = document.getElementById('btn-random-reroll');
+  const confCanvas = document.getElementById('rsm-confetti');
+  const flashEl    = document.getElementById('rsm-flash');
+  const randomFab  = document.getElementById('random-fab');
+
+  if (overlay) overlay.classList.remove('open');
+  if (modal)   modal.classList.remove('rsm-spinning', 'rsm-winning', 'error');
+  if (openBtn)  openBtn.style.display  = 'inline-flex';
+  if (rerollBtn) rerollBtn.style.display = 'inline-flex';
+  if (confCanvas) confCanvas.classList.remove('visible');
+  if (flashEl)    flashEl.style.background  = 'rgba(255,255,255,0)';
+  if (randomFab)  randomFab.classList.remove('spinning');
+
+  randomSelectorCurrent = null;
+  if (resetState) {
+    document.body.style.overflow = detailOpen ? 'hidden' : '';
+    updateFabVisibility();
+  }
+}
+
+function rerollRandomSelector() {
+  startRandomSelector();
+}
+
+function openRandomSelected() {
+  if (!randomSelectorCurrent) return;
+  const selectedId = randomSelectorCurrent.id;
+  closeRandomSelector();
+  openDetail(selectedId);
 }
 
 /* ============================================================
@@ -5076,10 +6550,420 @@ function exitTodoSelectMode() {
 }
 
 /* ============================================================
+   PAGE SWITCHER
+   ============================================================ */
+function switchPage(page) {
+  const gridView   = document.getElementById('grid-view');
+  const slapView   = document.getElementById('slap-view');
+  const searchWrap = document.getElementById('search-bar-wrap');
+  const statsBar   = document.getElementById('stats-bar');
+  const btnMast    = document.getElementById('nav-masteries');
+  const btnSlap    = document.getElementById('nav-slap');
+
+  if (page === 'masteries') {
+    gridView.style.display   = '';
+    slapView.style.display   = 'none';
+    searchWrap.style.display = '';
+    statsBar.style.display   = '';
+    btnMast.classList.add('active');
+    btnSlap.classList.remove('active');
+  } else {
+    gridView.style.display   = 'none';
+    slapView.style.display   = 'flex';
+    searchWrap.style.display = 'none';
+    statsBar.style.display   = 'none';
+    btnMast.classList.remove('active');
+    btnSlap.classList.add('active');
+  }
+}
+
+/* ============================================================
    START
    ============================================================ */
 init();
+
+/* ============================================================
+   MASTERY COMPLETE ANIMATION
+   ============================================================ */
+function playMasteryCompleteAnim(id) {
+  const overlay = document.getElementById('mastery-complete-overlay');
+  const stage   = document.getElementById('mastery-complete-stage');
+  const imgDef  = document.getElementById('mc-img-default');
+  const imgBan  = document.getElementById('mc-img-banner');
+  const beam    = document.getElementById('mc-light-beam');
+  const flash   = document.getElementById('mc-flash-burst');
+  const label   = document.getElementById('mc-label');
+  const mastery = MASTERIES.find(m => m.id === id);
+  if (!overlay || !mastery) return;
+  playMasteryCompleteAnim._currentId = id;
+  playMasteryCompleteAnim._stickFoxyQueued = false;
+
+  // Hard reset
+  overlay.classList.remove('active');
+  stage.classList.remove('glow-ring');
+  [imgDef, imgBan, beam, flash, label].forEach(el => { el.style.transition = 'none'; });
+
+  imgDef.style.cssText += ';opacity:1;transform:scale(1);filter:saturate(0.4) brightness(0.7);';
+  imgBan.style.cssText += ';opacity:0;transform:scale(1.08);';
+  beam.style.cssText   += ';opacity:0;left:-30%;';
+  flash.style.cssText  += ';opacity:0;';
+  label.style.cssText  += ';opacity:0;transform:translateY(12px);';
+
+  imgDef.src = 'default_' + id + '.png';
+  imgBan.src = 'banner_'  + id + '.png';
+  imgDef.onerror = () => { imgDef.src = 'preview_placeholder.png'; };
+  imgBan.onerror = () => { imgBan.src = 'preview_placeholder.png'; };
+  label.textContent = '\u2736  ' + mastery.name.toUpperCase() + '  \u2014  MAESTR\u00CDA COMPLETADA  \u2736';
+
+  // Reset timer tracking
+  (_mcTimers || []).forEach(t => clearTimeout(t));
+  _mcTimers = [];
+  function mt(fn, ms) { const t = setTimeout(fn, ms); _mcTimers.push(t); return t; }
+
+  void overlay.offsetWidth;
+  overlay.classList.add('active');
+
+  const BEAM_START  = 420;
+  const BEAM_TRAVEL = 680;
+  const REVEAL      = BEAM_START + Math.round(BEAM_TRAVEL * 0.5);
+
+  // Sweep beam
+  mt(() => {
+    beam.style.transition = 'left ' + BEAM_TRAVEL + 'ms cubic-bezier(0.4,0,0.2,1), opacity 100ms ease';
+    beam.style.opacity = '1';
+    beam.style.left    = '120%';
+  }, BEAM_START);
+
+  // At midpoint: flash + reveal banner
+  mt(() => {
+    flash.style.transition = 'opacity 55ms ease';
+    flash.style.opacity = '1';
+
+    imgDef.style.transition = 'opacity 200ms ease, transform 400ms ease';
+    imgDef.style.opacity = '0';
+    imgDef.style.transform = 'scale(1.04)';
+
+    imgBan.style.transition = 'opacity 270ms ease 55ms, transform 440ms cubic-bezier(0.2,0.8,0.4,1) 40ms';
+    imgBan.style.opacity = '1';
+    imgBan.style.transform = 'scale(1)';
+
+    mt(() => {
+      flash.style.transition = 'opacity 260ms ease';
+      flash.style.opacity = '0';
+    }, 85);
+
+    mt(() => { stage.classList.add('glow-ring'); }, 140);
+
+    mt(() => {
+      label.style.transition = 'opacity 340ms ease, transform 340ms cubic-bezier(0.2,0.8,0.4,1)';
+      label.style.opacity = '1';
+      label.style.transform = 'translateY(0)';
+    }, 290);
+
+    mt(() => {
+      beam.style.transition = 'opacity 200ms ease';
+      beam.style.opacity = '0';
+    }, 310);
+
+  }, REVEAL);
+
+  mt(() => { playMasteryCompleteAnim._phase = 'revealed'; }, REVEAL + 400);
+
+  // Auto-dismiss after 4s → triggers outro
+  clearTimeout(playMasteryCompleteAnim._autoClose);
+  playMasteryCompleteAnim._autoClose = setTimeout(() => {
+    if (id === 'stick') startStickOutro();
+    else startStarOutro();
+  }, 4200);
+
+  // Flag: animation still playing (skip on first click, dismiss on second)
+  playMasteryCompleteAnim._phase = 'playing';
+}
+
+/* ── Skip on click: single click skips the whole cinematic ── */
+function handleMasterySkipClick(e) {
+  const overlay = document.getElementById('mastery-complete-overlay');
+  if (!overlay || !overlay.classList.contains('active')) return;
+  if (playMasteryCompleteAnim._phase !== 'playing' && playMasteryCompleteAnim._phase !== 'revealed') return;
+  if (playMasteryCompleteAnim._currentId === 'stick') return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  clearTimeout(playMasteryCompleteAnim._autoClose);
+  (_mcTimers || []).forEach(t => clearTimeout(t));
+  _mcTimers = [];
+  startStarOutro();
+}
+
+/* ── Star outro: shrink stage → burst into star → arc to bottom ── */
+function startStarOutro() {
+  playMasteryCompleteAnim._phase = 'outro';
+  const overlay = document.getElementById('mastery-complete-overlay');
+  const stage   = document.getElementById('mastery-complete-stage');
+  const canvas  = document.getElementById('mc-star-canvas');
+  if (!overlay || !stage || !canvas) { hardDismiss(); return; }
+
+  // Get stage screen position before we touch anything
+  const rect = stage.getBoundingClientRect();
+  const cx   = rect.left + rect.width  / 2;
+  const cy   = rect.top  + rect.height / 2;
+
+  // 1. Shrink stage to a point
+  stage.style.transition = 'transform 420ms cubic-bezier(0.4,0,1,1), opacity 420ms ease';
+  stage.style.transform  = 'scale(0.04)';
+  stage.style.opacity    = '0';
+
+  // 2. Fade out backdrop/overlay shell (keep canvas visible)
+  overlay.style.transition = 'opacity 350ms ease 80ms';
+  overlay.style.opacity    = '0';
+
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    overlay.style.transition = '';
+    overlay.style.opacity    = '';
+    stage.style.transition   = '';
+    stage.style.transform    = '';
+    stage.style.opacity      = '';
+    stage.classList.remove('glow-ring');
+
+    // 3. Run canvas star arc
+    runStarArc(canvas, cx, cy, () => {
+      canvas.classList.remove('visible');
+    });
+  }, 420);
+}
+
+function startStickOutro() {
+  playMasteryCompleteAnim._phase = 'outro';
+  const overlay = document.getElementById('mastery-complete-overlay');
+  const stage   = document.getElementById('mastery-complete-stage');
+  if (!overlay || !stage) { hardDismiss(); return; }
+
+  stage.style.transition = 'transform 220ms ease, opacity 220ms ease';
+  stage.style.transform  = 'scale(0.06)';
+  stage.style.opacity     = '0';
+  overlay.style.transition = 'opacity 180ms ease';
+  overlay.style.opacity    = '0';
+
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    overlay.style.transition = '';
+    overlay.style.opacity    = '';
+    stage.style.transition   = '';
+    stage.style.transform    = '';
+    stage.style.opacity      = '';
+    stage.classList.remove('glow-ring');
+    startStickGlitchThenJumpscare();
+  }, 240);
+}
+
+/* ─── Canvas star arc animation ─── */
+function runStarArc(canvas, startX, startY, onDone) {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.classList.add('visible');
+
+  const ctx = canvas.getContext('2d');
+  const W   = canvas.width;
+  const H   = canvas.height;
+
+  // Exaggerated arc: peak WAY above screen, wide horizontal swing, land bottom
+  const endX  = W / 2 + (Math.random() - 0.5) * W * 0.6;
+  const endY  = H + 80;
+  const peakX = startX + (endX - startX) * 0.35 + (Math.random() - 0.5) * W * 0.45;
+  const peakY = -H * 0.55; // well above the viewport
+
+  // Initial burst particles
+  const particles = [];
+  const BURST = 28;
+  for (let i = 0; i < BURST; i++) {
+    const angle = (i / BURST) * Math.PI * 2;
+    const speed = 2.5 + Math.random() * 5;
+    particles.push({
+      x: startX, y: startY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1, decay: 0.022 + Math.random() * 0.018,
+      size: 1.5 + Math.random() * 3,
+      hue: 35 + Math.random() * 50,
+      type: 'burst'
+    });
+  }
+
+  // Trail history — store last N positions for a comet-tail glow line
+  const trail = [];
+  const TRAIL_LEN = 28;
+
+  const START    = performance.now();
+  const DURATION = 750; // fast!
+
+  function bezier(t, p0, p1, p2) {
+    return (1-t)*(1-t)*p0 + 2*(1-t)*t*p1 + t*t*p2;
+  }
+
+  function drawStar(x, y, r, points, color, glowColor) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.shadowColor = glowColor || '#ffe066';
+    ctx.shadowBlur  = r * 5;
+    ctx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const a   = (i * Math.PI) / points - Math.PI / 2;
+      const rad = i % 2 === 0 ? r : r * 0.38;
+      ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function frame(now) {
+    const t    = Math.min((now - START) / DURATION, 1);
+    // ease-in (accelerates): feels like it's launched hard
+    const ease = t * t * (3 - 2 * t);
+
+    ctx.clearRect(0, 0, W, H);
+
+    const sx = bezier(ease, startX, peakX, endX);
+    const sy = bezier(ease, startY, peakY, endY);
+
+    // Push current pos to trail
+    trail.push({ x: sx, y: sy, t });
+    if (trail.length > TRAIL_LEN) trail.shift();
+
+    // ── Draw comet tail as a glowing tapered line ──
+    if (trail.length > 2) {
+      for (let i = 1; i < trail.length; i++) {
+        const a  = i / trail.length;           // 0 → tail end, 1 → head
+        const p0 = trail[i - 1];
+        const p1 = trail[i];
+        const w  = a * a * 5;                  // widens near head
+        const alpha = a * a * 0.9;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.strokeStyle = `hsl(${45 + (1-a)*30}, 100%, ${70 + a*25}%)`;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth   = w;
+        ctx.lineCap     = 'round';
+        ctx.shadowColor = '#ffdd44';
+        ctx.shadowBlur  = 14 * a;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // ── Sparkle trail: spawn aggressively ──
+    if (t < 0.96) {
+      const numSpawn = 3 + Math.floor(Math.random() * 3);
+      for (let s = 0; s < numSpawn; s++) {
+        particles.push({
+          x: sx + (Math.random()-0.5)*10,
+          y: sy + (Math.random()-0.5)*10,
+          vx: (Math.random()-0.5) * 3.5,
+          vy: (Math.random()-0.5) * 3.5,
+          life: 0.9 + Math.random() * 0.1,
+          decay: 0.055 + Math.random() * 0.04,
+          size: 1 + Math.random() * 3.5,
+          hue: 30 + Math.random() * 60,
+          type: 'trail'
+        });
+      }
+    }
+
+    // ── Update & draw particles ──
+    ctx.globalAlpha = 1;
+    particles.forEach(p => {
+      p.x    += p.vx;
+      p.y    += p.vy;
+      p.vy   += 0.09;
+      p.life -= p.decay;
+      if (p.life <= 0) return;
+
+      const alpha = p.type === 'burst'
+        ? p.life * Math.max(0, 1 - ease)      // burst fades as anim progresses
+        : p.life;
+
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.85;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fillStyle   = `hsl(${p.hue}, 100%, 72%)`;
+      ctx.shadowColor = `hsl(${p.hue}, 100%, 80%)`;
+      ctx.shadowBlur  = 10;
+      ctx.fill();
+      ctx.restore();
+    });
+
+    ctx.globalAlpha = 1;
+
+    // ── Star: small and sharp ──
+    const starR = (t < 0.08)
+      ? 13 * (t / 0.08)
+      : (t > 0.85)
+        ? 13 * (1 - (t - 0.85) / 0.15)
+        : 13;
+
+    if (sy < H + 50) {
+      // Outer glow aura
+      ctx.save();
+      ctx.globalAlpha = 0.35;
+      drawStar(sx, sy, starR * 2.2, 5, 'rgba(255,220,60,0.3)', '#ffcc00');
+      ctx.restore();
+      // Main star
+      drawStar(sx, sy, starR, 5, '#fff7aa', '#ffffff');
+      // Bright white core
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      drawStar(sx, sy, starR * 0.35, 5, '#ffffff', '#ffffff');
+      ctx.restore();
+    }
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      ctx.clearRect(0, 0, W, H);
+      onDone();
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+function hardDismiss() {
+  const overlay = document.getElementById('mastery-complete-overlay');
+  const stage   = document.getElementById('mastery-complete-stage');
+  const canvas  = document.getElementById('mc-star-canvas');
+  if (overlay) { overlay.classList.remove('active'); overlay.style.cssText = ''; }
+  if (stage)   { stage.style.cssText = ''; stage.classList.remove('glow-ring'); }
+  if (canvas)  { canvas.classList.remove('visible'); }
+}
+
+/* Shared timer array so skip can clear them all */
+let _mcTimers = [];
+
+
 </script>
+
+
+<!-- ══════════════════════════════════════════════
+     MASTERY COMPLETE ANIMATION OVERLAY
+     ══════════════════════════════════════════════ -->
+<canvas id="mc-star-canvas"></canvas>
+<div id="mastery-complete-overlay">
+  <div id="mastery-complete-backdrop"></div>
+  <div id="mastery-complete-stage">
+    <img id="mc-img-default" alt="">
+    <img id="mc-img-banner"  alt="">
+    <div id="mc-light-beam"></div>
+    <div id="mc-flash-burst"></div>
+    <div id="mc-label"></div>
+    <span id="mc-dismiss-hint">clic para cerrar</span>
+  </div>
+</div>
 
 </body>
 </html>
