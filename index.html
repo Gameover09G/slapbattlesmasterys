@@ -90,7 +90,7 @@ body {
 #mastery-complete-stage {
   position: relative;
   width: min(700px, 92vw);
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 700 / 450;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 0 0 3px #222, 0 20px 60px rgba(0,0,0,0.8);
@@ -3258,12 +3258,13 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
-    version: "0.4.0 - Maestrias y ludopatia",
+    version: "0.4.0 - Maestrias completadas",
     date: "13/06/2026",
     entries: [
       { emoji: "✨", color: "#FFD700",  text: "Todas las maestrias ya estan completas" },
       { emoji: "✅", color: "#39ff14",  text: "Se ejecuta una animacion cada vez que completas una maestria, mostrando el cambio entre el antiguo banner y el nuevo. Puedes saltarla solo haciendo clic." },
       { emoji: "🕛", color: "#a78bfa",  text: "Ahora muestra la fecha y hora de complecion de la maestria." },
+      { emoji: "🎲", color: "#c084fc",  text: "Arriba de los otros botones, hay otro para seleccionar una maestria random" },
       { emoji: "📋", color: "#5e5e5e",  text: "Ahora completar todas las misiones te auto-completan la maestria, desmarcar una maestria como completa reinicia el progreso de misiones y completar una maestria que completa todas las misiones." },
       { emoji: "👀", color: "#FFffff",  text: "Nuevo selector de modo, entre maestria y ¿guantes? (Proximamente)" },
     ]
