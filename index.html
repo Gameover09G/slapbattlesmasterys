@@ -106,7 +106,7 @@ body {
 }
 #mc-img-default {
   z-index: 1;
-  filter: saturate(0.4) brightness(0.7);
+  filter: none;
 }
 #mc-img-banner {
   z-index: 2;
@@ -387,7 +387,7 @@ body {
   border-color: var(--green-done) !important;
   animation: cardIn .4s ease both, greenPulse 2.5s ease-in-out .4s infinite;
 }
-.mastery-card.completed .card-top { opacity: 0.7; filter: saturate(0.6); }
+.mastery-card.completed .card-top { opacity: 1; filter: saturate(0.6); }
 .mastery-card.hidden {
   border-color: #222 !important;
   animation: cardIn 0.4s ease both;
@@ -1426,6 +1426,17 @@ body {
 #slap-view img {
   width: min(320px, 70vw);
   opacity: 0.55;
+}
+/* Los banners de guante NO heredan el opacity 0.55 del placeholder */
+#slap-view .glove-card-banner,
+#slap-view #glove-detail-banner-img,
+#slap-view #glove-detail-glove-img,
+#slap-view #glove-detail-badge-img,
+#slap-view .btn-glove-mastery-icon,
+#slap-view .page-nav-btn img {
+  width: auto;
+  opacity: 1 !important;
+  filter: none !important;
 }
 #slap-view p {
   font-family: 'Fredoka', sans-serif;
@@ -2868,6 +2879,1097 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   transform: translate(-100%, -100%) !important;
 }
 
+/* ============================================================
+   CALENDAR / DIARY VIEW  — rediseño completo
+   ============================================================ */
+#calendar-view {
+  padding: 16px 14px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 60vh;
+}
+
+/* ── Dos columnas: calendario izq, detalle der ── */
+#cal-main-layout {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,420px);
+  gap: 18px;
+  align-items: start;
+}
+
+/* ── Columna izquierda: widget del calendario ── */
+#cal-container {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ── Header nav ── */
+#cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+  border-bottom: 2px solid #2a2a2a;
+}
+#cal-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.25rem;
+  color: var(--yellow-bright);
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 0 0 18px rgba(255,215,0,0.4);
+  flex: 1;
+}
+#cal-nav-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+#cal-prev, #cal-next, #cal-today {
+  background: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  border-radius: 8px;
+  color: var(--text-white);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+#cal-today {
+  font-size: 0.72rem;
+  width: auto;
+  padding: 0 10px;
+  letter-spacing: 0.3px;
+}
+#cal-prev:hover, #cal-next:hover, #cal-today:hover {
+  background: #333;
+  border-color: var(--yellow-bright);
+  color: var(--yellow-bright);
+}
+
+/* ── Leyenda ── */
+#cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  justify-content: center;
+  padding: 8px 12px 6px;
+  background: #161616;
+  border-bottom: 1px solid #2a2a2a;
+}
+.cal-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.67rem;
+  color: #888;
+  letter-spacing: 0.3px;
+}
+.cal-legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Weekday labels ── */
+#cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  padding: 8px 10px 4px;
+  background: #1a1a1a;
+}
+#cal-weekdays span {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.67rem;
+  color: #555;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* ── Month grid ── */
+#cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 6px 10px 12px;
+  background: #1a1a1a;
+}
+.cal-day {
+  aspect-ratio: 1;
+  background: #242424;
+  border: 2px solid #2c2c2c;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px 3px 3px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .12s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.cal-day:hover {
+  border-color: var(--yellow-bright);
+  background: #2c2c2c;
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  z-index: 2;
+}
+.cal-day.other-month {
+  opacity: 0.2;
+  cursor: default;
+  pointer-events: none;
+}
+.cal-day.today {
+  border-color: var(--yellow-bright);
+  background: rgba(255,215,0,0.08);
+}
+.cal-day.today .cal-day-num {
+  color: var(--yellow-bright);
+  text-shadow: 0 0 10px rgba(255,215,0,0.7);
+}
+.cal-day.has-activity {
+  border-color: rgba(57,255,20,0.5);
+  background: rgba(57,255,20,0.04);
+}
+.cal-day.today.has-activity {
+  border-color: var(--yellow-bright);
+  background: rgba(255,215,0,0.1);
+}
+.cal-day.selected {
+  border-color: var(--yellow-bright) !important;
+  background: rgba(255,215,0,0.15) !important;
+  box-shadow: 0 0 18px rgba(255,215,0,0.3), inset 0 0 8px rgba(255,215,0,0.08) !important;
+  transform: scale(1.06);
+  z-index: 3;
+}
+.cal-day-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.82rem;
+  color: #ccc;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.cal-day-dots {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 2px;
+}
+.cal-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cal-dot.mastery-completed  { background: var(--green-done); box-shadow: 0 0 4px rgba(57,255,20,0.6); }
+.cal-dot.mastery-uncompleted { background: #ff4444; }
+.cal-dot.mission-done       { background: var(--yellow-bright); box-shadow: 0 0 3px rgba(255,215,0,0.5); }
+.cal-dot.mission-undone     { background: #666; }
+.cal-dot.counter-update     { background: #38bdf8; box-shadow: 0 0 3px rgba(56,189,248,0.5); }
+
+/* ── Activity count badge ── */
+.cal-day-count {
+  position: absolute;
+  top: 3px; right: 4px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.55rem;
+  color: var(--yellow-bright);
+  opacity: 0.8;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════
+   COLUMNA DERECHA — DETAIL PANEL
+   ══════════════════════════════════════════ */
+#cal-detail {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+#cal-detail.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+/* Header del detalle */
+#cal-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+  border-bottom: 2px solid #2a2a2a;
+  flex-shrink: 0;
+}
+#cal-detail-date {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--yellow-bright);
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 14px rgba(255,215,0,0.4);
+}
+#cal-detail-close {
+  background: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  color: #888;
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color .15s, border-color .15s, background .15s;
+}
+#cal-detail-close:hover { color: #fff; border-color: #ff3333; background: #1a0808; }
+
+/* Body scrollable */
+#cal-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px 18px;
+}
+#cal-detail-body::-webkit-scrollbar { width: 5px; }
+#cal-detail-body::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
+
+/* Empty state */
+#cal-detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 0.88rem;
+  padding: 40px 0;
+  text-align: center;
+}
+#cal-detail-empty .cal-empty-icon {
+  font-size: 2.8rem;
+  opacity: 0.5;
+}
+#cal-detail-empty .cal-empty-hint {
+  font-size: 0.73rem;
+  color: #444;
+}
+
+/* List of entries */
+#cal-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Agrupación por maestría ── */
+.cal-mastery-group {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2.5px solid #2e2e2e;
+  animation: missionSlide .22s ease both;
+  transition: border-color .25s, box-shadow .25s;
+  background: #1c1c1c;
+  position: relative;
+}
+.cal-mastery-group:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.55);
+}
+
+/* Banner completo de la maestría */
+.cal-group-banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 700 / 450;
+  overflow: hidden;
+  background: #111;
+  flex-shrink: 0;
+}
+.cal-group-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  display: block;
+  filter: brightness(0.65) saturate(0.9);
+  transition: filter .3s;
+}
+.cal-mastery-group:hover .cal-group-banner img {
+  filter: brightness(0.82) saturate(1.05);
+}
+.cal-group-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.82) 100%);
+  z-index: 1;
+}
+.cal-group-banner-name {
+  position: absolute;
+  bottom: 10px;
+  left: 14px;
+  right: 14px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.95);
+  z-index: 2;
+  line-height: 1.2;
+}
+.cal-group-banner-color-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  z-index: 3;
+}
+/* Fallback sin imagen */
+.cal-group-banner.no-img {
+  aspect-ratio: unset;
+  height: 52px;
+  background: repeating-linear-gradient(-45deg, #1e1600 0, #1e1600 14px, #130f00 14px, #130f00 28px);
+}
+
+/* Entradas dentro del grupo */
+.cal-group-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.cal-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 14px 9px;
+  border-top: 1px solid #2a2a2a;
+  background: transparent;
+  transition: background .15s;
+}
+.cal-entry:first-child { border-top: none; }
+.cal-entry:hover { background: rgba(255,255,255,0.03); }
+
+.cal-entry-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  line-height: 1.3;
+  margin-top: 1px;
+}
+.cal-entry-body {
+  flex: 1;
+  min-width: 0;
+}
+.cal-entry-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.88rem;
+  color: #ddd;
+  line-height: 1.25;
+  margin-bottom: 2px;
+}
+.cal-entry-sub {
+  font-size: 0.73rem;
+  color: #666;
+  line-height: 1.4;
+}
+.cal-entry-time {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.62rem;
+  color: #444;
+  flex-shrink: 0;
+  line-height: 1.3;
+  margin-top: 3px;
+}
+
+/* Border color per type inside entry */
+.cal-entry.type-mastery-completed  .cal-entry-title { color: var(--green-done); }
+.cal-entry.type-mastery-uncompleted .cal-entry-title { color: #ff7070; }
+.cal-entry.type-mission-done .cal-entry-title { color: var(--yellow-bright); }
+.cal-entry.type-counter-update .cal-entry-title { color: #7dd3fc; }
+
+/* Group border color per dominant type */
+.cal-mastery-group.gtype-completed   { border-color: rgba(57,255,20,0.4); }
+.cal-mastery-group.gtype-uncompleted { border-color: rgba(255,68,68,0.4); }
+.cal-mastery-group.gtype-mission     { border-color: rgba(255,215,0,0.3); }
+.cal-mastery-group.gtype-counter     { border-color: rgba(56,189,248,0.25); }
+
+/* ── Collage de banners en días del calendario ── */
+.cal-day-collage {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  overflow: hidden;
+  z-index: 0;
+  display: flex;
+}
+.cal-day-collage-img {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.28) saturate(0.6);
+}
+.cal-day-collage-border {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  pointer-events: none;
+}
+.cal-day .cal-day-num,
+.cal-day .cal-day-dots,
+.cal-day .cal-day-count {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Placeholder estado sin selección ── */
+#cal-detail-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 20px;
+  text-align: center;
+}
+#cal-detail-placeholder .cdp-icon { font-size: 3rem; opacity: 0.25; }
+#cal-detail-placeholder .cdp-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: #3a3a3a;
+  letter-spacing: 0.5px;
+}
+#cal-detail-placeholder .cdp-sub {
+  font-size: 0.75rem;
+  color: #2e2e2e;
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MÓVIL
+   ══════════════════════════════════════════ */
+@media (max-width: 720px) {
+  #calendar-view { padding: 12px 10px 60px; }
+
+  #cal-main-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* En móvil el detalle va debajo */
+  #cal-detail {
+    max-height: none;
+  }
+
+  .cal-day { padding: 4px 2px 2px; border-radius: 7px; }
+  .cal-day-num { font-size: 0.72rem; }
+  .cal-dot { width: 4px; height: 4px; }
+  #cal-title { font-size: 1.05rem; }
+
+  .cal-group-banner-name { font-size: 0.88rem; }
+  .cal-entry { padding: 7px 10px 7px; }
+}
+
+@media (max-width: 400px) {
+  #cal-grid { gap: 3px; padding: 5px 7px 10px; }
+  #cal-weekdays { padding: 6px 7px 3px; }
+  .cal-day-num { font-size: 0.65rem; }
+  #cal-prev, #cal-next, #cal-today { font-size: 0.9rem; width: 30px; height: 30px; }
+  #cal-title { font-size: 0.9rem; }
+}
+
+/* ============================================================
+   GLOVES PAGE — PASSWORD GATE
+   ============================================================ */
+#slap-view {
+  display: none;
+  flex-direction: column;
+  min-height: 60vh;
+  padding: 0;
+}
+#slap-view.active { display: flex; }
+
+/* ── Gate ── */
+#gloves-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 14px;
+  padding: 40px 20px;
+  animation: cardIn 0.4s ease both;
+}
+#gloves-gate-icon {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
+}
+#gloves-gate-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.5rem;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 20px rgba(255,215,0,0.4);
+  letter-spacing: 1px;
+}
+#gloves-gate-sub {
+  font-size: 0.88rem;
+  color: #666;
+  text-align: center;
+  line-height: 1.55;
+  max-width: 320px;
+}
+#gloves-gate-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: min(300px, 90vw);
+}
+#gloves-gate-input {
+  width: 100%;
+  background: #1e1e1e;
+  border: 3px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  color: var(--text-white);
+  outline: none;
+  text-align: center;
+  letter-spacing: 2px;
+  transition: border-color .2s, box-shadow .2s;
+}
+#gloves-gate-input:focus {
+  border-color: var(--yellow-bright);
+  box-shadow: 0 0 14px rgba(255,215,0,0.28);
+}
+#gloves-gate-input.error {
+  border-color: var(--red-close);
+  box-shadow: 0 0 12px rgba(255,51,51,0.35);
+  animation: lockShake 0.4s ease;
+}
+#gloves-gate-error {
+  font-size: 0.78rem;
+  color: var(--red-close);
+  opacity: 0;
+  transition: opacity .2s;
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: 0.5px;
+}
+#gloves-gate-error.show { opacity: 1; }
+
+/* ============================================================
+   GLOVES PAGE — REAL PAGE
+   ============================================================ */
+#gloves-page {
+  width: 100%;
+  padding: 14px 20px 60px;
+  animation: cardIn 0.35s ease both;
+}
+
+/* ── Search bar ── */
+#gloves-search-bar-wrap {
+  max-width: 560px;
+  margin: 0 auto 12px;
+}
+#gloves-search-input {
+  width: 100%;
+  background: #1e1e1e;
+  border: 3px solid #3a3a3a;
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  color: var(--text-white);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+#gloves-search-input::placeholder { color: #555; }
+#gloves-search-input:focus {
+  border-color: var(--yellow-bright);
+  box-shadow: 0 0 12px rgba(255,215,0,0.3);
+}
+
+/* ── Type filter bar ── */
+#gloves-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.gtype-filter {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  letter-spacing: 0.4px;
+  background: #222;
+  border: 2px solid #383838;
+  border-radius: 20px;
+  color: #777;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: border-color .18s, color .18s, background .18s, transform .1s;
+}
+.gtype-filter:hover { border-color: #555; color: #aaa; }
+.gtype-filter:active { transform: scale(0.94); }
+.gtype-filter.active {
+  background: #1a1500;
+  border-color: var(--yellow-bright);
+  color: var(--yellow-bright);
+  box-shadow: 0 0 10px rgba(255,215,0,0.2);
+}
+.gtype-filter[data-type="slaps"].active  { background:#0e1800; border-color:#4ade80; color:#4ade80; box-shadow:0 0 10px rgba(74,222,128,0.2); }
+.gtype-filter[data-type="robux"].active  { background:#0a1228; border-color:#60a5fa; color:#60a5fa; box-shadow:0 0 10px rgba(96,165,250,0.2); }
+.gtype-filter[data-type="logro"].active  { background:#1a1000; border-color:#fbbf24; color:#fbbf24; box-shadow:0 0 10px rgba(251,191,36,0.2); }
+.gtype-filter[data-type="otro"].active   { background:#160a22; border-color:#c084fc; color:#c084fc; box-shadow:0 0 10px rgba(192,132,252,0.2); }
+
+/* ── Grid ── */
+#gloves-grid-wrap { max-width: 1600px; margin: 0 auto; }
+#gloves-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+#gloves-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.35rem;
+  display: none;
+}
+
+/* ── Glove Card ── */
+.glove-card {
+  background: var(--bg-card);
+  border: 4px solid #111;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, border-color .25s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: cardIn 0.4s ease both;
+}
+.glove-card:hover {
+  transform: translateY(-5px) scale(1.025);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.7), var(--shadow-glow);
+  border-color: var(--yellow-bright);
+}
+/* Type-colored border when hovered */
+.glove-card[data-type="slaps"]:hover  { border-color: #4ade80; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(74,222,128,0.35); }
+.glove-card[data-type="robux"]:hover  { border-color: #60a5fa; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(96,165,250,0.35); }
+.glove-card[data-type="logro"]:hover  { border-color: #fbbf24; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(251,191,36,0.35); }
+.glove-card[data-type="otro"]:hover   { border-color: #c084fc; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(192,132,252,0.35); }
+
+.glove-card-top {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 411;
+  overflow: hidden;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.glove-card-banner {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter .18s ease, transform .18s ease;
+  filter: none;
+}
+.glove-card:hover .glove-card-banner { transform: scale(1.04); filter: none; }
+.glove-card-banner-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(-45deg,#1e1600 0,#1e1600 18px,#130f00 18px,#130f00 36px);
+  font-size: 3rem;
+}
+
+/* Type ribbon top-left */
+.glove-type-ribbon {
+  position: absolute;
+  top: 12px; left: -30px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  padding: 4px 40px;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  z-index: 2;
+}
+.gribbon-slaps { background: #4ade80; color: #061a0a; }
+.gribbon-robux { background: #60a5fa; color: #030d1a; }
+.gribbon-logro { background: #fbbf24; color: #1a0e00; }
+.gribbon-otro  { background: #c084fc; color: #0e0618; }
+
+/* Type accent bar at bottom of banner */
+.glove-card[data-type="slaps"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#4ade80; box-shadow:0 0 8px rgba(74,222,128,0.6); z-index:3; }
+.glove-card[data-type="robux"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#60a5fa; box-shadow:0 0 8px rgba(96,165,250,0.6); z-index:3; }
+.glove-card[data-type="logro"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#fbbf24; box-shadow:0 0 8px rgba(251,191,36,0.6); z-index:3; }
+.glove-card[data-type="otro"]  .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#c084fc; box-shadow:0 0 8px rgba(192,132,252,0.6); z-index:3; }
+
+.glove-card-body {
+  padding: 13px 15px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.glove-card-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.38rem;
+  color: var(--text-white);
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.1;
+}
+.glove-card-type-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.glove-tl-slaps { color: #4ade80; }
+.glove-tl-robux { color: #60a5fa; }
+.glove-tl-logro { color: #fbbf24; }
+.glove-tl-otro  { color: #c084fc; }
+
+.glove-card-footer {
+  display: flex;
+  gap: 8px;
+  padding: 0 13px 11px;
+  align-items: stretch;
+}
+.btn-glove-mastery {
+  background: #1a1500;
+  color: var(--yellow-bright);
+  border: 2px solid #3d3000;
+  border-radius: var(--radius-btn);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.82rem;
+  padding: 7px 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  transition: filter .15s, transform .1s, border-color .2s;
+  white-space: nowrap;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: auto;
+}
+.btn-glove-mastery:hover { filter: brightness(1.25); border-color: var(--yellow-bright); }
+.btn-glove-mastery:active { transform: scale(0.93); }
+.btn-glove-mastery-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+}
+
+/* ── Type badge in detail ── */
+.glove-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 2px solid;
+  margin: 3px 0 6px;
+}
+.gtbadge-slaps { color: #4ade80; background: #061a0a; border-color: #4ade80; }
+.gtbadge-robux { color: #60a5fa; background: #030d1a; border-color: #60a5fa; }
+.gtbadge-logro { color: #fbbf24; background: #1a0e00; border-color: #fbbf24; }
+.gtbadge-otro  { color: #c084fc; background: #0e0618; border-color: #c084fc; }
+
+/* ============================================================
+   GLOVE DETAIL VIEW
+   ============================================================ */
+#glove-detail-view {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(8,8,8,0.98);
+  flex-direction: column;
+  animation: fadeInDetail .22s ease;
+}
+#glove-detail-view.open { display: flex; }
+
+#glove-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 20px;
+  background: linear-gradient(90deg, #0a0a0a 0%, #181818 100%);
+  border-bottom: 4px solid var(--yellow-bright);
+  flex-shrink: 0;
+}
+#glove-detail-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.7rem;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 16px rgba(255,215,0,0.6), 2px 2px 0 #000;
+  letter-spacing: 1.5px;
+}
+#btn-close-glove-detail {
+  background: var(--red-close);
+  color: #fff;
+  border: 3px solid #000;
+  border-radius: 10px;
+  width: 44px; height: 44px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #000;
+  transition: filter .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center;
+}
+#btn-close-glove-detail:hover  { filter: brightness(1.2); }
+#btn-close-glove-detail:active { transform: scale(0.91); }
+
+#glove-detail-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* LEFT */
+#glove-detail-left {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 12px;
+  background: #181818;
+  border-right: 3px solid #2a2a2a;
+  overflow-y: auto;
+  min-height: 0;
+}
+#glove-detail-left::-webkit-scrollbar { width: 5px; }
+#glove-detail-left::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
+
+#glove-detail-banner-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 11px;
+  overflow: hidden;
+  border: 3px solid #333;
+  background: #0d0d0d;
+  aspect-ratio: 640 / 411;
+  flex-shrink: 0;
+}
+#glove-detail-banner-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  filter: none;
+}
+#glove-detail-banner-ph {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  background: repeating-linear-gradient(-45deg,#1e1600 0,#1e1600 18px,#130f00 18px,#130f00 36px);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: #555;
+}
+#glove-detail-tut-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.68);
+  border: 3px solid var(--yellow-bright);
+  border-radius: 10px;
+  color: var(--yellow-bright);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.88rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  z-index: 4;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+  display: none;
+}
+#glove-detail-tut-btn.visible {
+  display: flex; align-items: center; gap: 5px;
+}
+#glove-detail-tut-btn:hover { background: var(--yellow-bright); color: #111; transform: scale(1.08); }
+
+#glove-detail-glove-row {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+#glove-detail-img-wrap {
+  width: 88px;
+  background: #0d0d0d;
+  border: 3px solid #333;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+#glove-detail-glove-img { width: 100%; height: auto; object-fit: contain; display: block; }
+#glove-detail-glove-ph { font-size: 2.8rem; display: none; }
+#glove-detail-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+#glove-detail-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: var(--yellow-bright);
+  text-shadow: 1px 1px 0 #000;
+}
+#glove-detail-obtain-text {
+  font-size: 0.88rem;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+.slap-icon-inline {
+  width: 1.05em;
+  height: 1.05em;
+  object-fit: contain;
+  vertical-align: -0.18em;
+  margin-right: 5px;
+}
+
+/* RIGHT */
+#glove-detail-right {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 14px;
+  overflow-y: auto;
+  min-height: 0;
+}
+#glove-detail-right::-webkit-scrollbar { width: 5px; }
+#glove-detail-right::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
+
+.glove-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  color: var(--text-light);
+  line-height: 1.45;
+  animation: missionSlide .25s ease both;
+}
+.glove-detail-item-bullet {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+
+/* ── Bloque badge (logro) en glove detail ── */
+#glove-detail-badge-wrap {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  background: #0e1200;
+  border: 2px solid #2a2f00;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+#glove-detail-badge-wrap.visible { display: flex; }
+
+#glove-detail-badge-img-wrap {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #fbbf24;
+  box-shadow: 0 0 10px rgba(251,191,36,0.45);
+  background: #111;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+#glove-detail-badge-img-wrap:hover {
+  box-shadow: 0 0 20px rgba(251,191,36,0.75);
+  transform: scale(1.08);
+}
+#glove-detail-badge-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+#glove-detail-badge-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+#glove-detail-badge-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251,191,36,0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#btn-glove-badge-roblox {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #1a0e00;
+  color: #fbbf24;
+  border: 2px solid #fbbf24;
+  border-radius: 7px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  padding: 5px 11px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, filter .15s, transform .1s;
+  align-self: flex-start;
+  white-space: nowrap;
+}
+#btn-glove-badge-roblox:hover {
+  background: #fbbf24;
+  color: #1a0e00;
+  filter: brightness(1.1);
+}
+#btn-glove-badge-roblox:active { transform: scale(0.93); }
+
+@media (max-width: 860px) {
+  #glove-detail-body { grid-template-columns: 1fr; }
+  #glove-detail-left { border-right: none; border-bottom: 3px solid #2a2a2a; max-height: 48vh; }
+}
+
 </style>
 </head>
 <body>
@@ -2901,6 +4003,10 @@ body.todo-selecting #grid-view { padding-top: 72px; }
     <img src="slapicon.png" alt="Slap" onerror="this.style.display='none';this.parentElement.insertAdjacentText('beforeend','👋')">
     <span>Guantes</span>
   </button>
+  <button class="page-nav-btn" id="nav-calendar" onclick="switchPage('calendar')" title="Calendario">
+    <span style="font-size:1.25rem;line-height:1">📅</span>
+    <span>Diario</span>
+  </button>
 </div>
 <div style="text-align:center;padding:4px 0 0;">
   <button id="btn-reset" onclick="resetAllProgress()">🗑️ Resetear todo el progreso</button>
@@ -2919,11 +4025,153 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 </div>
 
 <!-- ========================================================
-     SLAP PAGE (placeholder)
+     SLAP PAGE — PASSWORD GATE + REAL GLOVES PAGE
      ======================================================== -->
 <div id="slap-view">
-  <img src="preview_placeholder.png" alt="Próximamente">
-  <p>Falta mucho por hacer aquí,<br>vuelve más tarde cuando esté listo 🔧</p>
+
+  <!-- ── Gate de contraseña ── -->
+  <div id="gloves-gate">
+    <div id="gloves-gate-icon">🔐</div>
+    <div id="gloves-gate-title">Acceso restringido</div>
+    <div id="gloves-gate-sub">Esta sección está en fase de testeo.<br>Introduce la contraseña para continuar.</div>
+    <div id="gloves-gate-input-wrap">
+      <input id="gloves-gate-input" type="password" placeholder="Contraseña..." autocomplete="off" oninput="glovesGateCheck()">
+      <div id="gloves-gate-error">Contraseña incorrecta</div>
+    </div>
+  </div>
+
+  <!-- ── Página real de guantes ── -->
+  <div id="gloves-page" style="display:none">
+
+    <!-- Buscador + filtros de tipo -->
+    <div id="gloves-search-bar-wrap">
+      <input type="text" id="gloves-search-input" placeholder="🔍  Buscar guante..." oninput="renderGlovesGrid()" autocomplete="off">
+    </div>
+    <div id="gloves-filter-bar">
+      <button class="gtype-filter active" data-type="all"    onclick="setGlovesFilter('all')">✨ Todos</button>
+      <button class="gtype-filter"        data-type="slaps"  onclick="setGlovesFilter('slaps')">👋 Slaps</button>
+      <button class="gtype-filter"        data-type="robux"  onclick="setGlovesFilter('robux')">💎 Robux</button>
+      <button class="gtype-filter"        data-type="logro"  onclick="setGlovesFilter('logro')">🏅 Logro</button>
+      <button class="gtype-filter"        data-type="otro"   onclick="setGlovesFilter('otro')">🔮 Otro</button>
+    </div>
+
+    <!-- Grid de tarjetas -->
+    <div id="gloves-grid-wrap">
+      <div id="gloves-grid"></div>
+      <div id="gloves-empty-state" style="display:none">No se encontraron guantes 😔</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================
+     GLOVE DETAIL VIEW
+     ======================================================== -->
+<div id="glove-detail-view">
+  <div id="glove-detail-header">
+    <span id="glove-detail-title">🥊 GUANTE</span>
+    <button id="btn-close-glove-detail" onclick="closeGloveDetail()" title="Cerrar (Esc)">✕</button>
+  </div>
+  <div id="glove-detail-body">
+
+    <!-- LEFT -->
+    <div id="glove-detail-left">
+      <div id="glove-detail-banner-wrap">
+        <img id="glove-detail-banner-img" alt="Banner" onclick="openImageModal(this.src, this.alt)" style="cursor:pointer">
+        <div id="glove-detail-banner-ph"><span>🖼️</span><span>Sin banner</span></div>
+        <button id="glove-detail-tut-btn" onclick="openGloveTutorial()" title="Ver tutorial">▶ Tutorial</button>
+      </div>
+      <div id="glove-detail-glove-row">
+        <div id="glove-detail-img-wrap">
+          <img id="glove-detail-glove-img" alt="Glove" onclick="openImageModal(this.src, this.alt)" style="cursor:pointer">
+          <div id="glove-detail-glove-ph">🥊</div>
+        </div>
+        <div id="glove-detail-info">
+          <div id="glove-detail-name">Guante</div>
+          <div class="glove-type-badge" id="glove-detail-type-badge"></div>
+          <div id="glove-detail-obtain-wrap">
+            <div class="detail-section-label" id="glove-detail-obtain-label">OBTENCIÓN</div>
+            <div id="glove-detail-obtain-text"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Badge de logro (visible solo en type=logro) -->
+      <div id="glove-detail-badge-wrap">
+        <div id="glove-detail-badge-img-wrap" onclick="openImageModal(document.getElementById('glove-detail-badge-img').src, document.getElementById('glove-detail-badge-name').textContent)" title="Ampliar badge">
+          <img id="glove-detail-badge-img" alt="Badge">
+        </div>
+        <div id="glove-detail-badge-info">
+          <div id="glove-detail-badge-name"></div>
+          <a id="btn-glove-badge-roblox" href="#" target="_blank" rel="noopener noreferrer">🏅 Ver en Roblox</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div id="glove-detail-right">
+      <div id="glove-detail-mechanics-wrap">
+        <div class="detail-section-label">⚙️ MECÁNICAS</div>
+        <div id="glove-detail-mechanics-list"></div>
+      </div>
+      <div id="glove-detail-abilities-wrap">
+        <div class="detail-section-label">⚡ HABILIDADES</div>
+        <div id="glove-detail-abilities-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================
+     CALENDAR / DIARY VIEW
+     ======================================================== -->
+<div id="calendar-view" style="display:none">
+  <div id="cal-main-layout">
+
+    <!-- Columna izquierda: widget calendario -->
+    <div id="cal-container">
+      <div id="cal-header">
+        <div id="cal-nav-group">
+          <button id="cal-prev" onclick="calNav(-1)" title="Mes anterior">‹</button>
+          <button id="cal-next" onclick="calNav(1)" title="Mes siguiente">›</button>
+          <button id="cal-today" onclick="calGoToday()">Hoy</button>
+        </div>
+        <div id="cal-title">Junio 2026</div>
+      </div>
+      <div id="cal-legend">
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green-done);box-shadow:0 0 4px rgba(57,255,20,0.6)"></div>Maestría completada</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#ff4444"></div>Maestría desmarcada</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--yellow-bright);box-shadow:0 0 3px rgba(255,215,0,0.5)"></div>Misión hecha</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#38bdf8"></div>Contador actualizado</div>
+      </div>
+      <div id="cal-weekdays">
+        <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+      </div>
+      <div id="cal-grid"></div>
+    </div>
+
+    <!-- Columna derecha: panel detalle -->
+    <div id="cal-detail">
+      <div id="cal-detail-header">
+        <span id="cal-detail-date">Selecciona un día</span>
+        <button id="cal-detail-close" onclick="calCloseDetail()" title="Cerrar">✕</button>
+      </div>
+      <div id="cal-detail-body">
+        <div id="cal-detail-placeholder">
+          <div class="cdp-icon">📅</div>
+          <div class="cdp-text">Selecciona un día</div>
+          <div class="cdp-sub">Pulsa cualquier fecha para ver tu actividad</div>
+        </div>
+        <div id="cal-detail-empty" style="display:none">
+          <div class="cal-empty-icon">📭</div>
+          <span>Sin actividad registrada</span>
+          <span class="cal-empty-hint">Los cambios que hagas aparecerán aquí</span>
+        </div>
+        <div id="cal-detail-list"></div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- ========================================================
@@ -3258,6 +4506,16 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
+    version: "0.4.1 - Diario",
+    date: "15/06/2026",
+    entries: [
+      { emoji: "📆", color: "#a78bfa",  text: "Registro diario: Mira los progresos que haces diariamente con las maestrias del slap battles." },
+      { emoji: "✨", color: "#FFD700",  text: "Mas maestrias (Plank, Rage, Tinkerer y Bubble) [MAÑANA SE TERMINA Y EMPIEZA A CREARSE EL SIGUIENTE APARTADO:]" },
+      { emoji: "👀", color: "#a78bfa",  text: "Creando los guantes normales, con su precio/metodo de obtencion, mecanicas y habilidades. Esa seccion es mucho mas vacia en contenido que las maestrias al ser mas limitados, pero eso permitira crear guantes mas rapidos, terminando el roster entero en 1 mes aproximadamente" },
+    ]
+  },
+  
+  {
     version: "0.4.0 - Maestrias completadas",
     date: "13/06/2026",
     entries: [
@@ -3482,7 +4740,7 @@ const MASTERIES = [
   {
     id: "ultrainstinct",
     name: "Ultra Instinct",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/1PcUDVw8kPg?si=VjDgiTYzVHddVZwD&t=410",
     date: "17/01/2025",
     description: "Y esto... es... para ir... al infinito y más allá!",
     upgrades: [
@@ -3506,7 +4764,7 @@ const MASTERIES = [
   {
     id: "obby",
     name: "Obby",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/DbuaNl9Naf8?si=sJo_aMY8D4jq6dfk&t=49",
     date: "17/01/2025",
     description: "En la Slap Battles civilization, nadie decide si saltar por un fragmento de null.",
     upgrades: [
@@ -3531,7 +4789,7 @@ const MASTERIES = [
   {
     id: "cloud",
     name: "Cloud",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/EYS-DYGi5k8?si=7mwt7jOdrb4GcUKa&t=20",
     date: "17/01/2025",
     description: "¿Podemos llegar más alto?",
     upgrades: [
@@ -3557,7 +4815,7 @@ const MASTERIES = [
   {
     id: "wormhole",
     name: "Wormhole",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/nxEhgWNa6E0?si=GAPBQAnnZ26QqyKi&t=31",
     date: "17/01/2025",
     description: "Masteriza la teletransportación molecular y forja un vínculo directo entre ti y tus portales.",
     upgrades: [
@@ -3582,7 +4840,7 @@ const MASTERIES = [
   {
     id: "killstreak",
     name: "Killstreak",
-    previewUrl: "",
+    previewUrl: "https://www.youtube.com/watch?v=kYv7qfbyTKA",
     date: "17/01/2025",
     description: "¿Qué significa ser un Rey para un Dios?",
     upgrades: [
@@ -3607,7 +4865,7 @@ const MASTERIES = [
   {
     id: "run",
     name: "Run",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/bxai_7fjgEg?si=pXHnxpmvpyOYyLW-&t=65",
     date: "17/01/2025",
     description: "¿Y QUIÉN DIJO QUE TENÍA QUE ESTAR EN UNA CATACUMBA PARA ASUSTARTE?",
     upgrades: [
@@ -3631,7 +4889,7 @@ const MASTERIES = [
   {
     id: "glovel",
     name: "Glovel",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/kYv7qfbyTKA?si=J1XRmluv1iH_UYiS&t=181",
     date: "24/01/2025",
     description: "Yo no he hecho nada más que transportar pan por 3 días.",
     upgrades: [
@@ -3655,7 +4913,7 @@ const MASTERIES = [
   {
     id: "bus",
     name: "Bus",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/m21MCLsEqAo?si=diIFoqIS833edpjD&t=41",
     date: "31/01/2025",
     description: "Atropellaron a mi abuela con un autobús.",
     upgrades: [
@@ -3680,7 +4938,7 @@ const MASTERIES = [
   {
     id: "redacted",
     name: "[REDACTED]",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/CQlwFFuqYb0?si=0VitCmoYCcoBeSeh&t=11",
     date: "31/01/2025",
     description: "Cierra tantas puertas como quieras... no te salvarán...",
     upgrades: [
@@ -3706,7 +4964,7 @@ const MASTERIES = [
   {
     id: "moai",
     name: "🗿 (Moai)",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/qEeplRVgnjs?si=pHspCnzoCE5YhBZQ&t=124",
     date: "07/02/2025",
     description: "🗿 \"Puede que la presión te rompa, o haces diamantes con ella.\" -Andy tras una noche de botellón.",
     upgrades: [
@@ -3730,7 +4988,7 @@ const MASTERIES = [
   {
     id: "bomb",
     name: "Bomb",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/pdSuTH5OXFo?si=UcXKFfKy9ycwawrF&t=149",
     date: "21/02/2025",
     description: "¡TIO, TIENES UNA BOMBA JUSTO DETRÁS DE TI! 'Si claro, como si alguien fuese a caer por e-'",
     upgrades: [
@@ -3755,7 +5013,7 @@ const MASTERIES = [
   {
     id: "rob",
     name: "Rob",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/w93MdBYVO28?si=5O27XQ9csgbolwdd&t=306",
     date: "28/02/2025",
     description: "Sientes que tu vínculo se estrecha con firmeza. Los ojos de Rob brillan con determinación.",
     upgrades: [
@@ -3782,7 +5040,7 @@ const MASTERIES = [
   {
     id: "spin",
     name: "Spin",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/3uOeq2y9ZRY?si=or74y98Ez_OzZh_2&t=32",
     date: "28/02/2025",
     description: "¡ESTO ES UNA REVELACIÓN! SPIN AHORA ROTA… ¡¡¡¡MÁS RÁPIDO!!!!!",
     upgrades: [
@@ -3806,7 +5064,7 @@ const MASTERIES = [
   {
     id: "fort",
     name: "Fort",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/JymTpp5GXMQ?si=d6MnsyXsuQt41W-B&t=67",
     date: "08/03/2025",
     description: "Me contrataron de constructor.",
     upgrades: [
@@ -3832,13 +5090,12 @@ const MASTERIES = [
   {
     id: "engineer",
     name: "Engineer",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/eEcXP8RbBE0?si=GL6-V9tc4_-vPKIc&t=178",
     date: "14/03/2025",
     description: "Coloca un guante, y si no funciona... Agrega otro guante.",
     upgrades: [
-      "Tu centinela gana inmunidad al stun.",
-      "Módulo extra de guante añadido al centinela.",
-      "[R] activa módulo de defensa con cañón (como Track)."
+      "[R] Cambia entre nuevos módulos de centinelas: Booster (Te da velocidad tras ser activada) / Cannon (Lanza un track tras ser activada) / Grabber (Agarra enemigos cercanos y los mantiene inmóviles temporalmente).",
+      "Puedes colocar hasta 3 módulos por centinela.",
     ],
     missions: [
       { text: "Golpea a 750 personas con tu centinela",          target: 750, isBool: false },
@@ -3846,8 +5103,8 @@ const MASTERIES = [
       { text: "Coloca 750 centinelas",                            target: 750,  isBool: false }
     ]
   ,
-    difficulty: 5,
-    time: 5,
+    difficulty: 4,
+    time: 3,
     fun: 4,
     worth: 2,
     locked: false
@@ -3857,7 +5114,7 @@ const MASTERIES = [
   {
     id: "flash",
     name: "Flash",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/NiJiSoxS_R8?si=lN5M8GbWepLxfYRV&t=8",
     date: "28/03/2025",
     description: "¿¡FLASH NEGRO!?",
     upgrades: [
@@ -3881,7 +5138,7 @@ const MASTERIES = [
   {
     id: "booster",
     name: "Booster",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/eGk_aWHY_gY?si=zjWhSYMK27cFiOfh&t=20",
     date: "04/04/2025",
     description: "VAMOOOOOOS WUUUUUUUUUUHUUUUU",
     upgrades: [
@@ -3903,7 +5160,7 @@ const MASTERIES = [
   {
     id: "space",
     name: "Space",
-    previewUrl: "",
+    previewUrl: "https://youtu.be/mpWcKvaC5LQ?si=kn_TDWBIuApJZ3xl&t=79",
     date: "11/04/2025",
     description: "Una pequeña bofetada por el hombre, una gran hostia para la humanidad.",
     upgrades: [
@@ -3929,7 +5186,7 @@ const MASTERIES = [
   {
     id: "shard",              // ← sin espacios, solo minúsculas/números
     name: "Shard",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/cJQ3FsxdrIg?si=k4xJtjsvabWrScb-&t=205",
     date: "25/04/2025",
     description: "Un fuego tan helado que quema.",
     upgrades: [
@@ -3957,7 +5214,7 @@ const MASTERIES = [
   {
     id: "phase",              // ← sin espacios, solo minúsculas/números
     name: "Phase",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://www.youtube.com/watch?v=oV1d3AfnCrg",
     date: "09/05/2025",
     description: "Profundizando en las sombras, convirtiéndote en uno con la oscuridad. Tu mente parpadea, pero después de todo, sigues siendo tú.",
     upgrades: [
@@ -3984,7 +5241,7 @@ const MASTERIES = [
   {
     id: "tycoon",              // ← sin espacios, solo minúsculas/números
     name: "Tycoon",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://www.youtube.com/watch?v=pCVusyPkTVA",
     date: "06/06/2025",
     description: "¡MI REINADO CAPITALISTA NO HA HECHO NADA MÁS QUE EMPEZAR!",
     upgrades: [
@@ -4010,7 +5267,7 @@ const MASTERIES = [
   {
     id: "hive",              // ← sin espacios, solo minúsculas/números
     name: "Hive",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/MzJg2x7mWuA?si=JNLxewv-IOoL-uKj&t=24",
     date: "06/06/2025",
     description: "¡NO, LAS ABEJAS NO! ¡¡NO LAS ABEJAS!! AAAAHHHH.",
     upgrades: [
@@ -4038,7 +5295,7 @@ const MASTERIES = [
   {
     id: "defense",              // ← sin espacios, solo minúsculas/números
     name: "Defense",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/bH6qydULyt4?si=WNPQaNXv8gy2r1Ux&t=161",
     date: "20/06/2025",
     description: "La mejor defensa es la ofensa.",
     upgrades: [
@@ -4066,7 +5323,7 @@ const MASTERIES = [
   {
     id: "carkeys",              // ← sin espacios, solo minúsculas/números
     name: "Car Keys",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/zL0MY8WnNkU?si=dDms3CL4ka2et9le&t=26",
     date: "27/06/2025",
     description: "No todo es lo que parece. ;)",
     upgrades: [
@@ -4091,7 +5348,7 @@ const MASTERIES = [
   {
     id: "voodoo",              // ← sin espacios, solo minúsculas/números
     name: "Voodoo",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/RswR59XU6Jk?si=Air5vM1LGeXpfKyr&t=10",
     date: "04/07/2025",
     description: "Vamos, ¿no le daríais la mano a una pobre alma?",
     upgrades: [
@@ -4116,7 +5373,7 @@ const MASTERIES = [
   {
     id: "cherry",              // ← sin espacios, solo minúsculas/números
     name: "Cherry",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/-wwSXVywhBg?si=peVM4bI6-yN6Xe1d&t=51",
     date: "18/07/2025",
     description: "La mitosis es el proceso en el que una célula replica sus cromosomas y se segregan, produciendo dos núcleos idénticos en preparación de una división celular.",
     upgrades: [
@@ -4142,7 +5399,7 @@ const MASTERIES = [
   {
     id: "stick",
     name: "Stick",
-    previewUrl: "",
+    previewUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     date: "01/08/2025",
     description: "Si te preguntas si esta maestría vale la pena, totalmente.",
     upgrades: [
@@ -4166,7 +5423,7 @@ const MASTERIES = [
   {
     id: "bonk",              // ← sin espacios, solo minúsculas/números
     name: "Bonk",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/dQSgnZVdIyQ?si=mj1qThd0e-KeaOlF&t=29",
     date: "29/08/2025",
     description: "Puede que no hayas captado la broma, pero estás a punto de sentir el remate.",
     upgrades: [
@@ -4192,7 +5449,7 @@ const MASTERIES = [
   {
     id: "chain",
     name: "Chain",
-    previewUrl: "",
+    previewUrl: "https://www.youtube.com/watch?v=D7AMNlefoTE",
     date: "26/09/2025",
     description: "¡Tú no puedes CONCEBIR de lo que soy capaz! ¡Estoy muy por encima de ti! ¡Soy como un dios con ropa humana! ¡RASHOS LÁSER APARECEN DE MIS DEDOS!",
     upgrades: [
@@ -4217,7 +5474,7 @@ const MASTERIES = [
   {
     id: "moon",              // ← sin espacios, solo minúsculas/números
     name: "Moon",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/jrHNjftG3so?si=u_kTLOt4IA96slOG&t=11",
     date: "17/10/2025",
     description: "¿Puedo tener vuestra atención, ciudadanos de Slap Battles? ¡Esta noche, ROBAMOS LA LUNA!",
     upgrades: [
@@ -4242,7 +5499,7 @@ const MASTERIES = [
   {
     id: "stalker",              // ← sin espacios, solo minúsculas/números
     name: "Stalker",   // ← tal como aparece en el juego
-    previewUrl: "",
+    previewUrl: "https://youtu.be/3-aaYZSzYak?si=I7xArVLRUjl-Sqff&t=29",
     date: "14/11/2025",
     description: "No puedes dormir, hay monstruos cerca.",
     upgrades: [
@@ -4267,69 +5524,118 @@ const MASTERIES = [
   {
     id: "rage",              // ← sin espacios, solo minúsculas/números
     name: "Rage",   // ← tal como aparece en el juego
-    previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    previewUrl: "https://www.youtube.com/watch?v=Vwq9QRhU6tA",
+    date: "28/11/2025",
+    description: "Porque ahora estoy enfadado, estoy MUY muy enfadado, y ahora es hora de PAGAR.",
     upgrades: [
-      "POR AGREGAR.",
+      "Mientras estás en el modo frenesí, puedes sobrepasar el límite del 100%.",
+      "Gana un pequeño boost de velocidad por cada pico de adrenalina.",
+      "[R] Activa Destruction Therapy: golpea el suelo con un knockback moderado, pero gastando gran parte de tu barra de rabia.",
+      "Tardas más en perder rabia.",
+      "Consigues 25% de rabia por slap en lugar de 20%.",
+      "Por cada 10% encima del límite, ganas 1 de poder.",
+      "Recibes un 20% más de ragdoll en el modo frenesí."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Asesina a 250 personas mientras estás en modo frenesí.",  target: 250, isBool: false },
+      { text: "Obtén el logro Prolonges Anger.",          target: 1,   isBool: true, badgeUrl: "https://www.roblox.com/badges/2127861437/Prolonged-Anger"},
+      { text: "Obtén un total de 20000% de rabia.",  target: 20000, isBool: false },
+      { text: "Mantente 18000 segundos en total en el modo frenesí con más del 50% de la barra de rabia. (30 minutos)",  target: 18000, isBool: false }
     ]
   ,
-    difficulty: 4,
+    difficulty: 3,
     time: 4,
-    fun: 3,
+    fun: 4,
     worth: 1,
-    locked: true
+    locked: false
+  },
+
+  // ── TINKERER ────────────────────────────────────────────────
+  {
+    id: "tinkerer",              // ← sin espacios, solo minúsculas/números
+    name: "Tinkerer",   // ← tal como aparece en el juego
+    previewUrl: "https://www.youtube.com/watch?v=TBj0mIcGi1A&t=91s",
+    date: "12/12/2025",
+    description: "¡Mejoras, gente, mejoras!",
+    upgrades: [
+      "Redirecciona los bots golpeándolos.",
+      "Construir bots ahora requiere scrap (nuevo medidor encima de tu hotbar).",
+      "[R] Al aparecer puedes elegir 3 de 7 bots distintos. Puedes cambiar entre esos 3 bots usando tu habilidad.",
+      "[2.5 Scrap] Zoom: más rápido, pero con menos knockback y derrapa alrededor de su objetivo.",
+      "[3.5 Scrap] Camo: Se hace invisible.",
+      "[3.5 Scrap] Scout: Se mueve más rápido y copia la direccion en la que miras.",
+      "[6.5 Scrap] Kevin: Es más lento, pero con una explosión más grande y más knockback.",
+      "[2 Scrap] Frenzi: Versión mejorada del bot clásico; más rápido y con menos tiempo de construcción.",
+      "[5 Scrap] Heli: Vuela por el vacío, pero tarda más en construirse.",
+      "[3.5 Scrap] Cuando explota, lanza pegamento que ralentiza a quien lo toque."
+
+    ],
+    missions: [
+      { text: "Lanza 10 personas al vacío sin morir.",  target: 1, isBool: true },
+      { text: "Golpea a 350 personas mientras son perseguidas por tus bots.",          target: 350,   isBool: false},
+      { text: "Explota a 750 personas con tus bots.",  target: 750, isBool: false }
+    ]
+  ,
+    difficulty: 5,
+    time: 4,
+    fun: 2,
+    worth: 3,
+    locked: false
   },
 
   // ── PLANK ────────────────────────────────────────────────
   {
     id: "plank",              // ← sin espacios, solo minúsculas/números
     name: "Plank",   // ← tal como aparece en el juego
-    previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    previewUrl: "https://www.youtube.com/watch?v=TPZ4VpGamgQ",
+    date: "26/12/2025",
+    description: "Estoy seguro de que esto está permitido por los estándares de regularización.",
     upgrades: [
-      "POR AGREGAR.",
+      "[R] Interactúa con tu tablón: si lo usas encima, lo cortas por la mitad, mientras que si lo usas cerca, lo agarrarás.",
+      "Vas más rápido por tus tablones.",
+      "Los tablones crecen más rápido y duran el doble.",
+      "Los tablones tienen colisión mientras los agarras…"
+
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Golpea a 150 jugadores saltando desde una rampa creada con un tablón.",  target: 150, isBool: false },
+      { text: "Mata a 100 jugadores usando tablones.",          target: 100,   isBool: false},
+      { text: "Golpea a 250 jugadores usando tablones.",  target: 250, isBool: false }
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    difficulty: 5,
+    time: 3,
+    fun: 4,
+    worth: 5,
+    locked: false
   },
 
   // ── BUBBLE ────────────────────────────────────────────────
   {
     id: "bubble",              // ← sin espacios, solo minúsculas/números
     name: "Bubble",   // ← tal como aparece en el juego
-    previewUrl: "",
-    date: "",
-    description: "Vamos, ¿no le daríais la mano a una pobre alma?",
+    previewUrl: "https://youtu.be/QSD-W0JzEhk?si=bJzRn_p_epojtEzF&t=10",
+    date: "09/01/2026",
+    description: "Primero se hace así, se gira. ¡Alto! Ahora se hace esto tres veces: una, dos, tres. Después~ movimiento de pelvis! ¡Wuuuuuuuu! ¡Wuuuu! ¡Te apoyas sobre el pie derecho, no lo olvides! Ahora es el momento de haceeeerla girar, haceeeerla girar. Entonces haces esto y esto y esto y esto y esto y esto y entonces…",
     upgrades: [
-      "POR AGREGAR.",
+      "Las burbujas sueltan miniburbujas que hacen que los enemigos se resbalen.",
+      "Puedes explotar las burbujas golpeándolas.",
+      "Golpear enemigos los captura brevemente en burbujas.",
+      "[R] Activa Bubble Barrier: lo mismo que capturar, pero... con 3 burbujas en lugar de 1...",
+      "La habilidad Capture tiene un cooldown mas largo."
     ],
     missions: [
-      { text: "POR AGREGAR.",  target: 5, isBool: false },
-      { text: "POR AGREGAR",          target: 100000,   isBool: false},
-      { text: "POR AGREGAR",  target: 750, isBool: false }
+      { text: "Envía a 150 personas al vacío, capturándolas con tus burbujas.",  target: 150, isBool: false },
+      { text: "Captura a 125 personas poco después de haberlas golpeado.",          target: 125,   isBool: false},
+      { text: "Captura a 5 personas seguidas sin fallar.",  target: 1, isBool: true },
+      { text: "Captura a 300 personas dentro de tus burbujas.",  target: 300, isBool: true }
     ]
   ,
     difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 1,
-    locked: true
+    time: 3,
+    fun: 1,
+    worth: 3,
+    locked: false
   },
 
   // ── PHANTOM ────────────────────────────────────────────────
@@ -4700,6 +6006,8 @@ function loadProgress() {
       if (completedSet.has(id)) completedSet.delete(id);
     });
   } catch(e) { console.warn('No se pudo cargar progreso:', e); }
+  // Cargar también el diario
+  loadDiary();
 }
 
 function buildMasterySnapshot() {
@@ -4803,6 +6111,13 @@ let stickJumpscareTimer = null;
 let stickJumpscareHideTimer = null;
 let foxyFailTimer = null;
 let foxyVideoActive = false;
+
+/* ── Diary / Calendar variables (declaradas aquí para que estén disponibles en todo el script) ── */
+const STORAGE_KEY_DIARY = 'slap_battles_diary_v1';
+let diaryData      = {};
+let calYear        = new Date().getFullYear();
+let calMonth       = new Date().getMonth();
+let calSelectedKey = null;
 
 /* Emoji por defecto por id de guante */
 function getGloveEmoji(id) {
@@ -5084,7 +6399,7 @@ function createCard(mastery) {
       <img class="card-banner-img"
            src="banner_${mastery.id}.png"
            alt="${mastery.name}"
-           onerror="if(this.dataset.previewFallback==='1'){this.style.display='none'; this.nextElementSibling.style.display='flex';}else{this.dataset.previewFallback='1'; this.onerror=null; this.src='preview_placeholder.png'; this.style.objectFit='contain'; this.style.background='#111';}">
+           onerror="if(this.dataset.previewFallback==='1'){this.style.display='none'; this.nextElementSibling.style.display='flex';}else{this.dataset.previewFallback='1'; this.onerror=null; this.src='preview_placeholder.png';}">
       <div class="card-banner-fallback" style="display:none">${getGloveEmoji(mastery.id)}</div>
       ${isNew ? '<div class="new-ribbon">NEW</div>' : ''}
       ${isHidden ? '<div class="hidden-ribbon">OCULTO</div>' : '<div class="mastered-ribbon">MASTERED</div>'}
@@ -5183,10 +6498,14 @@ function setCompletedTimestamp(id) {
     hour: '2-digit',
     minute: '2-digit'
   });
+  // Registrar en el diario
+  diaryAdd({ type: 'mastery-completed', masteryId: id, ts: timeNow() });
 }
 
 function clearCompletedTimestamp(id) {
   delete completedAtMap[id];
+  // Registrar en el diario
+  diaryAdd({ type: 'mastery-uncompleted', masteryId: id, ts: timeNow() });
 }
 
 /* Auto-completes every mission for a mastery */
@@ -5274,7 +6593,7 @@ function openDetail(id) {
   bannerImg.onload  = null;
   bannerImg.onerror = null;
   bannerImg.onerror = () => {
-    applyPreviewPlaceholder(bannerImg, 'contain');
+    applyPreviewPlaceholder(bannerImg, 'cover');
     bannerPH.style.display  = 'none';
   };
   bannerImg.src = 'banner_' + mastery.id + '.png';
@@ -5455,11 +6774,21 @@ function toggleMission(masteryId, missionIndex) {
   if (!progressData[masteryId]) progressData[masteryId] = {};
 
   const cur = progressData[masteryId][missionIndex] || 0;
+  const willBeDone = mission.isBool ? cur < 1 : cur < mission.target;
+
   if (mission.isBool) {
     progressData[masteryId][missionIndex] = cur >= 1 ? 0 : 1;
   } else {
     progressData[masteryId][missionIndex] = cur >= mission.target ? 0 : mission.target;
   }
+
+  // Registrar en el diario
+  diaryAdd({
+    type: willBeDone ? 'mission-done' : 'mission-undone',
+    masteryId,
+    missionIndex,
+    ts: timeNow()
+  });
 
   saveProgress();
   showToast('💾 Guardado');
@@ -5475,6 +6804,7 @@ function updateCounter(masteryId, missionIndex, value) {
   const mastery = MASTERIES.find(m => m.id === masteryId);
   if (!mastery) return;
   const mission = mastery.missions[missionIndex];
+  const oldVal = (progressData[masteryId] || {})[missionIndex] || 0;
   const val = Math.max(0, parseInt(value) || 0);
 
   if (!progressData[masteryId]) progressData[masteryId] = {};
@@ -5507,6 +6837,18 @@ function updateCounter(masteryId, missionIndex, value) {
   // Guardar con debounce para no saturar localStorage
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
+    // Registrar en el diario (solo si el valor cambió)
+    const finalVal = (progressData[masteryId] || {})[missionIndex] || 0;
+    if (finalVal !== oldVal) {
+      diaryAdd({
+        type: 'counter-update',
+        masteryId,
+        missionIndex,
+        oldValue: oldVal,
+        newValue: finalVal,
+        ts: timeNow()
+      });
+    }
     saveProgress();
     showToast('💾 Guardado');
   }, 600);
@@ -6005,6 +7347,11 @@ function startRandomSelector() {
     }
   });
 
+  // Preload preview placeholder (shown at full brightness when a banner fails to load)
+  const placeholderImg = new Image();
+  placeholderImg.onerror = () => { placeholderImg._failed = true; };
+  placeholderImg.src = 'preview_placeholder.png';
+
   // ── Physics ──
   // Position = index into spinList * SLOT_W, animated by offset
   const TOTAL_DIST  = SPIN_COUNT * SLOT_W; // pixels to travel
@@ -6078,9 +7425,11 @@ function startRandomSelector() {
       ctx.closePath();
       ctx.clip();
 
-      // Draw image or placeholder
+      // Draw image, placeholder, or last-resort dark fallback
       if (img && img.complete && !img._failed && img.naturalWidth > 0) {
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
+      } else if (placeholderImg.complete && !placeholderImg._failed && placeholderImg.naturalWidth > 0) {
+        ctx.drawImage(placeholderImg, drawX, drawY, drawW, drawH);
       } else {
         // Placeholder
         const ph = ctx.createLinearGradient(drawX, drawY, drawX, drawY + drawH);
@@ -6556,25 +7905,31 @@ function exitTodoSelectMode() {
 function switchPage(page) {
   const gridView   = document.getElementById('grid-view');
   const slapView   = document.getElementById('slap-view');
+  const calView    = document.getElementById('calendar-view');
   const searchWrap = document.getElementById('search-bar-wrap');
   const statsBar   = document.getElementById('stats-bar');
   const btnMast    = document.getElementById('nav-masteries');
   const btnSlap    = document.getElementById('nav-slap');
+  const btnCal     = document.getElementById('nav-calendar');
+
+  // Reset todos
+  [gridView, slapView, calView].forEach(v => { if (v) v.style.display = 'none'; });
+  [btnMast, btnSlap, btnCal].forEach(b => { if (b) b.classList.remove('active'); });
+  if (searchWrap) searchWrap.style.display = 'none';
+  if (statsBar)   statsBar.style.display   = 'none';
 
   if (page === 'masteries') {
-    gridView.style.display   = '';
-    slapView.style.display   = 'none';
-    searchWrap.style.display = '';
-    statsBar.style.display   = '';
-    btnMast.classList.add('active');
-    btnSlap.classList.remove('active');
-  } else {
-    gridView.style.display   = 'none';
-    slapView.style.display   = 'flex';
-    searchWrap.style.display = 'none';
-    statsBar.style.display   = 'none';
-    btnMast.classList.remove('active');
-    btnSlap.classList.add('active');
+    if (gridView)   gridView.style.display   = '';
+    if (searchWrap) searchWrap.style.display = '';
+    if (statsBar)   statsBar.style.display   = '';
+    if (btnMast)    btnMast.classList.add('active');
+  } else if (page === 'slap') {
+    if (slapView) slapView.style.display = 'flex';
+    if (btnSlap)  btnSlap.classList.add('active');
+  } else if (page === 'calendar') {
+    if (calView) calView.style.display = '';
+    if (btnCal)  btnCal.classList.add('active');
+    renderCalendar();
   }
 }
 
@@ -6604,7 +7959,7 @@ function playMasteryCompleteAnim(id) {
   stage.classList.remove('glow-ring');
   [imgDef, imgBan, beam, flash, label].forEach(el => { el.style.transition = 'none'; });
 
-  imgDef.style.cssText += ';opacity:1;transform:scale(1);filter:saturate(0.4) brightness(0.7);';
+  imgDef.style.cssText += ';opacity:1;transform:scale(1);filter:none;';
   imgBan.style.cssText += ';opacity:0;transform:scale(1.08);';
   beam.style.cssText   += ';opacity:0;left:-30%;';
   flash.style.cssText  += ';opacity:0;';
@@ -6946,6 +8301,848 @@ function hardDismiss() {
 /* Shared timer array so skip can clear them all */
 let _mcTimers = [];
 
+/* ============================================================
+   DIARY / CALENDAR SYSTEM
+   ─────────────────────────────────────────────────────────────
+   Estructura en localStorage (STORAGE_KEY_DIARY):
+   {
+     "2026-06-13": [
+       { type, masteryId, missionIndex?, oldValue?, newValue?, ts }
+     ]
+   }
+
+   Tipos de entrada:
+     "mastery-completed"    – maestría marcada como completa
+     "mastery-uncompleted"  – maestría desmarcada
+     "mission-done"         – misión marcada manualmente
+     "mission-undone"       – misión desmarcada
+     "counter-update"       – contador numérico actualizado
+     "cancelled"            – operación cancelada (completar+descompletar mismo día)
+
+   Regla de cancelación: si en el mismo día se registra
+   "mastery-completed" y "mastery-uncompleted" para el mismo id,
+   AMBAS entradas se marcan como "cancelled" y no cuentan.
+   Igual con mission-done / mission-undone.
+   ============================================================ */
+/* STORAGE_KEY_DIARY y diaryData declarados en el bloque de variables globales (arriba) */
+
+/* ── Utilidades de fecha ── */
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-'
+    + String(d.getMonth() + 1).padStart(2, '0') + '-'
+    + String(d.getDate()).padStart(2, '0');
+}
+
+function dateKeyToDisplay(key) {
+  const [y, m, d] = key.split('-');
+  const months = ['enero','febrero','marzo','abril','mayo','junio',
+                  'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const days   = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const dt = new Date(Number(y), Number(m) - 1, Number(d));
+  return `${days[dt.getDay()]} ${Number(d)} de ${months[Number(m)-1]} de ${y}`;
+}
+
+function timeNow() {
+  return new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+/* ── Persistencia ── */
+function saveDiary() {
+  try { localStorage.setItem(STORAGE_KEY_DIARY, JSON.stringify(diaryData)); } catch(e) {}
+}
+function loadDiary() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_DIARY);
+    if (raw) diaryData = JSON.parse(raw);
+    if (!diaryData || typeof diaryData !== 'object') diaryData = {};
+  } catch(e) { diaryData = {}; }
+}
+
+/* ── Agregar entrada al diario ── */
+function diaryAdd(entry) {
+  const key = todayKey();
+  if (!diaryData[key]) diaryData[key] = [];
+
+  // Regla de cancelación para maestrías
+  if (entry.type === 'mastery-uncompleted') {
+    const todayEntries = diaryData[key];
+    const opposite = todayEntries.findIndex(
+      e => e.type === 'mastery-completed' && e.masteryId === entry.masteryId && e.status !== 'cancelled'
+    );
+    if (opposite !== -1) {
+      todayEntries[opposite].status = 'cancelled';
+      saveDiary();
+      return; // NO añadir la entrada de "uncompleted" tampoco
+    }
+  }
+  if (entry.type === 'mastery-completed') {
+    const todayEntries = diaryData[key];
+    const opposite = todayEntries.findIndex(
+      e => e.type === 'mastery-uncompleted' && e.masteryId === entry.masteryId && e.status !== 'cancelled'
+    );
+    if (opposite !== -1) {
+      todayEntries[opposite].status = 'cancelled';
+      saveDiary();
+      return;
+    }
+  }
+
+  // Regla de cancelación para misiones (bool)
+  if (entry.type === 'mission-undone') {
+    const todayEntries = diaryData[key];
+    const opposite = todayEntries.findIndex(
+      e => e.type === 'mission-done'
+        && e.masteryId === entry.masteryId
+        && e.missionIndex === entry.missionIndex
+        && e.status !== 'cancelled'
+    );
+    if (opposite !== -1) {
+      todayEntries[opposite].status = 'cancelled';
+      saveDiary();
+      return;
+    }
+  }
+  if (entry.type === 'mission-done') {
+    const todayEntries = diaryData[key];
+    const opposite = todayEntries.findIndex(
+      e => e.type === 'mission-undone'
+        && e.masteryId === entry.masteryId
+        && e.missionIndex === entry.missionIndex
+        && e.status !== 'cancelled'
+    );
+    if (opposite !== -1) {
+      todayEntries[opposite].status = 'cancelled';
+      saveDiary();
+      return;
+    }
+  }
+
+  // Para counter-update: si ya hay uno del mismo día/maestría/misión, actualizar el último
+  if (entry.type === 'counter-update') {
+    const todayEntries = diaryData[key];
+    const last = [...todayEntries].reverse().find(
+      e => e.type === 'counter-update'
+        && e.masteryId === entry.masteryId
+        && e.missionIndex === entry.missionIndex
+        && e.status !== 'cancelled'
+    );
+    if (last) {
+      // Actualizar valor nuevo pero mantener oldValue original
+      last.newValue = entry.newValue;
+      last.ts = entry.ts;
+      saveDiary();
+      return;
+    }
+  }
+
+  diaryData[key].push(entry);
+  saveDiary();
+}
+
+/* ── Contar entradas activas (no canceladas) de un día ── */
+function diaryActivCount(key) {
+  if (!diaryData[key]) return 0;
+  return diaryData[key].filter(e => e.status !== 'cancelled').length;
+}
+
+/* ── Obtener tipos de punto para un día (para los dots) ── */
+function diaryDotTypes(key) {
+  if (!diaryData[key]) return [];
+  const types = new Set();
+  diaryData[key].forEach(e => {
+    if (e.status !== 'cancelled') types.add(e.type);
+  });
+  return [...types];
+}
+
+/* ============================================================
+   CALENDAR UI
+   ============================================================ */
+/* calYear, calMonth y calSelectedKey declarados en el bloque de variables globales (arriba) */
+
+function renderCalendar() {
+  const titleEl = document.getElementById('cal-title');
+  const gridEl  = document.getElementById('cal-grid');
+  if (!titleEl || !gridEl) return;
+
+  // El panel detalle siempre visible (muestra placeholder cuando no hay selección)
+  const detailPanel = document.getElementById('cal-detail');
+  if (detailPanel && !detailPanel.classList.contains('open')) {
+    detailPanel.classList.add('open');
+  }
+
+  const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                     'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  titleEl.textContent = MONTHS_ES[calMonth] + ' ' + calYear;
+
+  const todayK = todayKey();
+  const firstDay = new Date(calYear, calMonth, 1);
+  // Lunes=0 en nuestro grid (semana lunes-domingo)
+  let startDow = firstDay.getDay(); // 0=dom,1=lun...
+  startDow = (startDow + 6) % 7;   // convertir a lunes=0
+
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+
+  gridEl.innerHTML = '';
+  const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+
+    let dayNum, monthOffset, year = calYear, month = calMonth;
+
+    if (i < startDow) {
+      dayNum = daysInPrev - startDow + i + 1;
+      monthOffset = -1;
+      month = calMonth - 1;
+      if (month < 0) { month = 11; year--; }
+      cell.classList.add('other-month');
+    } else if (i >= startDow + daysInMonth) {
+      dayNum = i - startDow - daysInMonth + 1;
+      monthOffset = 1;
+      month = calMonth + 1;
+      if (month > 11) { month = 0; year++; }
+      cell.classList.add('other-month');
+    } else {
+      dayNum = i - startDow + 1;
+      monthOffset = 0;
+    }
+
+    const key = year + '-' + String(month + 1).padStart(2,'0') + '-' + String(dayNum).padStart(2,'0');
+
+    if (key === todayK) cell.classList.add('today');
+    if (key === calSelectedKey) cell.classList.add('selected');
+
+    const activeCount = diaryActivCount(key);
+    if (activeCount > 0) cell.classList.add('has-activity');
+
+    // Número del día
+    const numEl = document.createElement('div');
+    numEl.className = 'cal-day-num';
+    numEl.textContent = dayNum;
+    cell.appendChild(numEl);
+
+    // Dots
+    const dotTypes = diaryDotTypes(key);
+    if (dotTypes.length > 0) {
+      const dotsEl = document.createElement('div');
+      dotsEl.className = 'cal-day-dots';
+      // máx 5 dots visibles
+      dotTypes.slice(0, 5).forEach(type => {
+        const dot = document.createElement('div');
+        dot.className = 'cal-dot ' + type;
+        dotsEl.appendChild(dot);
+      });
+      cell.appendChild(dotsEl);
+    }
+
+    // Count badge si hay más de 3 eventos
+    if (activeCount > 3) {
+      const badge = document.createElement('div');
+      badge.className = 'cal-day-count';
+      badge.textContent = activeCount;
+      cell.appendChild(badge);
+    }
+
+    // Collage de banners de maestrías en el día
+    const entries = (diaryData[key] || []).filter(e => e.status !== 'cancelled');
+    if (entries.length > 0 && monthOffset === 0) {
+      // Obtener maestrías únicas del día
+      const uniqueMasteries = [...new Set(entries.map(e => e.masteryId).filter(Boolean))];
+      // Determinar color dominante del borde del collage
+      const hasCompleted = entries.some(e => e.type === 'mastery-completed');
+      const hasUncompleted = entries.some(e => e.type === 'mastery-uncompleted');
+      const hasMission = entries.some(e => e.type === 'mission-done');
+      let collageGlow = '#39ff14';
+      if (!hasCompleted && hasUncompleted) collageGlow = '#ff4444';
+      else if (!hasCompleted && !hasUncompleted && hasMission) collageGlow = '#FFD700';
+      else if (!hasCompleted && !hasUncompleted && !hasMission) collageGlow = '#38bdf8';
+
+      if (uniqueMasteries.length > 0) {
+        const collageEl = document.createElement('div');
+        collageEl.className = 'cal-day-collage';
+        // Mostrar hasta 3 banners en split
+        const shown = uniqueMasteries.slice(0, 3);
+        shown.forEach(mid => {
+          const img = document.createElement('img');
+          img.className = 'cal-day-collage-img';
+          img.src = `banner_${mid}.png`;
+          img.alt = '';
+          img.onerror = function(){ this.style.display='none'; };
+          collageEl.appendChild(img);
+        });
+        // Borde de color sutil encima
+        const borderEl = document.createElement('div');
+        borderEl.className = 'cal-day-collage-border';
+        borderEl.style.boxShadow = `inset 0 0 0 2px ${collageGlow}55`;
+        collageEl.appendChild(borderEl);
+        cell.insertBefore(collageEl, cell.firstChild);
+      }
+    }
+
+    if (monthOffset === 0) {
+      cell.addEventListener('click', () => calSelectDay(key));
+    }
+
+    gridEl.appendChild(cell);
+  }
+}
+
+function calSelectDay(key) {
+  calSelectedKey = key;
+  renderCalendar();
+  renderCalDetail(key);
+}
+
+function renderCalDetail(key) {
+  const detail      = document.getElementById('cal-detail');
+  const dateEl      = document.getElementById('cal-detail-date');
+  const emptyEl     = document.getElementById('cal-detail-empty');
+  const listEl      = document.getElementById('cal-detail-list');
+  const placeholder = document.getElementById('cal-detail-placeholder');
+  if (!detail) return;
+
+  detail.classList.add('open');
+  dateEl.textContent = dateKeyToDisplay(key);
+
+  // Solo entradas ACTIVAS — las canceladas no se muestran
+  const entries = (diaryData[key] || [])
+    .filter(e => e.status !== 'cancelled');
+
+  listEl.innerHTML = '';
+
+  // Ocultar placeholder
+  if (placeholder) placeholder.style.display = 'none';
+
+  if (entries.length === 0) {
+    emptyEl.style.display = 'flex';
+    listEl.style.display  = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.style.display  = 'flex';
+
+  // ── AGRUPAR POR MAESTRÍA ──
+  // Mantener orden de aparición de maestrías (primera vez que aparece)
+  const masteryOrder = [];
+  const masteryGroups = {}; // masteryId → { completed:[], uncompleted:[], missionDone:[], missionUndone:[], counter:[] }
+
+  entries.forEach(e => {
+    const mid = e.masteryId || '__unknown__';
+    if (!masteryGroups[mid]) {
+      masteryGroups[mid] = { completed:[], uncompleted:[], missionDone:[], missionUndone:[], counter:[] };
+      masteryOrder.push(mid);
+    }
+    if      (e.type === 'mastery-completed')   masteryGroups[mid].completed.push(e);
+    else if (e.type === 'mastery-uncompleted') masteryGroups[mid].uncompleted.push(e);
+    else if (e.type === 'mission-done')        masteryGroups[mid].missionDone.push(e);
+    else if (e.type === 'mission-undone')      masteryGroups[mid].missionUndone.push(e);
+    else if (e.type === 'counter-update')      masteryGroups[mid].counter.push(e);
+  });
+
+  // Colores de borde para la barra de color del banner
+  const TYPE_COLORS = {
+    'mastery-completed':   '#39ff14',
+    'mastery-uncompleted': '#ff4444',
+    'mission-done':        '#FFD700',
+    'mission-undone':      '#666',
+    'counter-update':      '#38bdf8',
+  };
+
+  masteryOrder.forEach((mid, gIdx) => {
+    const g = masteryGroups[mid];
+    const mastery = MASTERIES.find(m => m.id === mid);
+    const mName = mastery ? mastery.name : (mid === '__unknown__' ? '?' : mid);
+    const bannerSrc = `banner_${mid}.png`;
+
+    // Orden de aparición DENTRO del grupo: completada/desmarcada → misión hecha/desmarcada → contador
+    const orderedEntries = [
+      ...g.completed.map(e=>({...e,_type:'mastery-completed'})),
+      ...g.uncompleted.map(e=>({...e,_type:'mastery-uncompleted'})),
+      ...g.missionDone.map(e=>({...e,_type:'mission-done'})),
+      ...g.missionUndone.map(e=>({...e,_type:'mission-undone'})),
+      ...g.counter.map(e=>({...e,_type:'counter-update'})),
+    ];
+
+    // Clase de borde del grupo según tipo dominante
+    let gTypeClass = 'gtype-counter';
+    if (g.completed.length)   gTypeClass = 'gtype-completed';
+    else if (g.uncompleted.length) gTypeClass = 'gtype-uncompleted';
+    else if (g.missionDone.length) gTypeClass = 'gtype-mission';
+
+    // Color de la barra superior del banner
+    let barColor = '#38bdf8';
+    if (g.completed.length)   barColor = '#39ff14';
+    else if (g.uncompleted.length) barColor = '#ff4444';
+    else if (g.missionDone.length) barColor = '#FFD700';
+
+    const groupEl = document.createElement('div');
+    groupEl.className = `cal-mastery-group ${gTypeClass}`;
+    groupEl.style.animationDelay = (gIdx * 0.06) + 's';
+
+    // Banner completo de la maestría
+    groupEl.innerHTML = `
+      <div class="cal-group-banner" id="cgb_${gIdx}">
+        <div class="cal-group-banner-color-bar" style="background:${barColor};opacity:1;box-shadow:0 0 8px ${barColor}66"></div>
+        <img src="${bannerSrc}" alt=""
+          onerror="this.parentElement.classList.add('no-img');this.style.display='none'">
+        <div class="cal-group-banner-overlay"></div>
+        <div class="cal-group-banner-name">${mName}</div>
+      </div>
+      <div class="cal-group-entries"></div>
+    `;
+
+    const entriesEl = groupEl.querySelector('.cal-group-entries');
+
+    orderedEntries.forEach((e, eIdx) => {
+      let icon = '📌', titleText = '', subText = '';
+
+      if (e._type === 'mastery-completed') {
+        icon = '🏆'; titleText = '¡Maestría completada!'; subText = 'Maestría marcada como terminada';
+      } else if (e._type === 'mastery-uncompleted') {
+        icon = '↩️'; titleText = 'Maestría desmarcada'; subText = 'Se quitó la marca de completada';
+      } else if (e._type === 'mission-done') {
+        icon = '✅';
+        const mission = mastery ? mastery.missions[e.missionIndex] : null;
+        titleText = 'Misión completada';
+        subText   = mission ? `"${mission.text}"` : `Misión ${(e.missionIndex||0) + 1}`;
+      } else if (e._type === 'mission-undone') {
+        icon = '🔲';
+        const mission = mastery ? mastery.missions[e.missionIndex] : null;
+        titleText = 'Misión desmarcada';
+        subText   = mission ? `"${mission.text}"` : `Misión ${(e.missionIndex||0) + 1}`;
+      } else if (e._type === 'counter-update') {
+        icon = '📊';
+        const mission = mastery ? mastery.missions[e.missionIndex] : null;
+        const mText = mission ? mission.text : `Misión ${(e.missionIndex||0) + 1}`;
+        titleText = 'Contador actualizado';
+        subText = `${mText} · ${(e.oldValue||0).toLocaleString()} → ${(e.newValue||0).toLocaleString()}`;
+      }
+
+      const entryEl = document.createElement('div');
+      entryEl.className = `cal-entry type-${e._type}`;
+
+      entryEl.innerHTML = `
+        <div class="cal-entry-icon">${icon}</div>
+        <div class="cal-entry-body">
+          <div class="cal-entry-title">${titleText}</div>
+          <div class="cal-entry-sub">${subText}</div>
+        </div>
+        <div class="cal-entry-time">${e.ts || ''}</div>
+      `;
+      entriesEl.appendChild(entryEl);
+    });
+
+    listEl.appendChild(groupEl);
+  });
+}
+
+function calCloseDetail() {
+  calSelectedKey = null;
+  // Volver al estado placeholder
+  const placeholder = document.getElementById('cal-detail-placeholder');
+  const emptyEl     = document.getElementById('cal-detail-empty');
+  const listEl      = document.getElementById('cal-detail-list');
+  const dateEl      = document.getElementById('cal-detail-date');
+  if (placeholder) placeholder.style.display = 'flex';
+  if (emptyEl)     emptyEl.style.display     = 'none';
+  if (listEl)      { listEl.innerHTML = ''; listEl.style.display = 'none'; }
+  if (dateEl)      dateEl.textContent = 'Selecciona un día';
+  renderCalendar();
+}
+
+function calNav(dir) {
+  calMonth += dir;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  renderCalendar();
+}
+
+function calGoToday() {
+  calYear  = new Date().getFullYear();
+  calMonth = new Date().getMonth();
+  renderCalendar();
+}
+
+/* ============================================================
+   EXTENDER switchPage con el calendario
+   ============================================================ */
+/* switchPage ya incluye soporte para 'calendar' en su definición original */
+
+/* ── Cargar diario junto con el resto del progreso ── */
+/* loadProgress ya llama a loadDiary() en su definición original */
+
+
+
+
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║               GUANTES — DATOS Y LÓGICA                  ║
+   ╚══════════════════════════════════════════════════════════╝ */
+
+/* Contraseña de acceso */
+const GLOVES_PASSWORD = 'andynicoemilio';
+let glovesUnlocked = false;
+let glovesTypeFilter = 'all';
+let gloveDetailOpen = null;
+
+/* ── Tipos:  slaps | robux | logro | otro ── */
+const GLOVES = [
+
+  /* ── EJEMPLO TIPO: SLAPS ── */
+  {
+    id: 'cloud',
+    name: 'Cloud',
+    type: 'slaps',
+    cost: 28000,              // en slaps
+    mechanics: [
+      'Guante básico sin habilidades especiales.',
+      'Todo el mundo empieza con este guante.',
+    ],
+    abilities: [
+      '[Clic] Golpea a los jugadores cercanos.',
+    ],
+    tutorialUrl: null,
+  },
+
+  /* ── EJEMPLO TIPO: ROBUX ── */
+  {
+    id: 'lucky',
+    name: 'Lucky',
+    type: 'robux',
+    cost: 199,            // en robux
+    mechanics: [
+      'Cada golpe tiene una probabilidad de activar un efecto aleatorio.',
+      'Los efectos van desde slaps masivos hasta efectos visuales especiales.',
+    ],
+    abilities: [
+      '[Clic] Golpea; tiene 25% de activar un efecto de suerte.',
+      '[E] Gira la ruleta de la suerte manualmente (30s cooldown).',
+    ],
+    tutorialUrl: null,
+  },
+
+  /* ── EJEMPLO TIPO: LOGRO ── */
+  {
+    id: 'error',
+    name: 'Error',
+    type: 'logro',
+    obtainMethod: 'Consigue el badge "Error" en Slap Battles encontrando el glitch secreto del mapa.',
+    badgeName: 'Error',                                          // nombre del logro en Roblox
+    badgeUrl:  'https://www.roblox.com/badges/2124858899/Error', // URL del badge en Roblox
+    mechanics: [
+      'Distorsiona la pantalla de los jugadores golpeados durante 3 segundos.',
+      'El golpe ignora el 20% del knockback resistido.',
+    ],
+    abilities: [
+      '[Clic] Golpe con efecto de corrupción visual.',
+      '[E] Teletranspórtate a una posición aleatoria del mapa (45s cooldown).',
+    ],
+    tutorialUrl: null,
+  },
+
+  /* ── EJEMPLO TIPO: OTRO ── */
+  {
+    id: 'santa',
+    name: 'Santa',
+    type: 'otro',
+    obtainMethod: 'Disponible únicamente durante el evento de Navidad (diciembre). No se puede comprar fuera de temporada.',
+    mechanics: [
+      'Lanza regalos que al impactar explotan con confeti.',
+      'Los regalos pueden recoger a jugadores en un área de 15 studs.',
+    ],
+    abilities: [
+      '[Clic] Lanza un regalo hacia el jugador más cercano.',
+      '[E] Invoca una lluvia de regalos en un área de 20 studs (60s cooldown).',
+    ],
+    tutorialUrl: null,
+  },
+
+];
+
+/* ── Tipos: metadatos visuales ── */
+const GLOVE_TYPE_META = {
+  slaps: { label: '👋 Slaps',  badgeClass: 'gtbadge-slaps', ribbonClass: 'gribbon-slaps', obtainLabel: '💰 PRECIO (SLAPS)' },
+  robux: { label: '💎 Robux',  badgeClass: 'gtbadge-robux', ribbonClass: 'gribbon-robux', obtainLabel: '💎 PRECIO (ROBUX)' },
+  logro: { label: '🏅 Logro',  badgeClass: 'gtbadge-logro', ribbonClass: 'gribbon-logro', obtainLabel: '🏅 MÉTODO DE OBTENCIÓN' },
+  otro:  { label: '🔮 Otro',   badgeClass: 'gtbadge-otro',  ribbonClass: 'gribbon-otro',  obtainLabel: '🔮 MÉTODO DE OBTENCIÓN' },
+};
+
+/* ============================================================
+   GATE — comprobación de contraseña
+   ============================================================ */
+function glovesGateCheck() {
+  const input = document.getElementById('gloves-gate-input');
+  const error = document.getElementById('gloves-gate-error');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === GLOVES_PASSWORD) {
+    glovesUnlocked = true;
+    localStorage.setItem('gloves_unlocked', '1');
+    document.getElementById('gloves-gate').style.display = 'none';
+    document.getElementById('gloves-page').style.display = '';
+    renderGlovesGrid();
+  } else if (val.length >= GLOVES_PASSWORD.length) {
+    input.classList.add('error');
+    error.classList.add('show');
+    setTimeout(() => { input.classList.remove('error'); input.value = ''; error.classList.remove('show'); }, 1200);
+  }
+}
+
+function checkGlovesUnlock() {
+  if (localStorage.getItem('gloves_unlocked') === '1') {
+    glovesUnlocked = true;
+    const gate = document.getElementById('gloves-gate');
+    const page = document.getElementById('gloves-page');
+    if (gate) gate.style.display = 'none';
+    if (page) { page.style.display = ''; renderGlovesGrid(); }
+  }
+}
+
+/* ============================================================
+   FILTER
+   ============================================================ */
+function setGlovesFilter(type) {
+  glovesTypeFilter = type;
+  document.querySelectorAll('.gtype-filter').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  });
+  renderGlovesGrid();
+}
+
+/* ============================================================
+   RENDER GRID
+   ============================================================ */
+function renderGlovesGrid() {
+  const grid  = document.getElementById('gloves-grid');
+  const empty = document.getElementById('gloves-empty-state');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const query = (document.getElementById('gloves-search-input')?.value || '').toLowerCase().trim();
+  const list  = GLOVES.filter(g => {
+    if (glovesTypeFilter !== 'all' && g.type !== glovesTypeFilter) return false;
+    return g.name.toLowerCase().includes(query);
+  });
+
+  if (list.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.forEach((g, i) => {
+    const card = createGloveCard(g);
+    card.style.animationDelay = (i * 0.04) + 's';
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   CREATE GLOVE CARD
+   ============================================================ */
+function createGloveCard(glove) {
+  const meta = GLOVE_TYPE_META[glove.type] || GLOVE_TYPE_META.otro;
+  // ¿Tiene maestría asociada?
+  const linkedMastery = MASTERIES.find(m => m.id === glove.id);
+
+  const card = document.createElement('div');
+  card.className = 'glove-card';
+  card.dataset.type = glove.type;
+  card.dataset.id   = glove.id;
+
+  card.innerHTML = `
+    <div class="glove-card-top">
+      <img class="glove-card-banner" src="default_${glove.id}.png" alt="${glove.name}"
+        onerror="this.onerror=null;this.src='preview_placeholder.png'">
+      <div class="glove-type-ribbon ${meta.ribbonClass}">${meta.label}</div>
+    </div>
+    <div class="glove-card-body">
+      <div class="glove-card-name">${glove.name}</div>
+      <div class="glove-card-type-label glove-tl-${glove.type}">${meta.label}</div>
+    </div>
+    <div class="glove-card-footer">
+      <button class="btn btn-primary" style="flex:1" onclick="openGloveDetail('${glove.id}',event)">📖 VER MÁS</button>
+      ${linkedMastery ? `<button class="btn btn-glove-mastery" onclick="openGloveGoMastery('${glove.id}',event)" title="Ver maestría"><img class="btn-glove-mastery-icon" src="masteryicon.png" alt="Maestría" width="20" height="20" style="width:20px;height:20px;max-width:20px;max-height:20px;object-fit:contain;flex-shrink:0;display:block;" onerror="this.style.display='none';this.insertAdjacentText('afterend','⚔️')"></button>` : ''}
+    </div>
+  `;
+
+  return card;
+}
+
+/* ============================================================
+   OPEN / CLOSE GLOVE DETAIL
+   ============================================================ */
+function openGloveDetail(id, e) {
+  if (e) e.stopPropagation();
+  const glove = GLOVES.find(g => g.id === id);
+  if (!glove) return;
+  gloveDetailOpen = glove;
+  const meta = GLOVE_TYPE_META[glove.type] || GLOVE_TYPE_META.otro;
+
+  // Title
+  document.getElementById('glove-detail-title').textContent = '🥊 ' + glove.name.toUpperCase();
+
+  // Banner
+  const bannerImg = document.getElementById('glove-detail-banner-img');
+  const bannerPh  = document.getElementById('glove-detail-banner-ph');
+  bannerImg.style.display = 'block';
+  bannerPh.style.display  = 'none';
+  bannerImg.onerror = () => { bannerImg.onerror = null; bannerImg.src = 'preview_placeholder.png'; };
+  bannerImg.src = 'default_' + glove.id + '.png';
+
+  // Tutorial button
+  const tutBtn = document.getElementById('glove-detail-tut-btn');
+  if (glove.tutorialUrl) {
+    tutBtn.classList.add('visible');
+  } else {
+    tutBtn.classList.remove('visible');
+  }
+
+  // Glove image
+  const gloveImg = document.getElementById('glove-detail-glove-img');
+  const glovePh  = document.getElementById('glove-detail-glove-ph');
+  gloveImg.style.display = 'block';
+  glovePh.style.display  = 'none';
+  gloveImg.onerror = () => { gloveImg.onerror = null; gloveImg.src = 'preview_placeholder.png'; };
+  gloveImg.src = 'defglove_' + glove.id + '.png';
+
+  // Name
+  document.getElementById('glove-detail-name').textContent = glove.name;
+
+  // Type badge
+  const badge = document.getElementById('glove-detail-type-badge');
+  badge.textContent = meta.label;
+  badge.className   = 'glove-type-badge ' + meta.badgeClass;
+
+  // Obtain
+  const obtainLabel = document.getElementById('glove-detail-obtain-label');
+  const obtainText  = document.getElementById('glove-detail-obtain-text');
+  obtainLabel.textContent = meta.obtainLabel;
+  if (glove.type === 'slaps') {
+    obtainText.innerHTML = `<img class="slap-icon-inline" src="slapicon.png" alt="Slaps" onerror="this.remove()">${glove.cost.toLocaleString()}`;
+  } else if (glove.type === 'robux') {
+    obtainText.textContent = glove.cost + ' Robux';
+  } else {
+    obtainText.textContent = glove.obtainMethod || '—';
+  }
+
+  // Badge de logro
+  const badgeWrap    = document.getElementById('glove-detail-badge-wrap');
+  const badgeImg     = document.getElementById('glove-detail-badge-img');
+  const badgeName    = document.getElementById('glove-detail-badge-name');
+  const badgeRoblox  = document.getElementById('btn-glove-badge-roblox');
+  if (glove.type === 'logro') {
+    badgeWrap.classList.add('visible');
+    // Imagen circular del badge
+    badgeImg.src = 'badge_' + glove.id + '.png';
+    badgeImg.onerror = () => { badgeImg.onerror = null; badgeImg.style.opacity = '0.3'; };
+    // Nombre del logro
+    badgeName.textContent = glove.badgeName || glove.name + ' Badge';
+    // Botón Roblox
+    if (glove.badgeUrl) {
+      badgeRoblox.href = glove.badgeUrl;
+      badgeRoblox.style.display = 'inline-flex';
+    } else {
+      badgeRoblox.style.display = 'none';
+    }
+  } else {
+    badgeWrap.classList.remove('visible');
+    badgeImg.src = '';
+  }
+
+  // Mechanics
+  const mechList = document.getElementById('glove-detail-mechanics-list');
+  mechList.innerHTML = '';
+  (glove.mechanics || []).forEach((m, i) => {
+    const el = document.createElement('div');
+    el.className = 'glove-detail-item';
+    el.style.animationDelay = (i * 0.06) + 's';
+    el.innerHTML = `<span class="glove-detail-item-bullet">⚙️</span><span>${m}</span>`;
+    mechList.appendChild(el);
+  });
+
+  // Abilities
+  const abilList = document.getElementById('glove-detail-abilities-list');
+  abilList.innerHTML = '';
+  (glove.abilities || []).forEach((a, i) => {
+    const el = document.createElement('div');
+    el.className = 'glove-detail-item';
+    el.style.animationDelay = (i * 0.06) + 's';
+    el.innerHTML = `<span class="glove-detail-item-bullet">⚡</span><span>${a}</span>`;
+    abilList.appendChild(el);
+  });
+
+  document.getElementById('glove-detail-view').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGloveDetail() {
+  document.getElementById('glove-detail-view').classList.remove('open');
+  document.body.style.overflow = '';
+  gloveDetailOpen = null;
+}
+
+/* Botón maestría en la tarjeta → abre el detail de maestría */
+function openGloveGoMastery(id, e) {
+  if (e) e.stopPropagation();
+  const mastery = MASTERIES.find(m => m.id === id);
+  if (!mastery) return;
+  // Si estamos en la vista guantes, cambiamos a maestrías primero
+  switchPage('masteries');
+  setTimeout(() => openDetail(mastery.id), 80);
+}
+
+/* Tutorial */
+function openGloveTutorial() {
+  if (!gloveDetailOpen?.tutorialUrl) return;
+  // Reutilizamos el modal de video de maestrías
+  openVideoModal(gloveDetailOpen.id);
+  // Si no hay previewUrl en el glove, inyectamos la url del tutorial
+  if (!MASTERIES.find(m => m.id === gloveDetailOpen.id)) {
+    const iframe = document.getElementById('video-player');
+    const ph     = document.getElementById('video-placeholder');
+    if (iframe && gloveDetailOpen.tutorialUrl) {
+      const url = gloveDetailOpen.tutorialUrl
+        .replace('youtu.be/', 'www.youtube.com/embed/')
+        .replace('watch?v=', 'embed/');
+      iframe.src = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&rel=0';
+      iframe.style.display = 'block';
+      if (ph) ph.style.display = 'none';
+    }
+  }
+}
+
+/* ============================================================
+   PATCH switchPage para guantes
+   ============================================================ */
+const _origSwitchPage = switchPage;
+const _patchedSwitchPage = function(page) {
+  const slapView = document.getElementById('slap-view');
+  _origSwitchPage(page);
+  if (page === 'slap') {
+    if (slapView) slapView.style.display = 'flex';
+    checkGlovesUnlock();
+  }
+};
+switchPage = _patchedSwitchPage;
+
+/* ── Init check: si ya estaba desbloqueado ── */
+(function() {
+  // Defer until DOM ready
+  const _origInit = typeof init === 'function' ? init : null;
+  // We run checkGlovesUnlock when the gloves page is first shown,
+  // but we also patch the keyboard Esc to close glove detail
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const gd = document.getElementById('glove-detail-view');
+      if (gd && gd.classList.contains('open')) closeGloveDetail();
+    }
+  });
+})();
 
 </script>
 
