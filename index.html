@@ -1289,19 +1289,6 @@ body {
 .mission-row.done .mission-bar-fill {
   background: linear-gradient(90deg, var(--green-done), #00cc55);
 }
-.mission-row.over100 .mission-counter-label {
-  color: #ff8c00;
-  text-shadow: 0 0 6px rgba(255,140,0,0.5);
-}
-.mission-row.over100:not(.done) .mission-bar-fill {
-  background: linear-gradient(90deg, #ff8c00, #ffd700, #ff8c00);
-  background-size: 200% 100%;
-  animation: over100Shine 1.6s linear infinite;
-}
-@keyframes over100Shine {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
 .mission-counter-label {
   font-size: 0.78rem;
   color: var(--text-yellow);
@@ -2354,227 +2341,6 @@ body {
 @keyframes randomFabSpin {
   from { transform: rotate(0deg) scale(1.08); }
   to   { transform: rotate(360deg) scale(1.08); }
-}
-
-/* ============================================================
-   FEEDBACK FAB
-   ============================================================ */
-#feedback-fab {
-  position: fixed;
-  bottom: 150px;
-  right: 18px;
-  z-index: 400;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: #111;
-  border: 1px solid #2e2e2e;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, opacity .2s, border-color .2s;
-  font-family: 'Fredoka One', cursive;
-  animation: fabAppear .35s cubic-bezier(.34,1.56,.64,1) both;
-  opacity: 0.45;
-}
-#feedback-fab:hover {
-  opacity: 1;
-  transform: scale(1.12);
-  border-color: #60a5fa;
-  box-shadow: 0 0 14px rgba(96,165,250,0.35), 0 4px 12px rgba(0,0,0,0.6);
-}
-#feedback-fab:active { transform: scale(0.93); }
-#feedback-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
-
-/* ── Backdrop ── */
-#feedback-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 450;
-  background: rgba(0,0,0,0.78);
-  animation: fadeInDetail .2s ease;
-}
-#feedback-backdrop.open { display: block; }
-
-/* ── Panel ── */
-#feedback-panel {
-  position: fixed;
-  top: 0;
-  right: -600px;
-  width: 560px;
-  max-width: 95vw;
-  height: 100vh;
-  z-index: 460;
-  background: #0d0d0d;
-  border-left: 3px solid #60a5fa;
-  display: flex;
-  flex-direction: column;
-  box-shadow: -8px 0 40px rgba(0,0,0,0.8);
-  transition: right .32s cubic-bezier(.4,0,.2,1);
-}
-#feedback-panel.open { right: 0; }
-
-#feedback-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  background: linear-gradient(90deg, #00111a 0%, #001a26 100%);
-  border-bottom: 2px solid #003044;
-  flex-shrink: 0;
-}
-#feedback-panel-title {
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.1rem;
-  color: #60a5fa;
-  text-shadow: 0 0 14px rgba(96,165,250,0.35);
-  letter-spacing: 1.5px;
-}
-#btn-close-feedback {
-  background: #1a0404;
-  color: var(--red-close);
-  border: 2px solid #3d0a0a;
-  border-radius: 10px;
-  width: 34px; height: 34px;
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: filter .15s, transform .1s;
-  display: flex; align-items: center; justify-content: center;
-}
-#btn-close-feedback:hover  { background: #2a0606; filter: brightness(1.2); }
-#btn-close-feedback:active { transform: scale(0.91); }
-
-#feedback-panel-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 18px 18px 10px;
-  scrollbar-width: thin;
-  scrollbar-color: #003044 transparent;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-#feedback-panel-body::-webkit-scrollbar { width: 5px; }
-#feedback-panel-body::-webkit-scrollbar-thumb { background: #003044; border-radius: 3px; }
-
-.feedback-section-label {
-  font-family: 'Fredoka One', cursive;
-  font-size: 0.85rem;
-  color: #60a5fa;
-  letter-spacing: 1px;
-  margin-bottom: 9px;
-  display: block;
-}
-
-/* Radio options */
-#feedback-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.feedback-radio-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #111;
-  border: 2px solid #262626;
-  border-radius: 10px;
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: border-color .15s, background .15s;
-}
-.feedback-radio-option:hover { border-color: #3a3a3a; background: #151515; }
-.feedback-radio-option.selected {
-  border-color: #60a5fa;
-  background: #0a1622;
-  box-shadow: 0 0 10px rgba(96,165,250,0.2);
-}
-.feedback-radio-dot {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  border: 2px solid #444;
-  flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color .15s;
-}
-.feedback-radio-option.selected .feedback-radio-dot { border-color: #60a5fa; }
-.feedback-radio-dot-fill {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: #60a5fa;
-  opacity: 0;
-  transition: opacity .12s;
-}
-.feedback-radio-option.selected .feedback-radio-dot-fill { opacity: 1; }
-.feedback-radio-text {
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.92rem;
-  color: var(--text-light);
-}
-
-/* Text areas */
-#feedback-textarea-main {
-  width: 100%;
-  min-height: 140px;
-  background: #111;
-  border: 2px solid #262626;
-  border-radius: 10px;
-  color: var(--text-white);
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.92rem;
-  padding: 12px 14px;
-  resize: vertical;
-  transition: border-color .15s;
-}
-#feedback-textarea-main:focus { border-color: #60a5fa; outline: none; }
-#feedback-input-name {
-  width: 100%;
-  background: #111;
-  border: 2px solid #262626;
-  border-radius: 10px;
-  color: var(--text-white);
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.92rem;
-  padding: 10px 14px;
-  transition: border-color .15s;
-}
-#feedback-input-name:focus { border-color: #60a5fa; outline: none; }
-
-#feedback-panel-footer {
-  padding: 12px 14px;
-  background: #0a0a0a;
-  border-top: 2px solid #00222e;
-  flex-shrink: 0;
-}
-#btn-feedback-send {
-  width: 100%;
-  background: #001824;
-  border: 2px solid #003a55;
-  border-radius: 10px;
-  color: #60a5fa;
-  font-family: 'Fredoka One', cursive;
-  font-size: 0.95rem;
-  padding: 10px 0;
-  cursor: pointer;
-  letter-spacing: .5px;
-  transition: background .18s, border-color .18s, filter .15s, transform .1s;
-  box-shadow: 0 2px 0 #000;
-}
-#btn-feedback-send:hover {
-  background: #00283a;
-  border-color: #60a5fa;
-  filter: brightness(1.12);
-}
-#btn-feedback-send:active { transform: scale(0.97); }
-#btn-feedback-send:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  filter: none;
 }
 
 /* ============================================================
@@ -4428,14 +4194,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
      ======================================================== -->
 <button id="changelog-fab" onclick="openChangelogFab()" title="Ver registro de cambios">
   <span class="fab-dot"></span>
-  <span class="fab-icon">🕘</span>
-</button>
-
-<!-- ========================================================
-     FEEDBACK FAB (fixed bottom-right, above todo)
-     ======================================================== -->
-<button id="feedback-fab" onclick="openFeedbackPanel()" title="Enviar feedback">
-  <span class="fab-icon">💬</span>
+  <span class="fab-icon">📋</span>
 </button>
 
 <!-- ========================================================
@@ -4457,51 +4216,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   </div>
   <div id="todo-panel-footer">
     <button id="btn-todo-add" onclick="startTodoSelection()">➕ Agregar maestría</button>
-  </div>
-</div>
-
-<!-- ========================================================
-     FEEDBACK PANEL (right slide-in + dark backdrop)
-     ======================================================== -->
-<div id="feedback-backdrop" onclick="closeFeedbackPanel()"></div>
-<div id="feedback-panel">
-  <div id="feedback-panel-header">
-    <span id="feedback-panel-title">💬 ENVIAR FEEDBACK</span>
-    <button id="btn-close-feedback" onclick="closeFeedbackPanel()" title="Cerrar">✕</button>
-  </div>
-  <div id="feedback-panel-body">
-    <div>
-      <span class="feedback-section-label">TIPO DE FEEDBACK</span>
-      <div id="feedback-radio-group">
-        <div class="feedback-radio-option" data-value="Quality of life" onclick="selectFeedbackType(this)">
-          <div class="feedback-radio-dot"><div class="feedback-radio-dot-fill"></div></div>
-          <span class="feedback-radio-text">Quality of life</span>
-        </div>
-        <div class="feedback-radio-option" data-value="Mejora de una caracteristica" onclick="selectFeedbackType(this)">
-          <div class="feedback-radio-dot"><div class="feedback-radio-dot-fill"></div></div>
-          <span class="feedback-radio-text">Mejora de una característica</span>
-        </div>
-        <div class="feedback-radio-option" data-value="Integracion Nueva" onclick="selectFeedbackType(this)">
-          <div class="feedback-radio-dot"><div class="feedback-radio-dot-fill"></div></div>
-          <span class="feedback-radio-text">Integración Nueva</span>
-        </div>
-        <div class="feedback-radio-option" data-value="Falta de algun guante/maestria" onclick="selectFeedbackType(this)">
-          <div class="feedback-radio-dot"><div class="feedback-radio-dot-fill"></div></div>
-          <span class="feedback-radio-text">Falta de algún guante/maestría</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <span class="feedback-section-label">¿QUÉ AGREGAR?</span>
-      <textarea id="feedback-textarea-main" placeholder="¿Qué agregar?" oninput="updateFeedbackSendState()"></textarea>
-    </div>
-    <div>
-      <span class="feedback-section-label">¿QUIÉN ERES?</span>
-      <input id="feedback-input-name" type="text" placeholder="¿Quién eres?" autocomplete="off">
-    </div>
-  </div>
-  <div id="feedback-panel-footer">
-    <button id="btn-feedback-send" onclick="sendFeedback()" disabled>📨 Enviar feedback</button>
   </div>
 </div>
 
@@ -4797,7 +4511,6 @@ const CHANGELOGS = [
     entries: [
       { emoji: "✨", color: "#FFD700",  text: "La pagina web ya tiene todas las funciones importantes" },
       { emoji: "✅", color: "#39ff14",  text: "Ya estan todas las maestrias creadas y tambien se agrgaran en la pagina web el mismo dia que salgan publicamente." },
-      { emoji: "💬", color: "#ffffff",  text: "Donde estan todos los botones, hay uno nuevo: Feedback, envia cualquier cambio que quieras y lo implementare!" },
       { emoji: "👀", color: "#a78bfa",  text: "Aun que vosotros no podeis verlo, ya se ha terminado el sistema de guantes y su progreso sera el triple de rapido que el de las maestrias." },
     ]
   },
@@ -4957,21 +4670,18 @@ function updateFabVisibility() {
   const fab        = document.getElementById('changelog-fab');
   const todoFab    = document.getElementById('todo-fab');
   const randomFab  = document.getElementById('random-fab');
-  const feedbackFab= document.getElementById('feedback-fab');
   if (!fab) return;
   const detailOpen   = document.getElementById('detail-view')?.classList.contains('open');
   const changelogOpen= document.getElementById('changelog-overlay')?.classList.contains('open');
   const todoPanelOpen= document.getElementById('todo-panel')?.classList.contains('open');
-  const feedbackOpen = document.getElementById('feedback-panel')?.classList.contains('open');
   const nukeOpen     = document.getElementById('reset-nuke-overlay')?.classList.contains('open');
   const videoOpen    = document.getElementById('video-modal-overlay')?.classList.contains('open');
   const imgOpen      = document.getElementById('img-zoom-overlay')?.classList.contains('open');
   const randomOpen   = document.getElementById('random-selector-overlay')?.classList.contains('open');
   const hideFab = !!(detailOpen || changelogOpen || nukeOpen || videoOpen || imgOpen || randomOpen);
-  fab.classList.toggle('hidden', hideFab || !!todoPanelOpen || !!feedbackOpen);
-  if (todoFab)     todoFab.classList.toggle('hidden',     hideFab || !!todoPanelOpen || !!feedbackOpen);
-  if (randomFab)   randomFab.classList.toggle('hidden',   !!(detailOpen || changelogOpen || nukeOpen || videoOpen || imgOpen || todoPanelOpen || randomOpen || feedbackOpen));
-  if (feedbackFab) feedbackFab.classList.toggle('hidden', hideFab || !!todoPanelOpen || !!feedbackOpen);
+  fab.classList.toggle('hidden', hideFab || !!todoPanelOpen);
+  if (todoFab)   todoFab.classList.toggle('hidden',   hideFab || !!todoPanelOpen);
+  if (randomFab) randomFab.classList.toggle('hidden', !!(detailOpen || changelogOpen || nukeOpen || videoOpen || imgOpen || todoPanelOpen || randomOpen));
 }
 
 /* ============================================================
@@ -7044,12 +6754,10 @@ function renderMissions(mastery) {
     const isDone = m.isBool ? cur >= 1 : cur >= m.target;
     const pct    = m.isBool
       ? (isDone ? 100 : 0)
-      : Math.round((cur / m.target) * 100);
-    const barWidth = Math.min(100, pct);
-    const isOver = !m.isBool && pct > 100;
+      : Math.min(100, Math.round((cur / m.target) * 100));
 
     const row = document.createElement('div');
-    row.className = 'mission-row' + (isDone ? ' done' : '') + (isOver ? ' over100' : '');
+    row.className = 'mission-row' + (isDone ? ' done' : '');
     row.id = `mission_${mastery.id}_${i}`;
     row.style.animationDelay = (i * 0.07) + 's';
 
@@ -7062,7 +6770,7 @@ function renderMissions(mastery) {
           </div>
           <div class="mission-bar-row">
             <div class="mission-bar-bg">
-              <div class="mission-bar-fill" id="mbar_${mastery.id}_${i}" style="width:${barWidth}%"></div>
+              <div class="mission-bar-fill" id="mbar_${mastery.id}_${i}" style="width:${pct}%"></div>
             </div>
             <span class="mission-counter-label" id="mlabel_${mastery.id}_${i}">
               ${m.isBool ? (isDone ? '✓ Completado' : 'No obtenido') : `${pct}% (${cur.toLocaleString()}/${m.target.toLocaleString()})`}
@@ -7071,7 +6779,7 @@ function renderMissions(mastery) {
           ${!m.isBool ? `
           <div class="mission-input-wrap">
             <input class="mission-counter-input"
-                   type="number" min="0" max="${m.target * 100}"
+                   type="number" min="0" max="${m.target * 10}"
                    value="${cur}"
                    placeholder="Tu progreso..."
                    data-action="update-counter"
@@ -7136,13 +6844,12 @@ function updateCounter(masteryId, missionIndex, value) {
   progressData[masteryId][missionIndex] = val;
 
   // Live update bar + label
-  const pct      = Math.round((val / mission.target) * 100);
-  const barWidth = Math.min(100, pct);
+  const pct   = Math.min(100, Math.round((val / mission.target) * 100));
   const row   = document.getElementById(`mission_${masteryId}_${missionIndex}`);
   const bar   = document.getElementById(`mbar_${masteryId}_${missionIndex}`);
   const label = document.getElementById(`mlabel_${masteryId}_${missionIndex}`);
 
-  if (bar)   bar.style.width   = barWidth + '%';
+  if (bar)   bar.style.width   = pct + '%';
   if (label) label.textContent = `${pct}% (${val.toLocaleString()}/${mission.target.toLocaleString()})`;
 
   if (row) {
@@ -7155,7 +6862,6 @@ function updateCounter(masteryId, missionIndex, value) {
       const chk = row.querySelector('.mission-check');
       if (chk) chk.textContent = '';
     }
-    row.classList.toggle('over100', pct > 100);
   }
 
   updateOverallProgress(mastery);
@@ -7438,93 +7144,6 @@ function closeTodoPanel() {
   document.getElementById('todo-panel').classList.remove('open');
   if (!detailOpen) document.body.style.overflow = '';
   updateFabVisibility();
-}
-
-/* ============================================================
-   FEEDBACK PANEL
-   ============================================================ */
-let feedbackSelectedType = null;
-let feedbackFileHandle   = null; // File System Access API handle para afeedback.txt
-
-function openFeedbackPanel() {
-  document.getElementById('feedback-backdrop').classList.add('open');
-  document.getElementById('feedback-panel').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  updateFabVisibility();
-}
-
-function closeFeedbackPanel() {
-  document.getElementById('feedback-backdrop').classList.remove('open');
-  document.getElementById('feedback-panel').classList.remove('open');
-  if (!detailOpen) document.body.style.overflow = '';
-  updateFabVisibility();
-}
-
-function selectFeedbackType(el) {
-  document.querySelectorAll('.feedback-radio-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  feedbackSelectedType = el.dataset.value;
-  updateFeedbackSendState();
-}
-
-function updateFeedbackSendState() {
-  const text = document.getElementById('feedback-textarea-main').value.trim();
-  const btn  = document.getElementById('btn-feedback-send');
-  btn.disabled = !(feedbackSelectedType && text.length > 0);
-}
-
-async function sendFeedback() {
-  const tipo   = feedbackSelectedType;
-  const texto  = document.getElementById('feedback-textarea-main').value.trim();
-  const nombre = document.getElementById('feedback-input-name').value.trim() || 'Anónimo';
-  if (!tipo || !texto) return;
-
-  const fecha = new Date().toLocaleString('es-ES');
-  const entry = `[${fecha}] (${tipo}) — ${nombre}:\n${texto}\n${'-'.repeat(50)}\n`;
-
-  try {
-    if ('showSaveFilePicker' in window) {
-      // Primera vez: pedir al usuario donde está/crear afeedback.txt. Luego se reusa el handle.
-      if (!feedbackFileHandle) {
-        feedbackFileHandle = await window.showSaveFilePicker({
-          suggestedName: 'afeedback.txt',
-          types: [{ description: 'Archivo de texto', accept: { 'text/plain': ['.txt'] } }]
-        });
-      }
-      let previous = '';
-      try {
-        const existingFile = await feedbackFileHandle.getFile();
-        previous = await existingFile.text();
-      } catch (e) { /* archivo nuevo, sin contenido previo */ }
-      const writable = await feedbackFileHandle.createWritable();
-      await writable.write(previous + entry);
-      await writable.close();
-      showToast('💬 Feedback guardado en afeedback.txt');
-    } else {
-      // Fallback: navegadores sin File System Access API → descarga el archivo
-      const blob = new Blob([entry], { type: 'text/plain' });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url;
-      a.download = 'afeedback.txt';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('💬 Feedback descargado como afeedback.txt');
-    }
-  } catch (err) {
-    if (err.name === 'AbortError') return; // usuario canceló el picker
-    console.error(err);
-    showToast('⚠️ No se pudo guardar el feedback');
-    return;
-  }
-
-  // Reset del formulario
-  document.querySelectorAll('.feedback-radio-option').forEach(o => o.classList.remove('selected'));
-  feedbackSelectedType = null;
-  document.getElementById('feedback-textarea-main').value = '';
-  document.getElementById('feedback-input-name').value = '';
-  updateFeedbackSendState();
-  closeFeedbackPanel();
 }
 
 /* ── Render todo list ── */
