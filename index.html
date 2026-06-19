@@ -4506,6 +4506,13 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
+    version: "1.0.1 - Gummy Mastery"
+    date: "19/06/2026"
+    entries: [
+      { emoji: "🐻". color: "#39ff14", text: "Agregado Gummy Mastery"}
+    ]
+  },
+  {
     version: "1.0.0 - ¡COMPLETO!",
     date: "17/06/2026",
     entries: [
@@ -5921,23 +5928,24 @@ const MASTERIES = [
     name: "Gummy",   // ← tal como aparece en el juego
     previewUrl: "",
     date: "19/06/2026",
-    description: "Descripción de la maestría tal como aparece en el juego.",
+    description: "Puede que el álbum de Osito Gominola, el 13 de noviembre en tiendas, fuera Los amigos que hicimos en el camino.",
     upgrades: [
-      "Primera mejora que otorga la maestría.",
-      "Segunda mejora.",
-      "[R] activa la habilidad secundaria especial."
+      "Puedes colocar más de 3 gominolas.",
+      "[E] Infla gominas a ti mismo.",
+      "Explota las gominolas golpeando.",
+      "Minas de gominola."
     ],
     missions: [
-      { text: "Descripción de la misión 1",  target: 100, isBool: false },
-      { text: "Obtén el badge XYZ",          target: 1,   isBool: true,  badgeUrl: "https://www.roblox.com/badges/BADGE_ID_AQUI"  },
-      { text: "Descripción de la misión 3",  target: 500, isBool: false }
+      { text: "Coloca 700 gominolas en total a otras personas.",  target: 700, isBool: false },
+      { text: "Mata a 125 personas usando tus gominolas.",          target: 125,   isBool: false,  },
+      { text: "Coloca 3 gominolas a la vez a 300 personas.",  target: 300, isBool: false }
     ]
   ,
-    difficulty: 4,
-    time: 4,
-    fun: 3,
-    worth: 3,
-    locked: true
+    difficulty: 1,
+    time: 2,
+    fun: 4,
+    worth: 2,
+    locked: false
   },
 
   /* ============================================================
