@@ -3648,6 +3648,62 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .glove-tl-logro { color: #fbbf24; }
 .glove-tl-otro  { color: #c084fc; }
 
+/* ── Fila de meta-datos en la tarjeta: precio + estado ── */
+.glove-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 1px;
+}
+.glove-card-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  color: var(--text-yellow);
+  background: #1a1500;
+  border: 2px solid #3d3000;
+  border-radius: 8px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.glove-card-price.price-slaps { color: #4ade80; background: #0a1a0e; border-color: #1f5c34; }
+.glove-card-price.price-robux { color: #60a5fa; background: #0a1228; border-color: #1c3a66; }
+.glove-card-price.price-logro { color: #fbbf24; background: #1a1300; border-color: #5c4a1f; }
+.glove-card-price img { width: 13px; height: 13px; object-fit: contain; flex-shrink: 0; }
+/* Fix: #slap-view img (placeholder) tenía más especificidad y forzaba un ancho enorme al icono de slaps */
+#slap-view .glove-card-price img { width: 13px; height: 13px; opacity: 1 !important; }
+.glove-card-price.price-logro img { width: 28px; height: 24px; }
+#slap-view .glove-card-price.price-logro img { width: 28px; height: 24px; }
+
+.glove-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1.5px solid;
+  white-space: nowrap;
+}
+.gstatus-unobtainable { color: #ff6b6b; border-color: #5c1f1f; background: #1a0a0a; }
+.gstatus-limited      { color: #fbbf24; border-color: #5c4a1f; background: #1a1300; }
+.gstatus-halloween    { color: var(--text-orange); border-color: #5c3a00; background: #1a0d00; }
+.gstatus-christmas    { color: var(--red-close);   border-color: #5c1f1f; background: #1a0404; }
+
+/* ── Contador en los botones de filtro ── */
+.gtype-count {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+
 .glove-card-footer {
   display: flex;
   gap: 8px;
@@ -3853,6 +3909,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   vertical-align: -0.18em;
   margin-right: 5px;
 }
+/* Fix: #slap-view img (placeholder) tenía más especificidad y forzaba un ancho enorme al icono de slaps */
+#slap-view .slap-icon-inline { width: 1.05em; height: 1.05em; opacity: 1 !important; }
 
 /* RIGHT */
 #glove-detail-right {
@@ -3932,7 +3990,18 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   gap: 6px;
   min-width: 0;
 }
-#glove-detail-badge-name {
+#glove-detail-badge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.glove-detail-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.glove-detail-badge-name {
   font-family: 'Fredoka One', cursive;
   font-size: 0.95rem;
   color: #fbbf24;
@@ -3941,7 +4010,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-#btn-glove-badge-roblox {
+.btn-glove-badge-roblox {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -3955,15 +4024,121 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   cursor: pointer;
   text-decoration: none;
   transition: background .15s, filter .15s, transform .1s;
-  align-self: flex-start;
   white-space: nowrap;
 }
-#btn-glove-badge-roblox:hover {
+.btn-glove-badge-roblox:hover {
   background: #fbbf24;
   color: #1a0e00;
   filter: brightness(1.1);
 }
-#btn-glove-badge-roblox:active { transform: scale(0.93); }
+.btn-glove-badge-roblox:active { transform: scale(0.93); }
+
+/* ── Acento de color del banner según tipo ── */
+#glove-detail-banner-wrap.gbtype-slaps::after,
+#glove-detail-banner-wrap.gbtype-robux::after,
+#glove-detail-banner-wrap.gbtype-logro::after,
+#glove-detail-banner-wrap.gbtype-otro::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 4px;
+  z-index: 3;
+}
+#glove-detail-banner-wrap.gbtype-slaps::after { background: #4ade80; box-shadow: 0 0 10px rgba(74,222,128,0.65); }
+#glove-detail-banner-wrap.gbtype-robux::after { background: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.65); }
+#glove-detail-banner-wrap.gbtype-logro::after { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.65); }
+#glove-detail-banner-wrap.gbtype-otro::after  { background: #c084fc; box-shadow: 0 0 10px rgba(192,132,252,0.65); }
+
+/* ── Fila de meta (badge tipo + estado) en el detalle ── */
+.glove-detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 3px 0 4px;
+}
+.glove-detail-meta-row .glove-type-badge { margin: 0; }
+
+.glove-detail-release {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.76rem;
+  color: #8a8a8a;
+  margin-bottom: 5px;
+}
+
+/* ── Caja de cita / quote ── */
+.glove-detail-quote {
+  position: relative;
+  background: #14110a;
+  border-left: 4px solid var(--yellow-bright);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 14px 10px 32px;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #d8cfa8;
+  line-height: 1.5;
+  margin: 2px 0 8px;
+}
+.glove-detail-quote::before {
+  content: '\201C';
+  position: absolute;
+  left: 8px; top: 0px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.9rem;
+  color: var(--yellow-bright);
+  opacity: 0.65;
+  line-height: 1;
+}
+
+/* ── Mini caja de rating reutilizando estilo de #detail-ratings ── */
+.mini-rating-box {
+  margin-top: 6px;
+  background: #111;
+  border: 2px solid #2a2a2a;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.mini-rating-box .rating-row { border-bottom: none; }
+
+/* ── Caja de estadísticas (Poder / Velocidad): número con fondo de color ── */
+.glove-stats-box {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.glove-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111;
+  border: 2px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.glove-stat-key {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+.glove-stat-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  min-width: 28px;
+  text-align: center;
+  padding: 3px 12px;
+  border-radius: 7px;
+  border: 1.5px solid;
+}
+/* Cuanto más alto el valor, más verde. Cuanto más bajo, más rojo. */
+.glove-stat-num.sval-1 { color: var(--red-close);    background: #1a0404; border-color: #3d0a0a; }
+.glove-stat-num.sval-2 { color: var(--text-orange);  background: #1a0d00; border-color: #3d2000; }
+.glove-stat-num.sval-3 { color: var(--yellow-bright); background: #1a1500; border-color: #3d3000; }
+.glove-stat-num.sval-4 { color: #a8e63d;             background: #0d1a04; border-color: #2a4010; }
+.glove-stat-num.sval-5 { color: var(--green-done);   background: #081a04; border-color: #1a4a0a; }
 
 @media (max-width: 860px) {
   #glove-detail-body { grid-template-columns: 1fr; }
@@ -4029,8 +4204,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
      ======================================================== -->
 <div id="slap-view">
 
-  <!-- ── Gate de contraseña ── -->
-  <div id="gloves-gate">
+  <!-- ── Gate de contraseña (DESACTIVADO) ── -->
+  <div id="gloves-gate" style="display:none">
     <div id="gloves-gate-icon">🔐</div>
     <div id="gloves-gate-title">Acceso restringido</div>
     <div id="gloves-gate-sub">Esta sección está en fase de testeo.<br>Introduce la contraseña para continuar.</div>
@@ -4041,18 +4216,18 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   </div>
 
   <!-- ── Página real de guantes ── -->
-  <div id="gloves-page" style="display:none">
+  <div id="gloves-page" style="display:">
 
     <!-- Buscador + filtros de tipo -->
     <div id="gloves-search-bar-wrap">
       <input type="text" id="gloves-search-input" placeholder="🔍  Buscar guante..." oninput="renderGlovesGrid()" autocomplete="off">
     </div>
     <div id="gloves-filter-bar">
-      <button class="gtype-filter active" data-type="all"    onclick="setGlovesFilter('all')">✨ Todos</button>
-      <button class="gtype-filter"        data-type="slaps"  onclick="setGlovesFilter('slaps')">👋 Slaps</button>
-      <button class="gtype-filter"        data-type="robux"  onclick="setGlovesFilter('robux')">💎 Robux</button>
-      <button class="gtype-filter"        data-type="logro"  onclick="setGlovesFilter('logro')">🏅 Logro</button>
-      <button class="gtype-filter"        data-type="otro"   onclick="setGlovesFilter('otro')">🔮 Otro</button>
+      <button class="gtype-filter active" data-type="all"    onclick="setGlovesFilter('all')">✨ Todos<span class="gtype-count" id="gtcount-all"></span></button>
+      <button class="gtype-filter"        data-type="slaps"  onclick="setGlovesFilter('slaps')">👋 Slaps<span class="gtype-count" id="gtcount-slaps"></span></button>
+      <button class="gtype-filter"        data-type="robux"  onclick="setGlovesFilter('robux')">💎 Robux<span class="gtype-count" id="gtcount-robux"></span></button>
+      <button class="gtype-filter"        data-type="logro"  onclick="setGlovesFilter('logro')">🏅 Logro<span class="gtype-count" id="gtcount-logro"></span></button>
+      <button class="gtype-filter"        data-type="otro"   onclick="setGlovesFilter('otro')">🔮 Otro<span class="gtype-count" id="gtcount-otro"></span></button>
     </div>
 
     <!-- Grid de tarjetas -->
@@ -4088,21 +4263,41 @@ body.todo-selecting #grid-view { padding-top: 72px; }
         </div>
         <div id="glove-detail-info">
           <div id="glove-detail-name">Guante</div>
-          <div class="glove-type-badge" id="glove-detail-type-badge"></div>
+          <div class="glove-detail-meta-row">
+            <div class="glove-type-badge" id="glove-detail-type-badge"></div>
+            <span class="glove-status-pill" id="glove-detail-status-pill" style="display:none"></span>
+          </div>
+          <div class="glove-detail-release" id="glove-detail-release" style="display:none">
+            <span>📅</span><span id="glove-detail-release-text"></span>
+          </div>
+          <div class="glove-detail-quote" id="glove-detail-quote" style="display:none"></div>
           <div id="glove-detail-obtain-wrap">
             <div class="detail-section-label" id="glove-detail-obtain-label">OBTENCIÓN</div>
             <div id="glove-detail-obtain-text"></div>
           </div>
         </div>
       </div>
-      <!-- Badge de logro (visible solo en type=logro) -->
+      <!-- Badge(s) de logro (visible solo en type=logro, admite 1 o varios) -->
       <div id="glove-detail-badge-wrap">
-        <div id="glove-detail-badge-img-wrap" onclick="openImageModal(document.getElementById('glove-detail-badge-img').src, document.getElementById('glove-detail-badge-name').textContent)" title="Ampliar badge">
+        <div id="glove-detail-badge-img-wrap" onclick="openImageModal(document.getElementById('glove-detail-badge-img').src, gloveDetailOpen ? gloveDetailOpen.name : 'Badge')" title="Ampliar badge">
           <img id="glove-detail-badge-img" alt="Badge">
         </div>
         <div id="glove-detail-badge-info">
-          <div id="glove-detail-badge-name"></div>
-          <a id="btn-glove-badge-roblox" href="#" target="_blank" rel="noopener noreferrer">🏅 Ver en Roblox</a>
+          <div id="glove-detail-badge-list"></div>
+        </div>
+      </div>
+      <!-- Estadísticas: Poder y Velocidad (opcional) -->
+      <div id="glove-detail-stats-wrap" style="display:none">
+        <div class="detail-section-label">📊 ESTADÍSTICAS</div>
+        <div class="glove-stats-box">
+          <div class="glove-stat-row" id="gstat-power-row">
+            <span class="glove-stat-key">Poder</span>
+            <span class="glove-stat-num" id="gstat-power"></span>
+          </div>
+          <div class="glove-stat-row" id="gstat-speed-row">
+            <span class="glove-stat-key">Velocidad</span>
+            <span class="glove-stat-num" id="gstat-speed"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -4121,6 +4316,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 
   </div>
 </div>
+
 
 <!-- ========================================================
      CALENDAR / DIARY VIEW
@@ -4505,6 +4701,14 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
+  {
+    version: "1.1.0 - Mas y mas guantes",
+    date: "20/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Agregado los guantes normales, y si, estaran todos, dadme tiempo!"}
+    ]
+  },
+  
   {
     version: "1.0.1 - Gummy Mastery",
     date: "19/06/2026",
@@ -8831,78 +9035,182 @@ let glovesTypeFilter = 'all';
 let gloveDetailOpen = null;
 
 /* ── Tipos:  slaps | robux | logro | otro ── */
+/* ── Campos NUEVOS y OPCIONALES (déjalos fuera si no los usas, no rompen nada):
+     quote       : string   — frase corta a modo de cita (se ve como bocadillo)
+     releaseDate : string   — fecha de lanzamiento, ej: '11/08/2023'
+     status      : 'unobtainable' | 'limited' | 'halloween' | 'christmas'  — pastilla de disponibilidad
+                   (cualquier otro valor, o no poner status, no muestra ninguna pastilla)
+     power       : number — estadística "Poder" (mínimo 1, sin máximo)
+     speed       : number — estadística "Velocidad" (mínimo 1, sin máximo)
+     badges      : Array<{name, url}>  — SOLO para type:'logro'. Uno o varios logros necesarios
+                   para conseguir el guante. La imagen siempre es badge_(id del guante).png
+   ────────────────────────────────────────────────────────────── */
 const GLOVES = [
 
   /* ── EJEMPLO TIPO: SLAPS ── */
+  {
+    id: 'brick',
+    name: 'Brick',
+    type: 'slaps',
+    cost: 65,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+  },
+
+  {
+    id: 'killstreak',
+    name: 'Killstreak',
+    type: 'slaps',
+    cost: 5000,              // en slaps
+    quote: 'Este guante recolecta las almas de tus enemigos para hacerte más fuerte.',
+    releaseDate: '22/04/2021',
+    power: 35,                 // 1-5, opcional
+    speed: 15,                 // 1-5, opcional
+    mechanics: [
+      'Cada vez que mates a alguien, te haces más fuerte, cambiando de fase en cada "milestone".',
+      "[4 Kills] 55-80 de poder, ganas un aura negra, velocidad y empieza a sonar 'Finale' de Toby Fox. Ganas inmunidad a la ralentización por nieve.",
+      "[10 Kills] 85-155 de poder; Al activar la fase aparece un flash rojo a todos los jugadores. Ganas más velocidad e inmunidad al Time Stop de God's Hand. Empieza a sonar 'Scourge of the Universe' de DM Dokuro.",
+      "[25 Kills] 160-280 de poder; empiezas con muy baja velocidad, pero invencible, justo después para ganar muchísima velocidad y poder. Ganas un aura amarilla en forma de X y empieza a sonar 'Universal Collapse' de DM Dokuro.",
+      "[50 kills] 285 de poder; sale una explosión morada y la pantalla se vuelve completamente roja para todas las personas. Ganas otra vez un aura roja que solo muestra tu silueta y cada vez que golpeas suena como el guante 'Overkill'. Empieza a sonar 'Stained, Brutal Calamity' de DM Dokuro.",
+      "[75 Kills] 35-95 de poder; Pierdes todo tu poder y velocidad para volver a una etapa parecida a la de 0 kills, pero desbloqueas tu habilidad pasiva. Ganas un aura morada y empieza a sonar 'Sixes and Sevens' de Desolo Zantas, una canción original para esta etapa del killstreak.",
+      "[100 Kills] 285 de poder; Empieza la fase con un flash amarillo a todos los jugadores, ganas un aura amarilla en forma de X otra vez, vuelves a tener una velocidad elevada y se mejora tu habilidad activa. Empieza a sonar 'Unholy Insurgency' de DM Dokuro.",
+      "[250 Kills] 0 de poder; Lanzas una onda expansiva negra y adoptas una nueva animación con tus brazos detrás de tu espalda. Pierdes completa habilidad de hacer slaps para adoptar una habilidad pasiva en su lugar. La velocidad es inferior a la de la anterior fase y obtienes un aura negra que solo muestra la silueta de tu cuerpo. Empieza a sonar 'True Love [Metal Remix]'",
+      "[1000 Kills] 0 de poder; cuando llegas a esta fase, se activa una cinemática que muestra un ser gigante dándote una corona. Al igual que en la anterior, no puedes hacer slaps y tienes una habilidad en su lugar. Durante esta fase, puedes volar por el vacío de forma similar a Rob y tu hitbox está ligeramente más arriba. Ganas un aura dorada, varias alas y un símbolo giratorio detrás de ti y a tus pies. Ganas inmunidad a la habilidad de Za Hando y empieza a sonar 'Threats of The Ocean Floor' de DM Dokuro."
+    ],
+    abilities: [
+      '[E - 100 Kills] Lanzas una esfera morada de tamaño mediano con un empuje moderado tirando a bajo.',
+      "[E - 100 Kills] Lanzas una esfera amarilla gigante con un empuje alto.",
+      "[Clic/E - 250 Kills] Lanzas volando a todo el que esté delante, actuando como un slap que puede dar a muchas personas y de mayor alcance.",
+      '[Clic - 1000 Kills] Lanzas volando a todo el que esté alrededor de ti, actuando como un slap que puede dar a muchas personas, de mayor alcance y omnidireccional.',
+      "[E- 1000 Kills] Conviertes en oro a cualquiera que esté en un radio similar al de la isla principal."
+    ],
+    tutorialUrl: null,
+  },
+
+  {
+    id: 'wormhole',
+    name: 'Wormhole',
+    type: 'slaps',
+    cost: 12000,              // en slaps
+    quote: 'El pastel fue una mentira.',
+    releaseDate: '22/04/2021',
+    power: 52,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
+    mechanics: [
+      'Puedes pasar entre portales para teletransportarte.',
+      'Puedes colocar hasta 2 portales',
+      "Salir de un portal te da mejora de velocidad temporal.",
+      'Las otras personas no pueden ver el portal.'
+    ],
+    abilities: [
+      '[E] Coloca portales. (2s cooldown)',
+    ],
+    tutorialUrl: null,
+  },
+
   {
     id: 'cloud',
     name: 'Cloud',
     type: 'slaps',
     cost: 28000,              // en slaps
+    quote: '¡¡¡Yo creo que puedo volar!!!',
+    releaseDate: '11/08/2023',
+    power: 57,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
     mechanics: [
-      'Guante básico sin habilidades especiales.',
-      'Todo el mundo empieza con este guante.',
+      'La nube puede usarse como movilidad aérea.',
+      'Puedes llevar a otra persona en tu nube.',
     ],
     abilities: [
-      '[Clic] Golpea a los jugadores cercanos.',
+      '[E] Invoca una nube.',
     ],
     tutorialUrl: null,
   },
 
   /* ── EJEMPLO TIPO: ROBUX ── */
   {
-    id: 'lucky',
-    name: 'Lucky',
+    id: 'ultrainstinct',
+    name: 'Ultra Instinct',
     type: 'robux',
-    cost: 199,            // en robux
+    cost: 309,            // en robux
+    quote: "'Se teletransporta detrás de ti' Nada personal, niño.",
+    power: 60,
+    speed: 20,
     mechanics: [
-      'Cada golpe tiene una probabilidad de activar un efecto aleatorio.',
-      'Los efectos van desde slaps masivos hasta efectos visuales especiales.',
+      'El guante tiene velocidad de slap infinito.',
+      'Cada slap rellena tu barra de esquive.',
+      "Cada vez que te golpeen, si tienes parte de tu barra rellenada, esquivarás el golpe."
     ],
     abilities: [
-      '[Clic] Golpea; tiene 25% de activar un efecto de suerte.',
-      '[E] Gira la ruleta de la suerte manualmente (30s cooldown).',
+      '[E] Aura farming: Desprendes aura y te teletransportas detrás de tu enemigo si te pegan. (2s cooldown / 6s si se falla).',
     ],
     tutorialUrl: null,
   },
 
-  /* ── EJEMPLO TIPO: LOGRO ── */
+  /* ── EJEMPLO TIPO: LOGRO (admite 1 o varios badges) ── */
   {
-    id: 'error',
-    name: 'Error',
+    id: 'obby',
+    name: 'Obby',
     type: 'logro',
-    obtainMethod: 'Consigue el badge "Error" en Slap Battles encontrando el glitch secreto del mapa.',
-    badgeName: 'Error',                                          // nombre del logro en Roblox
-    badgeUrl:  'https://www.roblox.com/badges/2124858899/Error', // URL del badge en Roblox
+    obtainMethod: 'Consigue el badge "ULTRAROCK" tragandote 10 personas distintas con una misma Megarock.',
+    badges: [
+      { name: 'ULTRAROCK', url: 'https://www.roblox.com/badges/2130463063/ULTRAROCK' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Construye un MEGA OBBY DE 5000+ FASES CON ADMIN GRATIS SUPERFÁCIL ahora.',
+    releaseDate: '13/01/2023',
+    power: 52,
+    speed: 16,
     mechanics: [
-      'Distorsiona la pantalla de los jugadores golpeados durante 3 segundos.',
-      'El golpe ignora el 20% del knockback resistido.',
+      'Coloca entre una gran variedad de bloques, principalmente para la creación de parkours:',
+      'Killbrick: Bloque de tamaño pequeño que daña rápidamente en contacto.',
+      'Killbrick rotatorio: Lo mismo que el killbrick, pero alargado y gira.',
+      'Platform: Plataforma de altura corta pero ancura grande.',
+      "Truss: Bloque alto pero poco ancho que se puede escalar.",
+      "Plank: Bloque normal alargado"
     ],
     abilities: [
-      '[Clic] Golpe con efecto de corrupción visual.',
-      '[E] Teletranspórtate a una posición aleatoria del mapa (45s cooldown).',
+      '[E] Coloca el bloque seleccionado.',
+      '[R] Rota entre diferentes bloques.'
     ],
-    tutorialUrl: null,
+    tutorialUrl: 'https://www.youtube.com/watch?v=lnObhmrwqDk',
   },
 
   /* ── EJEMPLO TIPO: OTRO ── */
   {
-    id: 'santa',
-    name: 'Santa',
+    id: 'acrobat',
+    name: 'Acrobat',
     type: 'otro',
-    obtainMethod: 'Disponible únicamente durante el evento de Navidad (diciembre). No se puede comprar fuera de temporada.',
+    obtainMethod: 'Disponible tras marcar el juego como favorito.',
+    quote: 'Estoy ejercitando, ¿vale?',
+    releaseDate: '07/05/2023',
+    status: '',
+    power: 40,
+    speed: 15,
     mechanics: [
-      'Lanza regalos que al impactar explotan con confeti.',
-      'Los regalos pueden recoger a jugadores en un área de 15 studs.',
+      'El roll te mueve 20 studs.',
+      "Puedes pegar mientras ejecutas la habilidad."
     ],
     abilities: [
-      '[Clic] Lanza un regalo hacia el jugador más cercano.',
-      '[E] Invoca una lluvia de regalos en un área de 20 studs (60s cooldown).',
+      '[E] Te lanzas rodando hacia delante. (4s cooldown).',
     ],
     tutorialUrl: null,
   },
 
 ];
+
 
 /* ── Tipos: metadatos visuales ── */
 const GLOVE_TYPE_META = {
@@ -8911,6 +9219,18 @@ const GLOVE_TYPE_META = {
   logro: { label: '🏅 Logro',  badgeClass: 'gtbadge-logro', ribbonClass: 'gribbon-logro', obtainLabel: '🏅 MÉTODO DE OBTENCIÓN' },
   otro:  { label: '🔮 Otro',   badgeClass: 'gtbadge-otro',  ribbonClass: 'gribbon-otro',  obtainLabel: '🔮 MÉTODO DE OBTENCIÓN' },
 };
+
+/* ── Estados de disponibilidad: metadatos visuales (todos opcionales) ──
+   La etiqueta "Disponible" (obtainable) se ha eliminado a propósito:
+   si glove.status === 'obtainable' simplemente no se muestra ninguna pastilla.
+   El antiguo estado genérico "event" se ha separado en halloween / christmas. */
+const GLOVE_STATUS_META = {
+  unobtainable: { label: 'No disponible',      icon: '🔴', cls: 'gstatus-unobtainable' },
+  limited:      { label: 'Por tiempo limitado', icon: '🟡', cls: 'gstatus-limited' },
+  halloween:    { label: 'Solo en Halloween',   icon: '🎃', cls: 'gstatus-halloween' },
+  christmas:    { label: 'Solo en Navidad',     icon: '🎄', cls: 'gstatus-christmas' },
+};
+
 
 /* ============================================================
    GATE — comprobación de contraseña
@@ -8963,6 +9283,8 @@ function renderGlovesGrid() {
   if (!grid) return;
   grid.innerHTML = '';
 
+  updateGloveFilterCounts();
+
   const query = (document.getElementById('gloves-search-input')?.value || '').toLowerCase().trim();
   const list  = GLOVES.filter(g => {
     if (glovesTypeFilter !== 'all' && g.type !== glovesTypeFilter) return false;
@@ -8982,6 +9304,17 @@ function renderGlovesGrid() {
   });
 }
 
+/* Cuenta cuántos guantes hay por tipo y lo refleja en los botones de filtro */
+function updateGloveFilterCounts() {
+  const counts = { all: GLOVES.length, slaps: 0, robux: 0, logro: 0, otro: 0 };
+  GLOVES.forEach(g => { if (counts[g.type] !== undefined) counts[g.type]++; });
+  Object.keys(counts).forEach(type => {
+    const el = document.getElementById('gtcount-' + type);
+    if (el) el.textContent = ' (' + counts[type] + ')';
+  });
+}
+
+
 /* ============================================================
    CREATE GLOVE CARD
    ============================================================ */
@@ -8989,6 +9322,22 @@ function createGloveCard(glove) {
   const meta = GLOVE_TYPE_META[glove.type] || GLOVE_TYPE_META.otro;
   // ¿Tiene maestría asociada?
   const linkedMastery = MASTERIES.find(m => m.id === glove.id);
+  const statusMeta = GLOVE_STATUS_META[glove.status];
+
+  // Precio (slaps / robux) o logro(s) necesario(s) para guantes de tipo "logro"
+  let priceHtml = '';
+  if (glove.type === 'slaps' && typeof glove.cost === 'number') {
+    priceHtml = `<span class="glove-card-price price-slaps"><img src="slapicon.png" alt="Slaps" onerror="this.remove()">${glove.cost.toLocaleString()}</span>`;
+  } else if (glove.type === 'robux' && typeof glove.cost === 'number') {
+    priceHtml = `<span class="glove-card-price price-robux"><img src="robuxicon.png" alt="Robux" onerror="this.remove()">${glove.cost.toLocaleString()}</span>`;
+  } else if (glove.type === 'logro' && Array.isArray(glove.badges) && glove.badges.length) {
+    const badgeNames = glove.badges.map(b => (typeof b === 'string' ? b : b.name)).join(', ');
+    priceHtml = `<span class="glove-card-price price-logro"><img src="badge_${glove.id}.png" alt="Logro" onerror="this.remove()">${badgeNames}</span>`;
+  }
+
+  const statusHtml = statusMeta
+    ? `<span class="glove-status-pill ${statusMeta.cls}">${statusMeta.icon} ${statusMeta.label}</span>`
+    : '';
 
   const card = document.createElement('div');
   card.className = 'glove-card';
@@ -9004,6 +9353,7 @@ function createGloveCard(glove) {
     <div class="glove-card-body">
       <div class="glove-card-name">${glove.name}</div>
       <div class="glove-card-type-label glove-tl-${glove.type}">${meta.label}</div>
+      ${(priceHtml || statusHtml) ? `<div class="glove-card-meta-row">${priceHtml}${statusHtml}</div>` : ''}
     </div>
     <div class="glove-card-footer">
       <button class="btn btn-primary" style="flex:1" onclick="openGloveDetail('${glove.id}',event)">📖 VER MÁS</button>
@@ -9012,6 +9362,23 @@ function createGloveCard(glove) {
   `;
 
   return card;
+}
+
+/* Rellena un número de estadística (Poder/Velocidad) con su color según el valor 1-5.
+   Cuanto más alto, más verde; cuanto más bajo, más rojo. Oculta la fila si no hay valor. */
+function setGloveStatNum(numId, rowId, value) {
+  const num = document.getElementById(numId);
+  const row = document.getElementById(rowId);
+  if (!num) return;
+  if (typeof value === 'number' && value > 0) {
+    const val = Math.max(1, value);
+    const colorVal = Math.min(5, val);
+    num.textContent = val;
+    num.className   = 'glove-stat-num sval-' + colorVal;
+    if (row) row.style.display = 'flex';
+  } else {
+    if (row) row.style.display = 'none';
+  }
 }
 
 /* ============================================================
@@ -9030,6 +9397,8 @@ function openGloveDetail(id, e) {
   // Banner
   const bannerImg = document.getElementById('glove-detail-banner-img');
   const bannerPh  = document.getElementById('glove-detail-banner-ph');
+  const bannerWrap = document.getElementById('glove-detail-banner-wrap');
+  bannerWrap.className = 'gbtype-' + glove.type;
   bannerImg.style.display = 'block';
   bannerPh.style.display  = 'none';
   bannerImg.onerror = () => { bannerImg.onerror = null; bannerImg.src = 'preview_placeholder.png'; };
@@ -9066,30 +9435,61 @@ function openGloveDetail(id, e) {
   if (glove.type === 'slaps') {
     obtainText.innerHTML = `<img class="slap-icon-inline" src="slapicon.png" alt="Slaps" onerror="this.remove()">${glove.cost.toLocaleString()}`;
   } else if (glove.type === 'robux') {
-    obtainText.textContent = glove.cost + ' Robux';
+    obtainText.innerHTML = `<img class="slap-icon-inline" src="robuxicon.png" alt="Robux" onerror="this.remove()">${glove.cost.toLocaleString()}`;
   } else {
     obtainText.textContent = glove.obtainMethod || '—';
   }
 
-  // Badge de logro
-  const badgeWrap    = document.getElementById('glove-detail-badge-wrap');
-  const badgeImg     = document.getElementById('glove-detail-badge-img');
-  const badgeName    = document.getElementById('glove-detail-badge-name');
-  const badgeRoblox  = document.getElementById('btn-glove-badge-roblox');
-  if (glove.type === 'logro') {
+  // Estado (disponibilidad)
+  const statusPill = document.getElementById('glove-detail-status-pill');
+  const statusMeta = GLOVE_STATUS_META[glove.status];
+  if (statusMeta) {
+    statusPill.textContent   = statusMeta.icon + ' ' + statusMeta.label;
+    statusPill.className     = 'glove-status-pill ' + statusMeta.cls;
+    statusPill.style.display = 'inline-flex';
+  } else {
+    statusPill.style.display = 'none';
+  }
+
+  // Fecha de lanzamiento
+  const releaseWrap = document.getElementById('glove-detail-release');
+  const releaseText = document.getElementById('glove-detail-release-text');
+  if (glove.releaseDate) {
+    releaseText.textContent  = glove.releaseDate;
+    releaseWrap.style.display = 'inline-flex';
+  } else {
+    releaseWrap.style.display = 'none';
+  }
+
+  // Cita / quote
+  const quoteEl = document.getElementById('glove-detail-quote');
+  if (glove.quote) {
+    quoteEl.textContent  = glove.quote;
+    quoteEl.style.display = 'block';
+  } else {
+    quoteEl.style.display = 'none';
+  }
+
+  // Badge(s) de logro — admite 1 o varios logros, la imagen es siempre badge_(id).png
+  const badgeWrap = document.getElementById('glove-detail-badge-wrap');
+  const badgeImg  = document.getElementById('glove-detail-badge-img');
+  const badgeList = document.getElementById('glove-detail-badge-list');
+  badgeList.innerHTML = '';
+  if (glove.type === 'logro' && Array.isArray(glove.badges) && glove.badges.length) {
     badgeWrap.classList.add('visible');
-    // Imagen circular del badge
+    // Imagen circular del badge (única, representa al guante)
     badgeImg.src = 'badge_' + glove.id + '.png';
     badgeImg.onerror = () => { badgeImg.onerror = null; badgeImg.style.opacity = '0.3'; };
-    // Nombre del logro
-    badgeName.textContent = glove.badgeName || glove.name + ' Badge';
-    // Botón Roblox
-    if (glove.badgeUrl) {
-      badgeRoblox.href = glove.badgeUrl;
-      badgeRoblox.style.display = 'inline-flex';
-    } else {
-      badgeRoblox.style.display = 'none';
-    }
+    // Una fila por cada logro necesario
+    glove.badges.forEach(b => {
+      const name = (typeof b === 'string') ? b : (b.name || glove.name + ' Badge');
+      const url  = (typeof b === 'string') ? null : b.url;
+      const row = document.createElement('div');
+      row.className = 'glove-detail-badge-row';
+      row.innerHTML = `<span class="glove-detail-badge-name">${name}</span>` +
+        (url ? `<a class="btn-glove-badge-roblox" href="${url}" target="_blank" rel="noopener noreferrer">🏅 Ver en Roblox</a>` : '');
+      badgeList.appendChild(row);
+    });
   } else {
     badgeWrap.classList.remove('visible');
     badgeImg.src = '';
@@ -9116,6 +9516,18 @@ function openGloveDetail(id, e) {
     el.innerHTML = `<span class="glove-detail-item-bullet">⚡</span><span>${a}</span>`;
     abilList.appendChild(el);
   });
+
+  // Estadísticas: Poder y Velocidad (opcional, números con fondo de color)
+  const statsWrap = document.getElementById('glove-detail-stats-wrap');
+  const hasPower = typeof glove.power === 'number' && glove.power > 0;
+  const hasSpeed = typeof glove.speed === 'number' && glove.speed > 0;
+  if (hasPower || hasSpeed) {
+    statsWrap.style.display = 'block';
+    setGloveStatNum('gstat-power', 'gstat-power-row', glove.power);
+    setGloveStatNum('gstat-speed', 'gstat-speed-row', glove.speed);
+  } else {
+    statsWrap.style.display = 'none';
+  }
 
   document.getElementById('glove-detail-view').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -9166,7 +9578,7 @@ const _patchedSwitchPage = function(page) {
   _origSwitchPage(page);
   if (page === 'slap') {
     if (slapView) slapView.style.display = 'flex';
-    checkGlovesUnlock();
+    renderGlovesGrid();
   }
 };
 switchPage = _patchedSwitchPage;
