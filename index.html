@@ -4216,8 +4216,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   </div>
 
   <!-- ── Página real de guantes ── -->
-  <div id="gloves-page" style="display:">
-
+  <div id="gloves-page" style="display:block">
     <!-- Buscador + filtros de tipo -->
     <div id="gloves-search-bar-wrap">
       <input type="text" id="gloves-search-input" placeholder="🔍  Buscar guante..." oninput="renderGlovesGrid()" autocomplete="off">
@@ -9049,6 +9048,25 @@ const GLOVES = [
 
   /* ── EJEMPLO TIPO: SLAPS ── */
   {
+    id: 'spin',
+    name: 'Spin',
+    type: 'slaps',
+    cost: -3,              // en slaps
+    quote: '¿Estás girando, hijo?',
+    releaseDate: '04/06/2021',
+    power: 25,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
+    mechanics: [
+      'Este guante es secreto; está situado en el techo del lobby a la izquierda del portal para entrar a la arena.',
+      'Mientras tienes este guante equipado, giras sin cesar.',
+    ],
+    abilities: [
+      'Este guante solo posee pasivas',
+    ],
+    tutorialUrl: null,
+  },
+  
+  {
     id: 'brick',
     name: 'Brick',
     type: 'slaps',
@@ -9064,6 +9082,26 @@ const GLOVES = [
     ],
     abilities: [
       '[E] Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+  },
+
+  {
+    id: 'fort',
+    name: 'Fort',
+    type: 'slaps',
+    cost: 1075,              // en slaps
+    quote: 'CONSTRUYENDO UNA FORTALEZA. CONSTRUYENDO UNA FORTALEZA. CONSTRUYENDO UNA FORTALEZA. CONSTRUYENDO UNA FORTALEZA.',
+    releaseDate: '04/06/2021',
+    power: 52,                 // 1-5, opcional
+    speed: 15,                 // 1-5, opcional
+    mechanics: [
+      'La pared bloquea el paso de cualquier persona, incluido el tuyo.',
+      'Las paredes se destruyen al primer impacto de una persona lanzada.',
+      "Las paredes desaparecen tras 60 segundos."
+    ],
+    abilities: [
+      '[E] Coloca una pared de ladrillos. (6s cooldown)',
     ],
     tutorialUrl: null,
   },
@@ -9094,6 +9132,27 @@ const GLOVES = [
       "[Clic/E - 250 Kills] Lanzas volando a todo el que esté delante, actuando como un slap que puede dar a muchas personas y de mayor alcance.",
       '[Clic - 1000 Kills] Lanzas volando a todo el que esté alrededor de ti, actuando como un slap que puede dar a muchas personas, de mayor alcance y omnidireccional.',
       "[E- 1000 Kills] Conviertes en oro a cualquiera que esté en un radio similar al de la isla principal."
+    ],
+    tutorialUrl: null,
+  },
+
+  {
+    id: 'engineer',
+    name: 'Engineer',
+    type: 'slaps',
+    cost: 9000,              // en slaps
+    quote: 'Oye, amigo, soy un ingeniero. Eso significa que resuelvo problemas. No problemas como "¿qué es la belleza?", porque eso entraría dentro del ámbito de tus dilemas filosóficos. Resuelvo problemas prácticos.',
+    releaseDate: '22/04/2021',
+    power: 50,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
+    mechanics: [
+      'El centinela gira por 30 segundos; después desaparece.',
+      "Si golpeas al centinela, ganará temporalmente más velocidad.",
+      "El centinela puede ser parado por la habilidad del guante Thor.",
+      "Cada centinela colocada tiene un 10% de probabilidades de hacer aparecer una caja de herramientas que sirve para obtener el guante Hammer."
+    ],
+    abilities: [
+      '[E] Coloca un centinela que contiene un guante giratorio. (13s cooldown)',
     ],
     tutorialUrl: null,
   },
@@ -9160,6 +9219,106 @@ const GLOVES = [
 
   /* ── EJEMPLO TIPO: LOGRO (admite 1 o varios badges) ── */
   {
+    id: 'redacted',
+    name: '[REDACTED]',
+    type: 'logro',
+    obtainMethod: 'Entra a la dimensión de [REDACTED] y escapa sin morir.',
+    badges: [
+      { name: 'Evaded', url: 'https://www.roblox.com/badges/2124858899/To-the-moon' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'El primer dueño del guante es: "Elias1187"',
+    releaseDate: '23/10/2021',
+    power: 51,
+    speed: 15,
+    mechanics: [
+      'El portal absorbe hacia arriba a todos los que estén debajo.',
+      'Dentro del dominio, hay para elegir varias puertas, pero solo 1 te salva y te recompensa con el guante.',
+      'Mientras estás en la dimensión de [REDACTED] vas perdiendo vida poco a poco, obligándote a elegir rápido.',
+    ],
+    abilities: [
+      '[E] Coloca un portal delante de ti que secuestra a quien se acerque. (11s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=-psfhOjmKwk',
+  },
+  
+  {
+    id: 'bus',
+    name: 'Bus',
+    type: 'logro',
+    obtainMethod: 'Activa la habilidad del guante space poco antes de ser chocado por un bus.',
+    badges: [
+      { name: 'To the moon', url: 'https://www.roblox.com/badges/2124858899/To-the-moon' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Mira de algún modo ambos lados.',
+    releaseDate: '12/11/2021',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'El bus tiene su trayectoria marcada con una línea roja.',
+      'El choque del bus tiene suficiente knockback para matar a quien toque, con pocos casos donde se salvan en la isla del cubo de la muerte.',
+      'El bus siempre irá en el eje de la persona más cercana.',
+      'Tu propio bus te puede chocar.',
+    ],
+    abilities: [
+      '[E] Lanza un bus en dirección a la isla de Slapple que lanza a quien toque. (20s cooldown / 10s spawn)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=qpcUpo5bn4I',
+  },
+
+  {
+    id: 'bomb',
+    name: 'Bomb',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Short fuse', url: 'https://www.roblox.com/badges/2124919840/Short-fuse' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+  },
+
+  {
+    id: 'moai',
+    name: '🗿 (Moai)',
+    type: 'logro',
+    obtainMethod: 'Pisa tu propia trampa del guante Trap.',
+    badges: [
+      { name: '🗿', url: 'https://www.roblox.com/badges/2130155314/unnamed' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '🗿',
+    releaseDate: '30/12/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'El 🗿 realiza una onda expansiva cada 2 segundos.',
+      'Pese a que se puede escapar, es un poco tardado y requiere de impulsarte saltando.',
+      'El 🗿 no desaparece hasta que la persona que lo ha colocado muere o coloca otro.',
+    ],
+    abilities: [
+      '[E] Coloca un 🗿 que paraliza al enemigo constantemente. (14s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=9fJDe8lcVSQ',
+  },
+
+  {
     id: 'obby',
     name: 'Obby',
     type: 'logro',
@@ -9186,6 +9345,87 @@ const GLOVES = [
       '[R] Rota entre diferentes bloques.'
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=lnObhmrwqDk',
+  },
+
+  {
+    id: 'rob',
+    name: 'rob',
+    type: 'logro',
+    obtainMethod: "Para conseguir el logro, requieres de un equipo de 4 personas: Un tycoon, un Killstreak de 3 o más kills, un Reaper de 3 o más kills, una God's Hand y un bob invocado. El God's Hand tiene que usar su habilidad en un lugar alto mientras todos los demás están cerca, y así se abre el portal al Dark Realm. Allí tienes que derrotar una Boss Fight de 5 fases compleja y de dificultad alta contra The Eternal Bob. Tras debilitarlo, te transformarás en rob y terminarás con él, consiguiendo todos los que hayan sobrevivido hasta la fase del duelo de defaults el logro. Es recomendable consultar el videotutorial para ver la Boss Fight completa.",
+    badges: [
+      { name: 'Emissary of Light', url: 'https://www.roblox.com/badges/2147429609/Emissary-Of-Light' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Tú no invocas a rob, rob te invoca.',
+    releaseDate: '23/06/2023',
+    power: 52,
+    speed: 16,
+    mechanics: [
+      'rob actúa exactamente igual que bob, pero sin un jugador fijo y con control absoluto.',
+      "rob mata al contacto, y justo después vuelves a tu forma. También vuelves si en 10 segundos no absorbes a nadie.",
+      'rob puede flotar sobre el vacío, con caminos ya establecidos para llegar a diferentes islas.',
+      'rob puede colisionar con un bob para crear un portal a la dimensión de Null.',
+
+    ],
+    abilities: [
+      '[E] Te conviertes en rob, controlándolo a tu antojo. (20s cooldown / 9s spawn / 100s null portal)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=HaVQTYyMZEs',
+  },
+
+  {
+    id: 'run',
+    name: 'Run',
+    type: 'logro',
+    obtainMethod: 'Entra al búnker de Hitman y acepta la misión "The Terry-fying Catacombs". Para completarla, tienes que escapar de la habilidad de Run un total de 10 veces. Tras terminarlo, reclama la recompensa con Hitman.',
+    badges: [
+      { name: "It's Finally Over...", url: 'https://www.roblox.com/badges/1579276416564374/Its-Finally-Over' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '💀',
+    releaseDate: '23/02/2024',
+    power: 52,
+    speed: 16,
+    mechanics: [
+      'La gente capturada es obligada a completar un laberinto, mientras tú te conviertes en Terry, una calavera gigante.',
+      "Mientras eres Terry, eres ligeramente más rápido que los supervivientes.",
+      "Para escapar, los supervivientes tienen que encontrar una salida. La salida tiene un sonido de estática como guía.",
+      "Si no capturas a nadie, te teletransporta a un lugar aleatorio de la isla.",
+      "También se te teletransporta a un lugar aleatorio tras matar a todos los supervivientes o que todos escapen."
+    ],
+    abilities: [
+      '[E] Extiende un agujero gigante que captura a quien esté cerca tras un pequeño delay. (15s cooldown / 3s spawn)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=fQbKva-S4x0',
+  },
+
+  {
+    id: 'glovel',
+    name: 'Glovel',
+    type: 'logro',
+    obtainMethod: 'Entra al búnker de Hitman y acepta la misión "A Hunt for the Hunter". tienes que llegar a la isla del cañón con el guante Extended e interactuar con el agujero que hay a la izquierda del cañón. Tras esto, desbloqueas una versión peor del guante Glovel y tienes que excavar en diferentes lugares marcados como X. Si no está el tesoro, saldrá un mensaje en el chat diciéndolo. Cuando lo encuentres, aparecerá un cofre del tesoro. Reclama la recompensa con Hitman.',
+    badges: [
+      { name: "The Hunt", url: 'https://www.roblox.com/badges/128402905805563/The-Hunt' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Cada día chambeo.',
+    releaseDate: '15/03/2024',
+    power: 48,
+    speed: 14,
+    mechanics: [
+      'Escavar tarda 3 segundos.',
+      "Por el suelo, te mueves mucho más rápido y eres inmune a los slaps.",
+      "Si usas otra vez tu habilidad, sales del suelo.",
+      "Si caes del mapa mientras escabas, también sales del suelo.",
+      "Si pegas a alguien mientras estás en el aire, realizarás un golpe crítico que tiene 65 de poder."
+    ],
+    abilities: [
+      '[E] Empieza a cavar en el suelo y te entierra, permitiéndote movilidad subterránea.',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=yxgfXUrZH4I',
   },
 
   /* ── EJEMPLO TIPO: OTRO ── */
