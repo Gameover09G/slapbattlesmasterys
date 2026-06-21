@@ -922,6 +922,18 @@ body {
 }
 
 /* ============================================================
+   KILLSTREAK — FLASH ROJO DE KILL (easter egg)
+   ============================================================ */
+#killstreak-flash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  background: #ff0000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
    FOXY FULLSCREEN VIDEO
    ============================================================ */
 /* upgrades */
@@ -4235,6 +4247,746 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   #glove-detail-left { border-right: none; border-bottom: 3px solid #2a2a2a; max-height: 48vh; }
 }
 
+/* ============================================================
+   CAJA DE VINILO (debajo de las estadísticas del guante)
+   ============================================================ */
+#glove-vinyl-wrap { margin-top: 6px; }
+
+#glove-vinyl-box {
+  position: relative;
+  height: 96px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* El disco asoma desde detrás de la caja, ya visible por defecto.
+   Se posiciona respecto al centro del box y se desplaza una cantidad fija
+   en px (no en % de su propio tamaño) para que sobresalga de verdad por
+   fuera del borde izquierdo de la caja. */
+#glove-vinyl-disc {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  margin-left: -39px;  /* mitad del ancho, para centrar el cálculo en translateX */
+  margin-top: -39px;   /* mitad de la altura */
+  transform: translateX(-34px);
+  background:
+    radial-gradient(circle at center, var(--yellow-bright) 0 6px, #0a0a0a 7px 9px, #3a3a3a 10px 100%),
+    repeating-radial-gradient(circle at center, #444 0 2px, #2a2a2a 2px 4px);
+  border: 2px solid #555;
+  box-shadow: 0 0 14px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,215,0,0.15);
+  transition: transform .25s ease;
+  z-index: 1;
+}
+#glove-vinyl-box:hover #glove-vinyl-disc { transform: translateX(-44px); }
+
+/* La caja (con el banner del guante) cubre la mayor parte del disco, pero
+   descentrada hacia la derecha para que el disco asome por la izquierda. */
+#glove-vinyl-case {
+  position: relative;
+  width: 130px;
+  height: 86px;
+  margin-left: 22px;
+  border-radius: 9px;
+  border: 3px solid var(--yellow-dark);
+  background: #111;
+  box-shadow: var(--shadow-card), 0 0 0 1px #000 inset;
+  overflow: hidden;
+  z-index: 2;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+}
+#glove-vinyl-case-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+#glove-vinyl-box:hover #glove-vinyl-case {
+  transform: translateX(6px) rotate(2deg);
+  box-shadow: var(--shadow-glow), 0 0 0 1px #000 inset;
+}
+
+/* Animación de salida: la caja se fija respecto al viewport (top/left/width/height
+   puestos por JS desde su posición real) y SOLO entonces se traslada fuera de la
+   pantalla, así nunca ensancha el contenedor con scroll que la contiene. */
+#glove-vinyl-case.vinyl-fixed {
+  position: fixed;
+  z-index: 950;
+  transition: none;
+  margin: 0;
+}
+#glove-vinyl-case.vinyl-fly-out {
+  animation: vinylCaseFlyOut .55s cubic-bezier(.55,0,.85,.35) forwards;
+}
+@keyframes vinylCaseFlyOut {
+  0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateX(160vw) rotate(35deg); opacity: 0.4; }
+}
+
+/* Animación de regreso: vuelve desde fuera de la pantalla a su posición original */
+#glove-vinyl-case.vinyl-fly-in {
+  animation: vinylCaseFlyIn .45s cubic-bezier(.2,.8,.3,1.05) forwards;
+}
+@keyframes vinylCaseFlyIn {
+  0%   { transform: translateX(160vw) rotate(35deg); opacity: 0.4; }
+  100% { transform: translateX(0) rotate(0deg); opacity: 1; }
+}
+
+/* ============================================================
+   REPRODUCTOR DE MÚSICA (overlay)
+   ============================================================ */
+#music-player-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0,0,0,0.92);
+  align-items: center;
+  justify-content: center;
+  animation: fadeInDetail .2s ease;
+}
+#music-player-overlay.open { display: flex; }
+
+#music-player-frame {
+  position: relative;
+  width: min(92vw, 380px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 22px 22px;
+  border-radius: 18px;
+  border: 4px solid var(--yellow-bright);
+  background: linear-gradient(180deg, #1f1f1f, #141414);
+  box-shadow: var(--shadow-glow), 0 16px 50px rgba(0,0,0,0.85);
+  animation: musicFrameIn .4s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes musicFrameIn {
+  0%   { opacity: 0; transform: scale(0.85) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#music-player-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border-bold);
+  background: var(--red-close);
+  color: #fff;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, filter .15s ease;
+}
+#music-player-close:hover { filter: brightness(1.2); }
+#music-player-close:active { transform: scale(0.9); }
+
+/* Disco grande girando */
+#music-vinyl-stage {
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#music-vinyl-disc-big {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at center, #1c1c1c 0 3px, #111 3px 6px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.7), inset 0 0 0 3px #000;
+  animation: vinylSpin 6s linear infinite;
+  animation-play-state: paused;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#music-vinyl-disc-big.spinning { animation-play-state: running; }
+@keyframes vinylSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+#music-vinyl-disc-grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 28px rgba(0,0,0,0.0);
+}
+#music-vinyl-center {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--yellow-bright);
+  background: #222;
+  box-shadow: 0 0 0 3px #000, 0 0 14px rgba(255,215,0,0.4);
+}
+#music-vinyl-center-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#music-track-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem;
+  color: var(--text-yellow);
+  text-align: center;
+  text-shadow: 1px 1px 0 #000;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#music-progress-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#music-time-current, #music-time-total {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: center;
+}
+#music-progress-bar {
+  flex: 1;
+  accent-color: var(--yellow-bright);
+  cursor: pointer;
+  height: 4px;
+}
+
+#music-controls-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+#music-btn-prev, #music-btn-next, #music-btn-playpause, #music-btn-shuffle {
+  border: 2px solid var(--yellow-dark);
+  background: var(--bg-card-inner);
+  color: var(--text-yellow);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+#music-btn-prev, #music-btn-next, #music-btn-shuffle { width: 36px; height: 36px; font-size: 1rem; }
+#music-btn-shuffle { width: 32px; height: 32px; font-size: 0.9rem; opacity: 0.7; }
+#music-btn-playpause { width: 46px; height: 46px; font-size: 1.2rem; background: var(--yellow-bright); color: #111; border-color: var(--border-bold); }
+#music-btn-prev:hover, #music-btn-next:hover, #music-btn-shuffle:hover { background: var(--yellow-dark); color: #111; transform: scale(1.08); }
+#music-btn-playpause:hover { filter: brightness(1.1); transform: scale(1.06); }
+#music-btn-prev:active, #music-btn-next:active, #music-btn-playpause:active, #music-btn-shuffle:active { transform: scale(0.92); }
+#music-btn-prev:disabled, #music-btn-next:disabled, #music-btn-shuffle:disabled { opacity: 0.35; cursor: default; transform: none; }
+#music-btn-shuffle.active {
+  opacity: 1;
+  background: var(--yellow-bright);
+  color: #111;
+  border-color: var(--border-bold);
+  box-shadow: 0 0 10px rgba(255,215,0,0.55);
+}
+
+#music-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 2px solid #333;
+}
+#music-volume-icon { font-size: 0.95rem; }
+#music-volume-bar {
+  width: 70px;
+  accent-color: var(--yellow-bright);
+  cursor: pointer;
+  height: 4px;
+}
+
+@media (max-width: 480px) {
+  #music-vinyl-stage, #music-vinyl-disc-big { width: 170px; height: 170px; }
+  #music-vinyl-center { width: 70px; height: 70px; }
+  #music-volume-bar { width: 50px; }
+}
+
+/* ============================================================
+   MINI REPRODUCTOR FLOTANTE (fijo a la izquierda, persiste
+   entre páginas mientras haya una canción cargada)
+   ============================================================ */
+#mini-player-fab {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 870;
+  display: none;
+  align-items: center;
+}
+#mini-player-fab.show { display: flex; }
+
+/* El disco: solo se ve la mitad, recortada por el borde izquierdo */
+#mini-player-disc-btn {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;  /* mitad fuera de la pantalla */
+  border: none;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  background: transparent;
+  transition: margin-left .25s cubic-bezier(.34,1.56,.64,1);
+}
+#mini-player-disc-btn:hover { margin-left: -24px; }
+
+#mini-player-disc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, var(--yellow-bright) 0 5px, #0a0a0a 6px 8px, #3a3a3a 9px 100%),
+    repeating-radial-gradient(circle at center, #444 0 2px, #2a2a2a 2px 4px);
+  border: 2px solid var(--yellow-dark);
+  box-shadow: 0 0 14px rgba(0,0,0,0.7), 0 0 10px rgba(255,215,0,0.25);
+  animation: vinylSpin 5s linear infinite;
+  animation-play-state: paused;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#mini-player-disc.spinning { animation-play-state: running; }
+#mini-player-disc-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #000;
+}
+
+/* Panel expandido hacia la derecha */
+#mini-player-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding: 0;
+  margin-left: -10px;
+  background: linear-gradient(90deg, #1a1a1a, #222);
+  border: 0px solid var(--yellow-dark);
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  transition: max-width .32s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .32s ease, border-width .2s ease;
+  white-space: nowrap;
+}
+#mini-player-fab.expanded #mini-player-panel {
+  max-width: 320px;
+  opacity: 1;
+  padding: 8px 12px 8px 22px;
+  border-width: 2px;
+}
+
+#mini-player-info { display: flex; flex-direction: column; gap: 4px; min-width: 130px; }
+#mini-player-track-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  color: var(--text-yellow);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 150px;
+}
+#mini-player-progress-row { width: 100%; }
+#mini-player-progress-bar {
+  width: 130px;
+  accent-color: var(--yellow-bright);
+  cursor: pointer;
+  height: 3px;
+}
+
+#mini-player-controls { display: flex; align-items: center; gap: 6px; }
+#mini-player-controls button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--yellow-dark);
+  background: var(--bg-card-inner);
+  color: var(--text-yellow);
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, background .15s ease;
+}
+#mini-player-controls button:hover { background: var(--yellow-dark); color: #111; transform: scale(1.1); }
+#mini-player-controls button:active { transform: scale(0.9); }
+#mini-player-btn-close { border-color: #5a1414 !important; }
+#mini-player-btn-close:hover { background: var(--red-close) !important; color: #fff !important; }
+
+@media (max-width: 480px) {
+  #mini-player-disc-btn { width: 52px; height: 52px; margin-left: -26px; }
+  #mini-player-disc-img { width: 20px; height: 20px; }
+  #mini-player-info { min-width: 100px; }
+  #mini-player-progress-bar, #mini-player-track-name { width: 100px; max-width: 100px; }
+  #mini-player-fab.expanded #mini-player-panel { max-width: 240px; }
+}
+
+/* ============================================================
+   SOUNDTRACK PAGE
+   ============================================================ */
+#soundtrack-view {
+  padding: 16px 14px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 60vh;
+}
+
+/* ── Vista de álbumes (en formato lista) ── */
+#soundtrack-albums-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+  border: 2px solid #2a2a2a;
+  border-radius: 16px;
+}
+.soundtrack-header-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(255,215,0,0.4));
+}
+#soundtrack-header-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 18px rgba(255,215,0,0.4);
+}
+#soundtrack-header-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+#soundtrack-albums-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.soundtrack-album-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-card);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .12s ease;
+}
+.soundtrack-album-row:hover {
+  border-color: var(--yellow-mid);
+  background: var(--bg-card-inner);
+  transform: translateX(3px);
+}
+.soundtrack-album-row:active { transform: scale(0.99); }
+
+.soundtrack-album-cover {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #222;
+  border: 2px solid #333;
+  flex-shrink: 0;
+}
+.soundtrack-album-cover.is-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, var(--yellow-bright), var(--yellow-dark));
+  border-color: var(--border-bold);
+}
+
+.soundtrack-album-info { flex: 1; min-width: 0; }
+.soundtrack-album-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--text-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.soundtrack-album-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.soundtrack-album-arrow {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+#soundtrack-albums-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ── Vista del reproductor: lista de canciones + reproductor, dividida por la mitad ── */
+
+#btn-soundtrack-back {
+  background: #2a2a2a;
+  border: 2px solid #383838;
+  border-radius: 10px;
+  color: var(--text-light);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+#btn-soundtrack-back:hover {
+  border-color: var(--yellow-bright);
+  background: #333;
+  color: var(--yellow-bright);
+}
+
+#soundtrack-player-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* Mitad izquierda: lista de canciones del álbum */
+#soundtrack-songlist-panel {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+}
+#soundtrack-album-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: var(--yellow-bright);
+  padding: 14px 16px 12px;
+  background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+  border-bottom: 2px solid #2a2a2a;
+  text-align: center;
+  flex-shrink: 0;
+}
+#soundtrack-songlist {
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.soundtrack-song-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background .15s ease, border-color .15s ease;
+}
+.soundtrack-song-row:hover { background: var(--bg-card-inner); }
+.soundtrack-song-row.active {
+  background: rgba(255,215,0,0.12);
+  border-color: var(--yellow-dark);
+}
+.soundtrack-song-index {
+  width: 22px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.soundtrack-song-row.active .soundtrack-song-index { color: var(--yellow-bright); }
+.soundtrack-song-text { flex: 1; min-width: 0; }
+.soundtrack-song-name {
+  font-size: 0.88rem;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.soundtrack-song-row.active .soundtrack-song-name { color: var(--yellow-bright); }
+.soundtrack-song-source {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.soundtrack-song-playicon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+/* Mitad derecha: reproductor con carátula cuadrada (sin disco girando) */
+#soundtrack-player-panel {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+#soundtrack-cover-wrap {
+  width: min(260px, 100%);
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 3px solid var(--yellow-bright);
+  background: #222;
+  box-shadow: 0 0 0 3px #000, 0 10px 28px rgba(0,0,0,0.6), var(--shadow-glow);
+}
+#soundtrack-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+#soundtrack-track-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: var(--text-yellow);
+  text-align: center;
+  text-shadow: 1px 1px 0 #000;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#soundtrack-track-source {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: -10px;
+}
+#soundtrack-progress-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#soundtrack-time-current, #soundtrack-time-total {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: center;
+}
+#soundtrack-progress-bar {
+  flex: 1;
+  accent-color: var(--yellow-bright);
+  cursor: pointer;
+  height: 4px;
+}
+#soundtrack-controls-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+#soundtrack-btn-prev, #soundtrack-btn-next, #soundtrack-btn-playpause, #soundtrack-btn-shuffle {
+  border: 2px solid var(--yellow-dark);
+  background: var(--bg-card-inner);
+  color: var(--text-yellow);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+#soundtrack-btn-prev, #soundtrack-btn-next, #soundtrack-btn-shuffle { width: 36px; height: 36px; font-size: 1rem; }
+#soundtrack-btn-shuffle { width: 32px; height: 32px; font-size: 0.9rem; opacity: 0.7; }
+#soundtrack-btn-playpause { width: 46px; height: 46px; font-size: 1.2rem; background: var(--yellow-bright); color: #111; border-color: var(--border-bold); }
+#soundtrack-btn-prev:hover, #soundtrack-btn-next:hover, #soundtrack-btn-shuffle:hover { background: var(--yellow-dark); color: #111; transform: scale(1.08); }
+#soundtrack-btn-playpause:hover { filter: brightness(1.1); transform: scale(1.06); }
+#soundtrack-btn-prev:active, #soundtrack-btn-next:active, #soundtrack-btn-playpause:active, #soundtrack-btn-shuffle:active { transform: scale(0.92); }
+#soundtrack-btn-prev:disabled, #soundtrack-btn-next:disabled, #soundtrack-btn-shuffle:disabled { opacity: 0.35; cursor: default; transform: none; }
+#soundtrack-btn-shuffle.active {
+  opacity: 1;
+  background: var(--yellow-bright);
+  color: #111;
+  border-color: var(--border-bold);
+  box-shadow: 0 0 10px rgba(255,215,0,0.55);
+}
+#soundtrack-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 2px solid #333;
+}
+#soundtrack-volume-icon { font-size: 0.95rem; }
+#soundtrack-volume-bar {
+  width: 70px;
+  accent-color: var(--yellow-bright);
+  cursor: pointer;
+  height: 4px;
+}
+
+@media (max-width: 760px) {
+  #soundtrack-player-split { grid-template-columns: 1fr; }
+  #soundtrack-songlist-panel { max-height: 320px; }
+}
+@media (max-width: 480px) {
+  #soundtrack-albums-header { padding: 12px 14px; gap: 10px; }
+  .soundtrack-header-icon { font-size: 1.6rem; }
+  #soundtrack-header-title { font-size: 1.1rem; }
+  #soundtrack-volume-bar { width: 50px; }
+}
+
 </style>
 </head>
 <body>
@@ -4271,6 +5023,10 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   <button class="page-nav-btn" id="nav-calendar" onclick="switchPage('calendar')" title="Calendario">
     <span style="font-size:1.25rem;line-height:1">📅</span>
     <span>Diario</span>
+  </button>
+  <button class="page-nav-btn" id="nav-soundtrack" onclick="switchPage('soundtrack')" title="Soundtrack">
+    <span style="font-size:1.25rem;line-height:1">🎵</span>
+    <span>Soundtrack</span>
   </button>
 </div>
 <div style="text-align:center;padding:4px 0 0;">
@@ -4398,16 +5154,26 @@ body.todo-selecting #grid-view { padding-top: 72px; }
           </div>
         </div>
       </div>
+      <!-- Caja de vinilo: solo visible si el guante tiene canciones (songs) -->
+      <div id="glove-vinyl-wrap" style="display:none">
+        <div class="detail-section-label">🎵 BANDA SONORA</div>
+        <div id="glove-vinyl-box" onclick="openMusicPlayer()" title="Abrir reproductor">
+          <div id="glove-vinyl-disc"></div>
+          <div id="glove-vinyl-case">
+            <img id="glove-vinyl-case-img" alt="Vinilo">
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- RIGHT -->
     <div id="glove-detail-right">
       <div id="glove-detail-mechanics-wrap">
-        <div class="detail-section-label">⚙️ MECÁNICAS</div>
+        <div class="detail-section-label">⚙️ MECÁNICAS Y PASIVAS</div>
         <div id="glove-detail-mechanics-list"></div>
       </div>
       <div id="glove-detail-abilities-wrap">
-        <div class="detail-section-label">⚡ HABILIDADES</div>
+        <div class="detail-section-label">⚡ HABILIDADES ACTIVAS</div>
         <div id="glove-detail-abilities-list"></div>
       </div>
     </div>
@@ -4469,6 +5235,63 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 </div>
 
 <!-- ========================================================
+     SOUNDTRACK PAGE
+     ======================================================== -->
+<div id="soundtrack-view" style="display:none">
+
+  <!-- Vista de álbumes: lista (no galería) -->
+  <div id="soundtrack-albums-view">
+    <div id="soundtrack-albums-header">
+      <span class="soundtrack-header-icon">🎵</span>
+      <div>
+        <div id="soundtrack-header-title">Soundtrack</div>
+        <div id="soundtrack-header-sub">Todas las canciones de los guantes, organizadas por álbum</div>
+      </div>
+    </div>
+    <div id="soundtrack-albums-list"></div>
+  </div>
+
+  <!-- Vista del reproductor: lista de canciones (izq) + reproductor (der) -->
+  <div id="soundtrack-player-view" style="display:none">
+    <button id="btn-soundtrack-back" onclick="closeSoundtrackAlbum()">← Volver a álbumes</button>
+    <div id="soundtrack-player-split">
+
+      <div id="soundtrack-songlist-panel">
+        <div id="soundtrack-album-title"></div>
+        <div id="soundtrack-songlist"></div>
+      </div>
+
+      <div id="soundtrack-player-panel">
+        <div id="soundtrack-cover-wrap">
+          <img id="soundtrack-cover-img" alt="Carátula">
+        </div>
+        <div id="soundtrack-track-name">—</div>
+        <div id="soundtrack-track-source"></div>
+
+        <div id="soundtrack-progress-row">
+          <span id="soundtrack-time-current">0:00</span>
+          <input type="range" id="soundtrack-progress-bar" min="0" max="100" value="0" step="0.1">
+          <span id="soundtrack-time-total">0:00</span>
+        </div>
+
+        <div id="soundtrack-controls-row">
+          <button id="soundtrack-btn-shuffle" onclick="stToggleShuffle()" title="Activar/desactivar aleatorio">🔀</button>
+          <button id="soundtrack-btn-prev" onclick="stPrevTrack()" title="Canción anterior">⏮</button>
+          <button id="soundtrack-btn-playpause" onclick="stTogglePlay()" title="Pausa / Reproducir">▶</button>
+          <button id="soundtrack-btn-next" onclick="stNextTrack()" title="Siguiente canción">⏭</button>
+          <div id="soundtrack-volume-wrap">
+            <span id="soundtrack-volume-icon">🔊</span>
+            <input type="range" id="soundtrack-volume-bar" min="0" max="100" value="70" step="1" oninput="stSetVolume(this.value)">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ========================================================
      RANDOM FAB (fixed, dedicated button)
      ======================================================== -->
 <button id="random-fab" onclick="startRandomSelector()" title="Selector random de maestría">
@@ -4490,6 +5313,34 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   <span class="fab-dot"></span>
   <span class="fab-icon">📋</span>
 </button>
+
+<!-- ========================================================
+     MINI MUSIC PLAYER (fixed left, persiste entre páginas)
+     Aparece cuando hay una canción cargada y se cierra el
+     reproductor grande. El disco asoma medio cortado por el
+     borde izquierdo; al pulsarlo se expande hacia la derecha.
+     ======================================================== -->
+<div id="mini-player-fab" aria-hidden="true">
+  <button id="mini-player-disc-btn" onclick="toggleMiniPlayerPanel()" title="Reproductor de música">
+    <div id="mini-player-disc">
+      <img id="mini-player-disc-img" alt="">
+    </div>
+  </button>
+  <div id="mini-player-panel">
+    <div id="mini-player-info">
+      <div id="mini-player-track-name">—</div>
+      <div id="mini-player-progress-row">
+        <input type="range" id="mini-player-progress-bar" min="0" max="100" value="0" step="0.1">
+      </div>
+    </div>
+    <div id="mini-player-controls">
+      <button id="mini-player-btn-play" onclick="musicTogglePlay(); syncMiniPlayer();" title="Pausa / Reproducir">⏸</button>
+      <button id="mini-player-btn-next" onclick="musicNextTrack()" title="Siguiente canción">⏭</button>
+      <button id="mini-player-btn-expand" onclick="reopenFullMusicPlayer()" title="Abrir reproductor completo">⛶</button>
+      <button id="mini-player-btn-close" onclick="musicStopAndHideMini()" title="Detener música">✕</button>
+    </div>
+  </div>
+</div>
 
 <!-- ========================================================
      TODO PANEL (right slide-in + dark backdrop)
@@ -4733,13 +5584,53 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   <div id="image-modal-title"></div>
 </div>
 
+<!-- ========================================================
+     MUSIC PLAYER (vinilo de guante)
+     ======================================================== -->
+<div id="music-player-overlay" onclick="if(event.target===this)closeMusicPlayer()">
+  <div id="music-player-frame">
+    <button id="music-player-close" onclick="closeMusicPlayer()" title="Cerrar">✕</button>
+
+    <div id="music-vinyl-stage">
+      <div id="music-vinyl-disc-big">
+        <div id="music-vinyl-disc-grooves"></div>
+        <div id="music-vinyl-center">
+          <img id="music-vinyl-center-img" alt="Carátula">
+        </div>
+      </div>
+    </div>
+
+    <div id="music-track-name">Cargando...</div>
+
+    <div id="music-progress-row">
+      <span id="music-time-current">0:00</span>
+      <input type="range" id="music-progress-bar" min="0" max="100" value="0" step="0.1">
+      <span id="music-time-total">0:00</span>
+    </div>
+
+    <div id="music-controls-row">
+      <button id="music-btn-shuffle" onclick="musicToggleShuffle()" title="Activar/desactivar aleatorio">🔀</button>
+      <button id="music-btn-prev" onclick="musicPrevTrack()" title="Canción anterior">⏮</button>
+      <button id="music-btn-playpause" onclick="musicTogglePlay()" title="Pausa / Reproducir">⏸</button>
+      <button id="music-btn-next" onclick="musicNextTrack()" title="Siguiente canción">⏭</button>
+      <div id="music-volume-wrap">
+        <span id="music-volume-icon">🔊</span>
+        <input type="range" id="music-volume-bar" min="0" max="100" value="70" step="1" oninput="musicSetVolume(this.value)">
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="stick-jumpscare-overlay" aria-hidden="true">
   <img id="stick-jumpscare-image" src="banner_stick.png" alt="Stick jumpscare">
 </div>
 
+
 <div id="foxy-video-overlay" aria-hidden="true">
   <video id="foxy-video" playsinline preload="auto"></video>
 </div>
+
+<div id="killstreak-flash-overlay" aria-hidden="true"></div>
 
 
 <!-- ========================================================
@@ -4799,6 +5690,17 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
+  {
+    version: "1.2.0 - Musica y Killstreaks.",
+    date: "22/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Agregado mas guantes normales."},
+      { emoji: "🎵", color: "#5e5e5e", text: "Agregado el soundtrack de Killstreak completo dentro de su pagina."},
+      { emoji: "🎶", color: "#fb923c", text: "Todos los guantes con musica se recopilaran en un nuevo apartado: Sountrack (hace falta hacer unos cuantos cambios todavia)"},
+      { emoji: "💀", color: "#fb923c", text: "Agregado el efecto de muerte de kilstreak cuando entras a su guante o maestria, simplemente como un pequeño detalle."},
+    ]
+  },
+  
   {
     version: "1.1.0 - Mas y mas guantes",
     date: "20/06/2026",
@@ -6454,6 +7356,7 @@ let stickJumpscareTimer = null;
 let stickJumpscareHideTimer = null;
 let foxyFailTimer = null;
 let foxyVideoActive = false;
+let killstreakFlashAudio = null;
 
 /* ── Diary / Calendar variables (declaradas aquí para que estén disponibles en todo el script) ── */
 const STORAGE_KEY_DIARY = 'slap_battles_diary_v1';
@@ -6611,6 +7514,44 @@ function startFoxyEgg() {
     if (foxyFailTimer) clearTimeout(foxyFailTimer);
     foxyFailTimer = setTimeout(() => stopFoxyEgg(), 5000);
   });
+}
+
+/* ============================================================
+   KILLSTREAK — FLASH ROJO DE KILL (easter egg)
+   Se dispara al entrar al guante Killstreak o a su maestría.
+   ============================================================ */
+function triggerKillstreakFlash() {
+  const overlay = document.getElementById('killstreak-flash-overlay');
+  if (!overlay) return;
+
+  // Detiene un flash/sonido anterior si se vuelve a entrar muy rápido
+  overlay.style.transition = 'none';
+  overlay.style.opacity = '0.3';
+  // Fuerza reflow para que el navegador aplique el opacity:0.3 antes del fadeout
+  void overlay.offsetWidth;
+  overlay.style.transition = 'opacity 1s ease-out';
+  overlay.style.opacity = '0';
+
+  if (killstreakFlashAudio) {
+    killstreakFlashAudio.pause();
+    killstreakFlashAudio.currentTime = 0;
+  }
+  killstreakFlashAudio = new Audio('killstreakkill.mp3');
+  killstreakFlashAudio.volume = 0.5;
+  killstreakFlashAudio.play().catch(() => {});
+}
+
+function stopKillstreakFlash() {
+  const overlay = document.getElementById('killstreak-flash-overlay');
+  if (overlay) {
+    overlay.style.transition = 'none';
+    overlay.style.opacity = '0';
+  }
+  if (killstreakFlashAudio) {
+    killstreakFlashAudio.pause();
+    killstreakFlashAudio.currentTime = 0;
+    killstreakFlashAudio = null;
+  }
 }
 
 /* ============================================================
@@ -7009,6 +7950,7 @@ function openDetail(id) {
   document.body.style.overflow = 'hidden';
   updateDetailHideButton();
   if (mastery.id === 'stick') startStickEgg();
+  if (mastery.id === 'killstreak') triggerKillstreakFlash();
   updateFabVisibility();
 }
 
@@ -7042,6 +7984,7 @@ function updateDetailHideButton() {
 function closeDetail() {
   stopStickEgg();
   stopFoxyEgg();
+  stopKillstreakFlash();
   document.getElementById('detail-view').classList.remove('open');
   document.body.style.overflow = '';
   detailOpen = null;
@@ -7290,6 +8233,8 @@ function setupEventDelegation() {
    ============================================================ */
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (document.getElementById('music-player-overlay').classList.contains('open')) { closeMusicPlayer(); return; }
+  if (document.getElementById('mini-player-fab').classList.contains('expanded')) { document.getElementById('mini-player-fab').classList.remove('expanded'); return; }
   if (document.getElementById('image-modal-overlay').classList.contains('open')) { closeImageModal(); return; }
   if (document.getElementById('video-modal-overlay').classList.contains('open')) { closeVideoModal(); return; }
   if (document.getElementById('random-selector-overlay').classList.contains('open')) { closeRandomSelector(); return; }
@@ -8249,15 +9194,21 @@ function switchPage(page) {
   const gridView   = document.getElementById('grid-view');
   const slapView   = document.getElementById('slap-view');
   const calView    = document.getElementById('calendar-view');
+  const stView     = document.getElementById('soundtrack-view');
   const searchWrap = document.getElementById('search-bar-wrap');
   const statsBar   = document.getElementById('stats-bar');
   const btnMast    = document.getElementById('nav-masteries');
   const btnSlap    = document.getElementById('nav-slap');
   const btnCal     = document.getElementById('nav-calendar');
+  const btnSt      = document.getElementById('nav-soundtrack');
+
+  // Al cambiar de página se detiene la reproducción del Soundtrack
+  // (si la hubiera) para no dejar música sonando sin reproductor visible.
+  stStopAudio();
 
   // Reset todos
-  [gridView, slapView, calView].forEach(v => { if (v) v.style.display = 'none'; });
-  [btnMast, btnSlap, btnCal].forEach(b => { if (b) b.classList.remove('active'); });
+  [gridView, slapView, calView, stView].forEach(v => { if (v) v.style.display = 'none'; });
+  [btnMast, btnSlap, btnCal, btnSt].forEach(b => { if (b) b.classList.remove('active'); });
   if (searchWrap) searchWrap.style.display = 'none';
   if (statsBar)   statsBar.style.display   = 'none';
 
@@ -8273,6 +9224,10 @@ function switchPage(page) {
     if (calView) calView.style.display = '';
     if (btnCal)  btnCal.classList.add('active');
     renderCalendar();
+  } else if (page === 'soundtrack') {
+    if (stView) stView.style.display = '';
+    if (btnSt)  btnSt.classList.add('active');
+    openSoundtrackAlbumsList();
   }
 }
 
@@ -9144,6 +10099,12 @@ let gloveDetailOpen = null;
                    para conseguir el guante. La imagen siempre es badge_(id del guante).png
      gamepasses  : Array<{name, url}>  — SOLO para type:'robux'. Uno o varios gamepasses
                    necesarios para conseguir el guante. La imagen siempre es gamepass_(id del guante).png
+     songs       : Object{nombreVisible: idCancion} | null  — diccionario de canciones del guante.
+                   Si es null (o no tiene ninguna clave), no se muestra nada. Si tiene al menos
+                   una entrada, aparece debajo de las estadísticas una caja de vinilo (con el banner
+                   default_(id del guante).png) que al hacer clic abre un reproductor de música.
+                   Cada canción usa el archivo de audio ost_(idCancion).mp3 y, en el reproductor,
+                   la imagen central del vinilo es ostbanner_(idCancion).png.
    ────────────────────────────────────────────────────────────── */
 const GLOVES = [
 
@@ -9162,9 +10123,10 @@ const GLOVES = [
       'Mientras tienes este guante equipado, giras sin cesar.',
     ],
     abilities: [
-      'Este guante solo posee pasivas',
+      'Este guante solo posee pasivas.',
     ],
     tutorialUrl: null,
+    songs: null,
   },
   
   {
@@ -9182,9 +10144,29 @@ const GLOVES = [
       "El guante tiene un contador de ladrillos para conseguir el guante Trap."
     ],
     abilities: [
-      '[E] Suelta un ladrillo. (5s cooldown)',
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
     ],
     tutorialUrl: null,
+    songs: null,
+  },
+
+  {
+    id: 'flash',
+    name: 'Flash',
+    type: 'slaps',
+    cost: 175,              // en slaps
+    quote: 'A quemar suela.',
+    releaseDate: '16/02/2021',
+    power: 48,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
+    mechanics: [
+      'El guante te teletransporta 50 studs hacia delante tras una espera de medio segundo.',
+    ],
+    abilities: [
+      '[E] Teletransportation: Te teletransporta en la dirección que estés mirando tras un pequeño delay. (4s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
   },
 
   {
@@ -9202,9 +10184,31 @@ const GLOVES = [
       "Las paredes desaparecen tras 60 segundos."
     ],
     abilities: [
-      '[E] Coloca una pared de ladrillos. (6s cooldown)',
+      '[E] Wall: Coloca una pared de ladrillos. (6s cooldown)',
     ],
     tutorialUrl: null,
+    songs: null,
+  },
+
+  {
+    id: 'space',
+    name: 'Space',
+    type: 'slaps',
+    cost: 1500,              // en slaps
+    quote: 'Ok, pero no te asfixies.',
+    releaseDate: '21/05/2021',
+    power: 50,                 // 1-5, opcional
+    speed: 15,                 // 1-5, opcional
+    mechanics: [
+      'Mientras estás en gravedad cero, tu pantalla se vuelve verde.',
+      'Duras 5 segundos con la habilidad activa.',
+      "Gravedad cero significa que subirás, pero no bajarás hasta que la habilidad se termine, conservando el 100% de la inercia del golpe/salto."
+    ],
+    abilities: [
+      '[E] Zero-G: Baja tu gravedad a 0, volando en el proceso. (15s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
   },
 
   {
@@ -9228,13 +10232,23 @@ const GLOVES = [
       "[1000 Kills] 0 de poder; cuando llegas a esta fase, se activa una cinemática que muestra un ser gigante dándote una corona. Al igual que en la anterior, no puedes hacer slaps y tienes una habilidad en su lugar. Durante esta fase, puedes volar por el vacío de forma similar a Rob y tu hitbox está ligeramente más arriba. Ganas un aura dorada, varias alas y un símbolo giratorio detrás de ti y a tus pies. Ganas inmunidad a la habilidad de Za Hando y empieza a sonar 'Threats of The Ocean Floor' de DM Dokuro."
     ],
     abilities: [
-      '[E - 100 Kills] Lanzas una esfera morada de tamaño mediano con un empuje moderado tirando a bajo.',
-      "[E - 100 Kills] Lanzas una esfera amarilla gigante con un empuje alto.",
-      "[Clic/E - 250 Kills] Lanzas volando a todo el que esté delante, actuando como un slap que puede dar a muchas personas y de mayor alcance.",
-      '[Clic - 1000 Kills] Lanzas volando a todo el que esté alrededor de ti, actuando como un slap que puede dar a muchas personas, de mayor alcance y omnidireccional.',
-      "[E- 1000 Kills] Conviertes en oro a cualquiera que esté en un radio similar al de la isla principal."
+      '[E - 75 Kills] 75 Orb: Lanzas una esfera morada de tamaño mediano con un empuje moderado tirando a bajo.',
+      "[E - 100 Kills] 100 Orb: Lanzas una esfera amarilla gigante con un empuje alto.",
+      "[Clic/E - 250 Kills] 250 Telekinesis: Lanzas volando a todo el que esté delante, actuando como un slap que puede dar a muchas personas y de mayor alcance.",
+      '[Clic - 1000 Kills] 1000 Telekinesis: Lanzas volando a todo el que esté alrededor de ti, actuando como un slap que puede dar a muchas personas, de mayor alcance y omnidireccional.',
+      "[E- 1000 Kills] Midas Touch: Conviertes en oro a cualquiera que esté en un radio similar al de la isla principal."
     ],
     tutorialUrl: null,
+    songs: {
+      'Finale': 'finale',
+      'Scourge of the Universe': 'scourgeuniverse',
+      'Universal Collapse': 'universalcollapse',
+      'Stained, Brutal Calamity': 'stainedbrutalcalamity',
+      'Sixes and Sevens': 'sixesandsevens',
+      'Unholy Insurgency': 'unholyinsurgency',
+      'True Love [Metal Remix]': 'truelove',
+      'Threats of The Ocean Floor': 'threatsoceanfloor',
+    },
   },
 
   {
@@ -9253,9 +10267,10 @@ const GLOVES = [
       "Cada centinela colocada tiene un 10% de probabilidades de hacer aparecer una caja de herramientas que sirve para obtener el guante Hammer."
     ],
     abilities: [
-      '[E] Coloca un centinela que contiene un guante giratorio. (13s cooldown)',
+      '[E] Sentry: Coloca un centinela que contiene un guante giratorio. (13s cooldown)',
     ],
     tutorialUrl: null,
+    songs: null,
   },
 
   {
@@ -9274,9 +10289,32 @@ const GLOVES = [
       'Las otras personas no pueden ver el portal.'
     ],
     abilities: [
-      '[E] Coloca portales. (2s cooldown)',
+      '[E] Portals: Coloca portales. (2s cooldown)',
     ],
     tutorialUrl: null,
+    songs: null,
+  },
+
+  {
+    id: 'booster',
+    name: 'Booster',
+    type: 'slaps',
+    cost: 17000,              // en slaps
+    quote: 'Ve en esa dirección. 🤣',
+    releaseDate: '09/12/2022',
+    power: 55,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
+    mechanics: [
+      'Los propulsores adheridos impulsan a tu objetivo en la dirección en que estén colocados.',
+      'Los propulsores se adhieren en una posición y dirección aleatoria.',
+      "Una persona puede contener hasta 3 propulsores simultáneamente.",
+      'Los propulsores desaparecen tras 10 segundos.'
+    ],
+    abilities: [
+      '[Clic] Attached Thruster: Implanta un propulsor en el cuerpo de tu enemigo. (0s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
   },
 
   {
@@ -9293,9 +10331,10 @@ const GLOVES = [
       'Puedes llevar a otra persona en tu nube.',
     ],
     abilities: [
-      '[E] Invoca una nube.',
+      '[E] Cloud Summon: Invoca una nube. (16s cooldoon / 3s spawn)',
     ],
     tutorialUrl: null,
+    songs: null,
   },
 
   /* ── EJEMPLO TIPO: ROBUX ── */
@@ -9321,6 +10360,7 @@ const GLOVES = [
       // { name: 'Otro Gamepass', url: 'https://www.roblox.com/game-pass/XXXX/Otro-Gamepass' },
     ],
     tutorialUrl: null,
+    songs: null,
   },
 
   /* ── EJEMPLO TIPO: LOGRO (admite 1 o varios badges) ── */
@@ -9344,9 +10384,10 @@ const GLOVES = [
       'Mientras estás en la dimensión de [REDACTED] vas perdiendo vida poco a poco, obligándote a elegir rápido.',
     ],
     abilities: [
-      '[E] Coloca un portal delante de ti que secuestra a quien se acerque. (11s cooldown)',
+      '[E] Abduction: Coloca un portal delante de ti que secuestra a quien se acerque. (11s cooldown)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=-psfhOjmKwk',
+    songs: null,
   },
   
   {
@@ -9370,9 +10411,10 @@ const GLOVES = [
       'Tu propio bus te puede chocar.',
     ],
     abilities: [
-      '[E] Lanza un bus en dirección a la isla de Slapple que lanza a quien toque. (20s cooldown / 10s spawn)',
+      '[E] Traffic Accident: Lanza un bus en dirección a la isla de Slapple que lanza a quien toque. (20s cooldown / 10s spawn)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=qpcUpo5bn4I',
+    songs: null,
   },
 
   {
@@ -9394,9 +10436,35 @@ const GLOVES = [
       'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
     ],
     abilities: [
-      '[E] Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+  },
+
+  {
+    id: 'shard',
+    name: 'Shard',
+    type: 'logro',
+    obtainMethod: 'Apaga 5 veces el fuego de uno o varios overkill en menos de 1 minuto. Da suficiente tiempo de hacerlo con solo 1 overkill.',
+    badges: [
+      { name: 'Firefighter', url: 'https://www.roblox.com/badges/2124919840/Short-fuse' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Momento anti-overkill.',
+    releaseDate: '19/02/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Las personas afectadas por los cristales obtienen una reelentización similar a la de Snow.',
+      'El shard tiene un rango casi infinito.',
+    ],
+    abilities: [
+      '[E] Ice Shards: Lanza 3 cristales de hielo en la dirección que estás mirando tras un pequeño delay, congelando a quien toque. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=ybkhfXgloW8',
+    songs: null,
   },
 
   {
@@ -9419,9 +10487,10 @@ const GLOVES = [
       'El 🗿 no desaparece hasta que la persona que lo ha colocado muere o coloca otro.',
     ],
     abilities: [
-      '[E] Coloca un 🗿 que paraliza al enemigo constantemente. (14s cooldown)',
+      '[E] 🗿: Coloca un 🗿 que paraliza al enemigo constantemente. (14s cooldown)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=9fJDe8lcVSQ',
+    songs: null,
   },
 
   {
@@ -9447,10 +10516,11 @@ const GLOVES = [
       "Plank: Bloque normal alargado"
     ],
     abilities: [
-      '[E] Coloca el bloque seleccionado.',
-      '[R] Rota entre diferentes bloques.'
+      '[E] Obby Builder: Coloca el bloque seleccionado. (1.5s cooldown)',
+      '[R] Change Part: Rota entre diferentes bloques. (0s cooldown)'
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=lnObhmrwqDk',
+    songs: null,
   },
 
   {
@@ -9475,9 +10545,10 @@ const GLOVES = [
 
     ],
     abilities: [
-      '[E] Te conviertes en rob, controlándolo a tu antojo. (20s cooldown / 9s spawn / 100s null portal)',
+      '[E] rob (rob really dislikes bob): Te conviertes en rob, controlándolo a tu antojo. (20s cooldown / 9s spawn / 100s null portal)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=HaVQTYyMZEs',
+    songs: null,
   },
 
   {
@@ -9502,9 +10573,10 @@ const GLOVES = [
       "También se te teletransporta a un lugar aleatorio tras matar a todos los supervivientes o que todos escapen."
     ],
     abilities: [
-      '[E] Extiende un agujero gigante que captura a quien esté cerca tras un pequeño delay. (15s cooldown / 3s spawn)',
+      '[E] Encasement: Extiende un agujero gigante que captura a quien esté cerca tras un pequeño delay. (15s cooldown / 3s spawn)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=fQbKva-S4x0',
+    songs: null,
   },
 
   {
@@ -9529,9 +10601,10 @@ const GLOVES = [
       "Si pegas a alguien mientras estás en el aire, realizarás un golpe crítico que tiene 65 de poder."
     ],
     abilities: [
-      '[E] Empieza a cavar en el suelo y te entierra, permitiéndote movilidad subterránea.',
+      '[E] Shovel: Empieza a cavar en el suelo y te entierra, permitiéndote movilidad subterránea. (4s cooldown / 3s spawn)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=yxgfXUrZH4I',
+    songs: null,
   },
 
   /* ── EJEMPLO TIPO: OTRO ── */
@@ -9550,9 +10623,10 @@ const GLOVES = [
       "Puedes pegar mientras ejecutas la habilidad."
     ],
     abilities: [
-      '[E] Te lanzas rodando hacia delante. (4s cooldown).',
+      '[E] Roll: Te lanzas rodando hacia delante. (4s cooldown).',
     ],
     tutorialUrl: null,
+    songs: null,
   },
 
 ];
@@ -9900,14 +10974,36 @@ function openGloveDetail(id, e) {
     statsWrap.style.display = 'none';
   }
 
+  // Caja de vinilo: solo si el guante tiene canciones (songs no es null/vacío)
+  const vinylWrap = document.getElementById('glove-vinyl-wrap');
+  const vinylCase = document.getElementById('glove-vinyl-case');
+  const vinylCaseImg = document.getElementById('glove-vinyl-case-img');
+  const hasSongs = glove.songs && typeof glove.songs === 'object' && Object.keys(glove.songs).length > 0;
+  // Reset defensivo: deja la caja en su estado normal por si quedó algo a medias
+  vinylCase.classList.remove('vinyl-fly-out', 'vinyl-fly-in', 'vinyl-fixed');
+  vinylCase.style.top = '';
+  vinylCase.style.left = '';
+  vinylCase.style.width = '';
+  vinylCase.style.height = '';
+  if (hasSongs) {
+    vinylWrap.style.display = 'block';
+    vinylCaseImg.onerror = () => { vinylCaseImg.onerror = null; vinylCaseImg.src = 'preview_placeholder.png'; };
+    vinylCaseImg.src = 'default_' + glove.id + '.png';
+  } else {
+    vinylWrap.style.display = 'none';
+  }
+
   document.getElementById('glove-detail-view').classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (glove.id === 'killstreak') triggerKillstreakFlash();
 }
 
 function closeGloveDetail() {
+  stopKillstreakFlash();
   document.getElementById('glove-detail-view').classList.remove('open');
   document.body.style.overflow = '';
   gloveDetailOpen = null;
+  closeMusicPlayer();
 }
 
 /* Botón maestría en la tarjeta → abre el detail de maestría */
@@ -9964,6 +11060,405 @@ const _patchedSwitchPage = function(page) {
 };
 switchPage = _patchedSwitchPage;
 
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║          REPRODUCTOR DE MÚSICA (vinilo de guante)        ║
+   ╚══════════════════════════════════════════════════════════╝
+   Archivos esperados junto al HTML:
+     ost_(idCancion).mp3        — audio de cada canción
+     ostbanner_(idCancion).png  — carátula central del vinilo, cambia por canción
+     default_(idGuante).png     — banner usado en la caja de vinilo cerrada
+   ============================================================ */
+let musicTrackList   = [];   // [{name, songId}, ...] del guante actual
+let musicTrackIndex  = 0;
+let musicAudio       = null;
+let musicIsPlaying   = false;
+let musicVolume      = 0.7;
+let musicSeeking     = false;
+
+/* Modo aleatorio: "bag shuffle" — se baraja una bolsa con todos los índices
+   pendientes y se van sacando uno a uno; ninguna canción se repite hasta que
+   no se han reproducido todas las demás. Al agotarse, se rebaraja de nuevo. */
+let musicShuffleOn   = false;
+let musicShuffleBag  = [];   // índices pendientes por sonar en esta ronda
+let musicShuffleHistory = []; // índices ya sonados en esta ronda (para "anterior")
+
+function musicFormatTime(sec) {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+/* Crea una bolsa nueva con todos los índices barajados (Fisher-Yates).
+   Si se indica excludeFirst, evita que ese índice quede primero en la
+   bolsa para que no suene dos veces seguidas al encadenar rondas. */
+function musicShuffleNewBag(excludeFirst) {
+  const bag = musicTrackList.map((_, i) => i);
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+  if (typeof excludeFirst === 'number' && bag.length > 1 && bag[0] === excludeFirst) {
+    // mueve esa entrada a otra posición al azar (no la primera)
+    const swapWith = 1 + Math.floor(Math.random() * (bag.length - 1));
+    [bag[0], bag[swapWith]] = [bag[swapWith], bag[0]];
+  }
+  return bag;
+}
+
+function openMusicPlayer() {
+  const glove = gloveDetailOpen;
+  if (!glove || !glove.songs) return;
+  const entries = Object.entries(glove.songs);
+  if (!entries.length) return;
+
+  musicTrackList  = entries.map(([name, songId]) => ({ name, songId }));
+  musicTrackIndex = 0;
+  musicShuffleOn  = false;
+  musicShuffleBag = [];
+  musicShuffleHistory = [];
+  const shuffleBtn = document.getElementById('music-btn-shuffle');
+  if (shuffleBtn) shuffleBtn.classList.remove('active');
+
+  // Animación: la caja de vinilo "vuela" fuera de la pantalla.
+  // Para que no ensanche el contenedor con scroll que la rodea, primero la
+  // fijamos en su posición real con position:fixed (coordenadas de viewport)
+  // y solo entonces aplicamos la animación de traslación.
+  const vinylCase = document.getElementById('glove-vinyl-case');
+  if (vinylCase) {
+    const rect = vinylCase.getBoundingClientRect();
+    vinylCase.classList.remove('vinyl-fly-in', 'vinyl-fly-out');
+    vinylCase.style.top    = rect.top + 'px';
+    vinylCase.style.left   = rect.left + 'px';
+    vinylCase.style.width  = rect.width + 'px';
+    vinylCase.style.height = rect.height + 'px';
+    vinylCase.classList.add('vinyl-fixed');
+    void vinylCase.offsetWidth; // fuerza reflow para que el fixed se aplique antes de animar
+    vinylCase.classList.add('vinyl-fly-out');
+  }
+
+  // Si ya había una mini-reproducción flotando, la ocultamos mientras se
+  // usa el reproductor grande (la música sigue sonando igual).
+  hideMiniPlayer();
+
+  const overlay = document.getElementById('music-player-overlay');
+  setTimeout(() => {
+    overlay.classList.add('open');
+    musicLoadTrack(0, true);
+  }, 320);
+}
+
+/* Cierra solo la VENTANA del reproductor grande. La música sigue sonando:
+   si hay una pista cargada, aparece el mini-reproductor flotante a la
+   izquierda y persiste aunque cambies de página o cierres el detalle. */
+function closeMusicPlayer() {
+  const overlay = document.getElementById('music-player-overlay');
+  const wasOpen = overlay.classList.contains('open');
+  overlay.classList.remove('open');
+  musicResetVinylCase();
+
+  if (musicAudio) {
+    syncMiniPlayer();
+    showMiniPlayer();
+  } else if (wasOpen) {
+    // No hay audio cargado (p. ej. todas las pistas fallaron): no mostramos nada.
+    hideMiniPlayer();
+  }
+}
+
+/* Detiene la música por completo y oculta el mini-reproductor */
+function musicStopAndHideMini() {
+  if (musicAudio) {
+    musicAudio.pause();
+    musicAudio.src = '';
+    musicAudio = null;
+  }
+  musicIsPlaying = false;
+  document.getElementById('music-vinyl-disc-big').classList.remove('spinning');
+  hideMiniPlayer();
+}
+
+/* Devuelve la caja de vinilo a su sitio original con una animación de regreso */
+function musicResetVinylCase() {
+  const vinylCase = document.getElementById('glove-vinyl-case');
+  if (!vinylCase || !vinylCase.classList.contains('vinyl-fixed')) return;
+
+  vinylCase.classList.remove('vinyl-fly-out');
+  vinylCase.classList.add('vinyl-fly-in');
+
+  const onDone = () => {
+    vinylCase.removeEventListener('animationend', onDone);
+    vinylCase.classList.remove('vinyl-fixed', 'vinyl-fly-in');
+    vinylCase.style.top = '';
+    vinylCase.style.left = '';
+    vinylCase.style.width = '';
+    vinylCase.style.height = '';
+  };
+  vinylCase.addEventListener('animationend', onDone);
+}
+
+function musicLoadTrack(index, autoplay) {
+  if (!musicTrackList.length) return;
+  if (index < 0) index = musicTrackList.length - 1;
+  if (index >= musicTrackList.length) index = 0;
+  musicTrackIndex = index;
+  const track = musicTrackList[index];
+
+  if (musicAudio) {
+    musicAudio.pause();
+    musicAudio = null;
+  }
+  musicAudio = new Audio('ost_' + track.songId + '.mp3');
+  musicAudio.volume = musicVolume;
+
+  document.getElementById('music-track-name').textContent = track.name;
+
+  const centerImg = document.getElementById('music-vinyl-center-img');
+  centerImg.onerror = () => { centerImg.onerror = null; centerImg.src = 'preview_placeholder.png'; };
+  centerImg.src = 'ostbanner_' + track.songId + '.png';
+
+  // Nav buttons: solo se deshabilitan si hay una única canción
+  const onlyOne = musicTrackList.length <= 1;
+  document.getElementById('music-btn-prev').disabled = onlyOne;
+  document.getElementById('music-btn-next').disabled = onlyOne;
+  document.getElementById('music-btn-shuffle').disabled = onlyOne;
+
+  const progressBar = document.getElementById('music-progress-bar');
+  progressBar.value = 0;
+  document.getElementById('music-time-current').textContent = '0:00';
+  document.getElementById('music-time-total').textContent   = '0:00';
+
+  musicAudio.addEventListener('loadedmetadata', () => {
+    document.getElementById('music-time-total').textContent = musicFormatTime(musicAudio.duration);
+    progressBar.max = musicAudio.duration || 0;
+    document.getElementById('mini-player-progress-bar').max = musicAudio.duration || 0;
+  });
+  musicAudio.addEventListener('timeupdate', () => {
+    if (musicSeeking) return;
+    progressBar.value = musicAudio.currentTime;
+    document.getElementById('music-time-current').textContent = musicFormatTime(musicAudio.currentTime);
+    const miniBar = document.getElementById('mini-player-progress-bar');
+    if (!miniBar.matches(':active')) miniBar.value = musicAudio.currentTime;
+  });
+  musicAudio.addEventListener('ended', () => {
+    musicNextTrack();
+  });
+  musicAudio.onerror = () => {
+    document.getElementById('music-track-name').textContent = track.name + ' (audio no disponible)';
+    document.getElementById('mini-player-track-name').textContent = track.name + ' (no disponible)';
+  };
+
+  if (autoplay) {
+    musicAudio.play().then(() => {
+      musicIsPlaying = true;
+      musicUpdatePlayButton();
+    }).catch(() => {
+      musicIsPlaying = false;
+      musicUpdatePlayButton();
+    });
+  } else {
+    musicIsPlaying = false;
+    musicUpdatePlayButton();
+  }
+  syncMiniPlayer();
+}
+
+function musicUpdatePlayButton() {
+  const btn  = document.getElementById('music-btn-playpause');
+  const disc = document.getElementById('music-vinyl-disc-big');
+  const miniBtn  = document.getElementById('mini-player-btn-play');
+  const miniDisc = document.getElementById('mini-player-disc');
+  if (musicIsPlaying) {
+    btn.textContent = '⏸';
+    disc.classList.add('spinning');
+    if (miniBtn)  miniBtn.textContent = '⏸';
+    if (miniDisc) miniDisc.classList.add('spinning');
+  } else {
+    btn.textContent = '▶';
+    disc.classList.remove('spinning');
+    if (miniBtn)  miniBtn.textContent = '▶';
+    if (miniDisc) miniDisc.classList.remove('spinning');
+  }
+}
+
+function musicTogglePlay() {
+  if (!musicAudio) return;
+  if (musicIsPlaying) {
+    musicAudio.pause();
+    musicIsPlaying = false;
+  } else {
+    musicAudio.play().catch(() => {});
+    musicIsPlaying = true;
+  }
+  musicUpdatePlayButton();
+}
+
+function musicNextTrack() {
+  if (musicTrackList.length <= 1) {
+    // Reinicia la misma canción si solo hay una
+    if (musicAudio) { musicAudio.currentTime = 0; musicAudio.play().catch(() => {}); musicIsPlaying = true; musicUpdatePlayButton(); }
+    return;
+  }
+
+  if (musicShuffleOn) {
+    // Si la bolsa está vacía, se rebaraja una ronda nueva evitando repetir
+    // justo la canción que acaba de sonar como primera de la nueva ronda.
+    if (musicShuffleBag.length === 0) {
+      musicShuffleBag = musicShuffleNewBag(musicTrackIndex);
+    }
+    const nextIndex = musicShuffleBag.shift();
+    musicShuffleHistory.push(musicTrackIndex);
+    musicLoadTrack(nextIndex, true);
+    return;
+  }
+
+  musicLoadTrack(musicTrackIndex + 1, true);
+}
+
+function musicPrevTrack() {
+  if (musicTrackList.length <= 1) {
+    if (musicAudio) { musicAudio.currentTime = 0; }
+    return;
+  }
+
+  if (musicShuffleOn) {
+    if (musicShuffleHistory.length > 0) {
+      // Vuelve a la canción anterior dentro del orden aleatorio ya recorrido
+      const prevIndex = musicShuffleHistory.pop();
+      musicShuffleBag.unshift(musicTrackIndex);
+      musicLoadTrack(prevIndex, true);
+    } else {
+      // No hay historial todavía: simplemente reinicia la canción actual
+      if (musicAudio) musicAudio.currentTime = 0;
+    }
+    return;
+  }
+
+  musicLoadTrack(musicTrackIndex - 1, true);
+}
+
+/* Activa/desactiva el modo aleatorio. Al activarlo se crea una bolsa nueva
+   con todos los índices barajados (sin contar la canción actual, que ya
+   está sonando); al desactivarlo, se limpia y el orden vuelve a ser
+   secuencial desde la pista actual. */
+function musicToggleShuffle() {
+  if (musicTrackList.length <= 1) return;
+  musicShuffleOn = !musicShuffleOn;
+
+  const btn = document.getElementById('music-btn-shuffle');
+  btn.classList.toggle('active', musicShuffleOn);
+
+  if (musicShuffleOn) {
+    musicShuffleBag = musicShuffleNewBag(musicTrackIndex)
+      .filter(i => i !== musicTrackIndex);
+    musicShuffleHistory = [];
+  } else {
+    musicShuffleBag = [];
+    musicShuffleHistory = [];
+  }
+}
+
+function musicSetVolume(val) {
+  musicVolume = Math.max(0, Math.min(100, Number(val))) / 100;
+  if (musicAudio) musicAudio.volume = musicVolume;
+  const icon = document.getElementById('music-volume-icon');
+  icon.textContent = musicVolume === 0 ? '🔇' : (musicVolume < 0.5 ? '🔉' : '🔊');
+}
+
+/* Barra de progreso: permite arrastrar para buscar posición */
+(function setupMusicProgressBar() {
+  const bar = document.getElementById('music-progress-bar');
+  if (!bar) return;
+  bar.addEventListener('input', () => {
+    musicSeeking = true;
+    document.getElementById('music-time-current').textContent = musicFormatTime(Number(bar.value));
+  });
+  bar.addEventListener('change', () => {
+    if (musicAudio) musicAudio.currentTime = Number(bar.value);
+    musicSeeking = false;
+  });
+})();
+
+/* ============================================================
+   MINI REPRODUCTOR FLOTANTE (fijo a la izquierda)
+   Aparece cuando se cierra el reproductor grande con una canción
+   cargada; la música sigue sonando y persiste entre páginas.
+   ============================================================ */
+
+/* Refresca nombre, carátula y progreso del mini-reproductor con la pista actual */
+function syncMiniPlayer() {
+  if (!musicAudio || !musicTrackList.length) return;
+  const track = musicTrackList[musicTrackIndex];
+  document.getElementById('mini-player-track-name').textContent = track.name;
+
+  const img = document.getElementById('mini-player-disc-img');
+  img.onerror = () => { img.onerror = null; img.src = 'preview_placeholder.png'; };
+  img.src = 'ostbanner_' + track.songId + '.png';
+
+  const bar = document.getElementById('mini-player-progress-bar');
+  bar.max = musicAudio.duration || 0;
+  bar.value = musicAudio.currentTime || 0;
+}
+
+function showMiniPlayer() {
+  const fab = document.getElementById('mini-player-fab');
+  fab.classList.add('show');
+  fab.setAttribute('aria-hidden', 'false');
+  syncMiniPlayer();
+  musicUpdatePlayButton();
+}
+
+function hideMiniPlayer() {
+  const fab = document.getElementById('mini-player-fab');
+  fab.classList.remove('show', 'expanded');
+  fab.setAttribute('aria-hidden', 'true');
+}
+
+/* Abre/cierra el panel expandido del mini-reproductor */
+function toggleMiniPlayerPanel() {
+  document.getElementById('mini-player-fab').classList.toggle('expanded');
+}
+
+/* Desde el mini-reproductor, reabre el reproductor grande con la pista actual */
+function reopenFullMusicPlayer() {
+  if (!musicTrackList.length) return;
+  document.getElementById('mini-player-fab').classList.remove('expanded');
+  hideMiniPlayer();
+
+  // Reusa la pista/posición actuales en vez de reiniciar desde cero
+  document.getElementById('music-track-name').textContent = musicTrackList[musicTrackIndex].name;
+  const centerImg = document.getElementById('music-vinyl-center-img');
+  centerImg.onerror = () => { centerImg.onerror = null; centerImg.src = 'preview_placeholder.png'; };
+  centerImg.src = 'ostbanner_' + musicTrackList[musicTrackIndex].songId + '.png';
+  const progressBar = document.getElementById('music-progress-bar');
+  if (musicAudio) {
+    progressBar.max = musicAudio.duration || 0;
+    progressBar.value = musicAudio.currentTime || 0;
+    document.getElementById('music-time-current').textContent = musicFormatTime(musicAudio.currentTime);
+    document.getElementById('music-time-total').textContent   = musicFormatTime(musicAudio.duration);
+  }
+  const onlyOne = musicTrackList.length <= 1;
+  document.getElementById('music-btn-prev').disabled = onlyOne;
+  document.getElementById('music-btn-next').disabled = onlyOne;
+  document.getElementById('music-btn-shuffle').disabled = onlyOne;
+  document.getElementById('music-btn-shuffle').classList.toggle('active', musicShuffleOn);
+  musicUpdatePlayButton();
+
+  document.getElementById('music-player-overlay').classList.add('open');
+}
+
+/* Barra de progreso del mini-reproductor: permite buscar posición */
+(function setupMiniPlayerProgressBar() {
+  const bar = document.getElementById('mini-player-progress-bar');
+  if (!bar) return;
+  bar.addEventListener('input', () => { musicSeeking = true; });
+  bar.addEventListener('change', () => {
+    if (musicAudio) musicAudio.currentTime = Number(bar.value);
+    musicSeeking = false;
+  });
+})();
+
 /* ── Init check: si ya estaba desbloqueado ── */
 (function() {
   // Defer until DOM ready
@@ -9975,6 +11470,348 @@ switchPage = _patchedSwitchPage;
       const gd = document.getElementById('glove-detail-view');
       if (gd && gd.classList.contains('open')) closeGloveDetail();
     }
+  });
+})();
+
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║                    SOUNDTRACK PAGE                       ║
+   ╚══════════════════════════════════════════════════════════╝
+   Recopila automáticamente las canciones (glove.songs) de todos
+   los guantes. El primer álbum es siempre "Todo el Soundtrack"
+   (todas las canciones juntas); el resto son álbumes por guante,
+   y solo aparecen si ese guante tiene canciones asignadas.
+   Archivos esperados junto al HTML:
+     ost_(idCancion).mp3        — audio de cada canción
+     ostbanner_(idCancion).png  — carátula cuadrada de cada canción
+     default_(idGuante).png     — carátula del álbum de un guante
+   ============================================================ */
+let soundtrackAlbums = [];
+let stCurrentAlbum   = null;
+let stTrackList      = [];
+let stTrackIndex     = 0;
+let stAudio          = null;
+let stIsPlaying      = false;
+let stVolume         = 0.7;
+let stShuffleOn      = false;
+let stShuffleBag     = [];
+let stShuffleHistory = [];
+let stSeeking        = false;
+
+/* Construye la lista de álbumes a partir de GLOVES */
+function buildSoundtrackAlbums() {
+  const albums    = [];
+  const allTracks = [];
+
+  GLOVES.forEach(g => {
+    if (!g.songs || typeof g.songs !== 'object') return;
+    const entries = Object.entries(g.songs);
+    if (!entries.length) return;
+    const tracks = entries.map(([name, songId]) => ({ name, songId, gloveId: g.id, gloveName: g.name }));
+    albums.push({ id: g.id, name: g.name, isAll: false, gloveId: g.id, tracks });
+    allTracks.push(...tracks);
+  });
+
+  albums.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+  // El álbum "Todo el Soundtrack" siempre va primero, tenga o no canciones
+  albums.unshift({ id: '__all__', name: 'Todo el Soundtrack', isAll: true, gloveId: null, tracks: allTracks });
+
+  return albums;
+}
+
+/* Vista de álbumes (lista) — se llama al entrar a la página y al volver */
+function openSoundtrackAlbumsList() {
+  document.getElementById('soundtrack-player-view').style.display = 'none';
+  document.getElementById('soundtrack-albums-view').style.display = '';
+  stCurrentAlbum = null;
+  renderSoundtrackAlbums();
+}
+
+function renderSoundtrackAlbums() {
+  soundtrackAlbums = buildSoundtrackAlbums();
+  const wrap = document.getElementById('soundtrack-albums-list');
+  wrap.innerHTML = '';
+
+  soundtrackAlbums.forEach(album => {
+    // Los guantes sin soundtrack no aparecen; "Todo el Soundtrack" siempre aparece.
+    if (!album.isAll && album.tracks.length === 0) return;
+
+    const row = document.createElement('div');
+    row.className = 'soundtrack-album-row';
+    row.onclick = () => openSoundtrackAlbum(album.id);
+
+    const coverHtml = album.isAll
+      ? `<div class="soundtrack-album-cover is-all">🎶</div>`
+      : `<img class="soundtrack-album-cover" src="default_${album.gloveId}.png" alt="${album.name}" onerror="this.onerror=null;this.src='preview_placeholder.png'">`;
+
+    row.innerHTML = `
+      ${coverHtml}
+      <div class="soundtrack-album-info">
+        <div class="soundtrack-album-name">${album.isAll ? '🎵 ' : ''}${album.name}</div>
+        <div class="soundtrack-album-count">${album.tracks.length} canción${album.tracks.length === 1 ? '' : 'es'}</div>
+      </div>
+      <div class="soundtrack-album-arrow">›</div>
+    `;
+    wrap.appendChild(row);
+  });
+
+  if (!wrap.children.length) {
+    wrap.innerHTML = `<div id="soundtrack-albums-empty">🎵 Todavía no hay ninguna canción registrada en los guantes.</div>`;
+  }
+}
+
+/* Abre un álbum: muestra la lista de canciones (izq) + reproductor (der) */
+function openSoundtrackAlbum(albumId) {
+  const album = soundtrackAlbums.find(a => a.id === albumId);
+  if (!album || !album.tracks.length) return;
+
+  stCurrentAlbum  = album;
+  stTrackList     = album.tracks;
+  stShuffleOn     = false;
+  stShuffleBag    = [];
+  stShuffleHistory = [];
+  const shuffleBtn = document.getElementById('soundtrack-btn-shuffle');
+  if (shuffleBtn) shuffleBtn.classList.remove('active');
+
+  document.getElementById('soundtrack-album-title').textContent =
+    album.isAll ? '🎵 Todo el Soundtrack' : album.name;
+
+  document.getElementById('soundtrack-albums-view').style.display = 'none';
+  document.getElementById('soundtrack-player-view').style.display = '';
+
+  stLoadTrack(0, true);
+}
+
+/* Vuelve de la vista de reproductor a la lista de álbumes */
+function closeSoundtrackAlbum() {
+  stStopAudio();
+  document.getElementById('soundtrack-player-view').style.display = 'none';
+  document.getElementById('soundtrack-albums-view').style.display = '';
+  stCurrentAlbum = null;
+}
+
+function renderSoundtrackSongList() {
+  const wrap = document.getElementById('soundtrack-songlist');
+  wrap.innerHTML = '';
+  stTrackList.forEach((track, i) => {
+    const row = document.createElement('div');
+    row.className = 'soundtrack-song-row' + (i === stTrackIndex ? ' active' : '');
+    row.dataset.index = i;
+    row.onclick = () => stSelectTrack(i);
+    const sourceHtml = stCurrentAlbum.isAll ? `<div class="soundtrack-song-source">${track.gloveName}</div>` : '';
+    row.innerHTML = `
+      <span class="soundtrack-song-index">${i + 1}</span>
+      <div class="soundtrack-song-text">
+        <div class="soundtrack-song-name">${track.name}</div>
+        ${sourceHtml}
+      </div>
+      <span class="soundtrack-song-playicon">${i === stTrackIndex && stIsPlaying ? '🔊' : ''}</span>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function stUpdateActiveSongRow() {
+  document.querySelectorAll('#soundtrack-songlist .soundtrack-song-row').forEach(row => {
+    const idx = Number(row.dataset.index);
+    const isActive = idx === stTrackIndex;
+    row.classList.toggle('active', isActive);
+    const icon = row.querySelector('.soundtrack-song-playicon');
+    if (icon) icon.textContent = isActive && stIsPlaying ? '🔊' : '';
+  });
+}
+
+function stSelectTrack(index) {
+  stLoadTrack(index, true);
+}
+
+function stLoadTrack(index, autoplay) {
+  if (!stTrackList.length) return;
+  if (index < 0) index = stTrackList.length - 1;
+  if (index >= stTrackList.length) index = 0;
+  stTrackIndex = index;
+  const track = stTrackList[index];
+
+  if (stAudio) {
+    stAudio.pause();
+    stAudio = null;
+  }
+  stAudio = new Audio('ost_' + track.songId + '.mp3');
+  stAudio.volume = stVolume;
+
+  document.getElementById('soundtrack-track-name').textContent   = track.name;
+  document.getElementById('soundtrack-track-source').textContent = stCurrentAlbum.isAll ? track.gloveName : '';
+
+  // Carátula cuadrada (sin disco girando)
+  const coverImg = document.getElementById('soundtrack-cover-img');
+  coverImg.onerror = () => { coverImg.onerror = null; coverImg.src = 'preview_placeholder.png'; };
+  coverImg.src = 'ostbanner_' + track.songId + '.png';
+
+  const onlyOne = stTrackList.length <= 1;
+  document.getElementById('soundtrack-btn-prev').disabled    = onlyOne;
+  document.getElementById('soundtrack-btn-next').disabled    = onlyOne;
+  document.getElementById('soundtrack-btn-shuffle').disabled = onlyOne;
+
+  const progressBar = document.getElementById('soundtrack-progress-bar');
+  progressBar.value = 0;
+  document.getElementById('soundtrack-time-current').textContent = '0:00';
+  document.getElementById('soundtrack-time-total').textContent   = '0:00';
+
+  // Referencia fija a ESTE elemento de audio: evita que listeners de pistas
+  // viejas sigan escribiendo sobre la UI (o crasheen) después de que
+  // `stAudio` cambie o se ponga a null (p. ej. al cerrar el reproductor).
+  const thisAudio = stAudio;
+  thisAudio.addEventListener('loadedmetadata', () => {
+    if (stAudio !== thisAudio) return;
+    document.getElementById('soundtrack-time-total').textContent = musicFormatTime(thisAudio.duration);
+    progressBar.max = thisAudio.duration || 0;
+  });
+  thisAudio.addEventListener('timeupdate', () => {
+    if (stAudio !== thisAudio || stSeeking) return;
+    progressBar.value = thisAudio.currentTime;
+    document.getElementById('soundtrack-time-current').textContent = musicFormatTime(thisAudio.currentTime);
+  });
+  thisAudio.addEventListener('ended', () => {
+    if (stAudio !== thisAudio) return;
+    stNextTrack();
+  });
+  thisAudio.onerror = () => {
+    if (stAudio !== thisAudio) return;
+    document.getElementById('soundtrack-track-name').textContent = track.name + ' (audio no disponible)';
+  };
+
+  if (autoplay) {
+    stAudio.play().then(() => {
+      stIsPlaying = true;
+      stUpdatePlayButton();
+    }).catch(() => {
+      stIsPlaying = false;
+      stUpdatePlayButton();
+    });
+  } else {
+    stIsPlaying = false;
+    stUpdatePlayButton();
+  }
+
+  renderSoundtrackSongList();
+}
+
+function stUpdatePlayButton() {
+  const btn = document.getElementById('soundtrack-btn-playpause');
+  if (btn) btn.textContent = stIsPlaying ? '⏸' : '▶';
+  stUpdateActiveSongRow();
+}
+
+function stTogglePlay() {
+  if (!stAudio) return;
+  if (stIsPlaying) {
+    stAudio.pause();
+    stIsPlaying = false;
+  } else {
+    stAudio.play().catch(() => {});
+    stIsPlaying = true;
+  }
+  stUpdatePlayButton();
+}
+
+/* Bolsa aleatoria tipo "bag shuffle" (igual que en el reproductor de guantes) */
+function stShuffleNewBag(excludeFirst) {
+  const bag = stTrackList.map((_, i) => i);
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+  if (typeof excludeFirst === 'number' && bag.length > 1 && bag[0] === excludeFirst) {
+    const swapWith = 1 + Math.floor(Math.random() * (bag.length - 1));
+    [bag[0], bag[swapWith]] = [bag[swapWith], bag[0]];
+  }
+  return bag;
+}
+
+function stNextTrack() {
+  if (stTrackList.length <= 1) {
+    if (stAudio) { stAudio.currentTime = 0; stAudio.play().catch(() => {}); stIsPlaying = true; stUpdatePlayButton(); }
+    return;
+  }
+
+  if (stShuffleOn) {
+    if (stShuffleBag.length === 0) {
+      stShuffleBag = stShuffleNewBag(stTrackIndex);
+    }
+    const nextIndex = stShuffleBag.shift();
+    stShuffleHistory.push(stTrackIndex);
+    stLoadTrack(nextIndex, true);
+    return;
+  }
+
+  stLoadTrack(stTrackIndex + 1, true);
+}
+
+function stPrevTrack() {
+  if (stTrackList.length <= 1) {
+    if (stAudio) stAudio.currentTime = 0;
+    return;
+  }
+
+  if (stShuffleOn) {
+    if (stShuffleHistory.length > 0) {
+      const prevIndex = stShuffleHistory.pop();
+      stShuffleBag.unshift(stTrackIndex);
+      stLoadTrack(prevIndex, true);
+    } else {
+      if (stAudio) stAudio.currentTime = 0;
+    }
+    return;
+  }
+
+  stLoadTrack(stTrackIndex - 1, true);
+}
+
+function stToggleShuffle() {
+  if (stTrackList.length <= 1) return;
+  stShuffleOn = !stShuffleOn;
+
+  const btn = document.getElementById('soundtrack-btn-shuffle');
+  btn.classList.toggle('active', stShuffleOn);
+
+  if (stShuffleOn) {
+    stShuffleBag = stShuffleNewBag(stTrackIndex).filter(i => i !== stTrackIndex);
+    stShuffleHistory = [];
+  } else {
+    stShuffleBag = [];
+    stShuffleHistory = [];
+  }
+}
+
+function stSetVolume(val) {
+  stVolume = Math.max(0, Math.min(100, Number(val))) / 100;
+  if (stAudio) stAudio.volume = stVolume;
+  const icon = document.getElementById('soundtrack-volume-icon');
+  if (icon) icon.textContent = stVolume === 0 ? '🔇' : (stVolume < 0.5 ? '🔉' : '🔊');
+}
+
+/* Detiene por completo la reproducción del Soundtrack (p. ej. al cambiar de página) */
+function stStopAudio() {
+  if (stAudio) {
+    stAudio.pause();
+    stAudio.src = '';
+    stAudio = null;
+  }
+  stIsPlaying = false;
+}
+
+/* Barra de progreso: permite arrastrar para buscar posición */
+(function setupSoundtrackProgressBar() {
+  const bar = document.getElementById('soundtrack-progress-bar');
+  if (!bar) return;
+  bar.addEventListener('input', () => {
+    stSeeking = true;
+    document.getElementById('soundtrack-time-current').textContent = musicFormatTime(Number(bar.value));
+  });
+  bar.addEventListener('change', () => {
+    if (stAudio) stAudio.currentTime = Number(bar.value);
+    stSeeking = false;
   });
 })();
 
