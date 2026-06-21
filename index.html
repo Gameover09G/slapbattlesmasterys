@@ -4033,6 +4033,96 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 .btn-glove-badge-roblox:active { transform: scale(0.93); }
 
+/* ── Bloque gamepass (robux) en glove detail ── */
+#glove-detail-gamepass-wrap {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  background: #050a16;
+  border: 2px solid #14233f;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+#glove-detail-gamepass-wrap.visible { display: flex; }
+
+#glove-detail-gamepass-img-wrap {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #60a5fa;
+  box-shadow: 0 0 10px rgba(96,165,250,0.45);
+  background: #111;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+#glove-detail-gamepass-img-wrap:hover {
+  box-shadow: 0 0 20px rgba(96,165,250,0.75);
+  transform: scale(1.08);
+}
+#glove-detail-gamepass-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+#glove-detail-gamepass-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+#glove-detail-gamepass-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.glove-detail-gamepass-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.glove-detail-gamepass-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: #60a5fa;
+  text-shadow: 0 0 10px rgba(96,165,250,0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-glove-gamepass-roblox {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #050a16;
+  color: #60a5fa;
+  border: 2px solid #60a5fa;
+  border-radius: 7px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  padding: 5px 11px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, filter .15s, transform .1s;
+  white-space: nowrap;
+}
+.btn-glove-gamepass-roblox:hover {
+  background: #60a5fa;
+  color: #050a16;
+  filter: brightness(1.1);
+}
+.btn-glove-gamepass-roblox:active { transform: scale(0.93); }
+
 /* ── Acento de color del banner según tipo ── */
 #glove-detail-banner-wrap.gbtype-slaps::after,
 #glove-detail-banner-wrap.gbtype-robux::after,
@@ -4283,6 +4373,15 @@ body.todo-selecting #grid-view { padding-top: 72px; }
         </div>
         <div id="glove-detail-badge-info">
           <div id="glove-detail-badge-list"></div>
+        </div>
+      </div>
+      <!-- Gamepass(es) (visible solo en type=robux, admite 1 o varios) -->
+      <div id="glove-detail-gamepass-wrap">
+        <div id="glove-detail-gamepass-img-wrap" onclick="openImageModal(document.getElementById('glove-detail-gamepass-img').src, gloveDetailOpen ? gloveDetailOpen.name : 'Gamepass')" title="Ampliar gamepass">
+          <img id="glove-detail-gamepass-img" alt="Gamepass">
+        </div>
+        <div id="glove-detail-gamepass-info">
+          <div id="glove-detail-gamepass-list"></div>
         </div>
       </div>
       <!-- Estadísticas: Poder y Velocidad (opcional) -->
@@ -9043,6 +9142,8 @@ let gloveDetailOpen = null;
      speed       : number — estadística "Velocidad" (mínimo 1, sin máximo)
      badges      : Array<{name, url}>  — SOLO para type:'logro'. Uno o varios logros necesarios
                    para conseguir el guante. La imagen siempre es badge_(id del guante).png
+     gamepasses  : Array<{name, url}>  — SOLO para type:'robux'. Uno o varios gamepasses
+                   necesarios para conseguir el guante. La imagen siempre es gamepass_(id del guante).png
    ────────────────────────────────────────────────────────────── */
 const GLOVES = [
 
@@ -9214,6 +9315,11 @@ const GLOVES = [
     abilities: [
       '[E] Aura farming: Desprendes aura y te teletransportas detrás de tu enemigo si te pegan. (2s cooldown / 6s si se falla).',
     ],
+    gamepasses: [
+      { name: 'Ultra Instinct', url: 'https://www.roblox.com/game-pass/GAMEPASS_ID_AQUI/Ultra-Instinct' },
+      // Puedes añadir más gamepasses aquí, ej:
+      // { name: 'Otro Gamepass', url: 'https://www.roblox.com/game-pass/XXXX/Otro-Gamepass' },
+    ],
     tutorialUrl: null,
   },
 
@@ -9224,7 +9330,7 @@ const GLOVES = [
     type: 'logro',
     obtainMethod: 'Entra a la dimensión de [REDACTED] y escapa sin morir.',
     badges: [
-      { name: 'Evaded', url: 'https://www.roblox.com/badges/2124858899/To-the-moon' },
+      { name: 'Evaded', url: 'https://www.roblox.com/badges/2124847850/Evaded' },
       // Puedes añadir más logros aquí, ej:
       // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
     ],
@@ -9733,6 +9839,31 @@ function openGloveDetail(id, e) {
   } else {
     badgeWrap.classList.remove('visible');
     badgeImg.src = '';
+  }
+
+  // Gamepass(es) — admite 1 o varios gamepasses, la imagen es siempre gamepass_(id).png
+  const gamepassWrap = document.getElementById('glove-detail-gamepass-wrap');
+  const gamepassImg  = document.getElementById('glove-detail-gamepass-img');
+  const gamepassList = document.getElementById('glove-detail-gamepass-list');
+  gamepassList.innerHTML = '';
+  if (glove.type === 'robux' && Array.isArray(glove.gamepasses) && glove.gamepasses.length) {
+    gamepassWrap.classList.add('visible');
+    // Imagen del gamepass (única, representa al guante)
+    gamepassImg.src = 'gamepass_' + glove.id + '.png';
+    gamepassImg.onerror = () => { gamepassImg.onerror = null; gamepassImg.style.opacity = '0.3'; };
+    // Una fila por cada gamepass
+    glove.gamepasses.forEach(g => {
+      const name = (typeof g === 'string') ? g : (g.name || glove.name + ' Gamepass');
+      const url  = (typeof g === 'string') ? null : g.url;
+      const row = document.createElement('div');
+      row.className = 'glove-detail-gamepass-row';
+      row.innerHTML = `<span class="glove-detail-gamepass-name">${name}</span>` +
+        (url ? `<a class="btn-glove-gamepass-roblox" href="${url}" target="_blank" rel="noopener noreferrer">💎 Ver Gamepass</a>` : '');
+      gamepassList.appendChild(row);
+    });
+  } else {
+    gamepassWrap.classList.remove('visible');
+    gamepassImg.src = '';
   }
 
   // Mechanics
