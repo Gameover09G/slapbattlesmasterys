@@ -9792,21 +9792,31 @@ function openGloveGoMastery(id, e) {
 /* Tutorial */
 function openGloveTutorial() {
   if (!gloveDetailOpen?.tutorialUrl) return;
-  // Reutilizamos el modal de video de maestrías
-  openVideoModal(gloveDetailOpen.id);
-  // Si no hay previewUrl en el glove, inyectamos la url del tutorial
-  if (!MASTERIES.find(m => m.id === gloveDetailOpen.id)) {
-    const iframe = document.getElementById('video-player');
-    const ph     = document.getElementById('video-placeholder');
-    if (iframe && gloveDetailOpen.tutorialUrl) {
-      const url = gloveDetailOpen.tutorialUrl
-        .replace('youtu.be/', 'www.youtube.com/embed/')
-        .replace('watch?v=', 'embed/');
-      iframe.src = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&rel=0';
-      iframe.style.display = 'block';
-      if (ph) ph.style.display = 'none';
-    }
+
+  const overlay     = document.getElementById('video-modal-overlay');
+  const player      = document.getElementById('video-player');
+  const placeholder = document.getElementById('video-placeholder');
+  const phImg       = document.getElementById('video-placeholder-img');
+  const phEmoji     = document.querySelector('#video-placeholder .vph-emoji');
+  const titleEl     = document.getElementById('video-modal-title');
+
+  titleEl.textContent = '▶ PREVIEW — ' + gloveDetailOpen.name.toUpperCase();
+
+  // Reset
+  player.src = '';
+  player.style.display      = 'none';
+  placeholder.style.display = 'none';
+
+  const embedUrl = youtubeToEmbed(gloveDetailOpen.tutorialUrl.trim());
+  if (embedUrl) {
+    player.src           = embedUrl;
+    player.style.display = 'block';
+  } else {
+    showVideoPlaceholder(player, placeholder, phImg, phEmoji);
   }
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 /* ============================================================
