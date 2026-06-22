@@ -3704,7 +3704,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   white-space: nowrap;
 }
 .gstatus-unobtainable { color: #ff6b6b; border-color: #5c1f1f; background: #1a0a0a; }
-.gstatus-limited      { color: #fbbf24; border-color: #5c4a1f; background: #1a1300; }
+.gstatus-scavenger     { color: #B66FED; border-color: #6000B0; background: #100319; }
 .gstatus-halloween    { color: var(--text-orange); border-color: #5c3a00; background: #1a0d00; }
 .gstatus-christmas    { color: var(--red-close);   border-color: #5c1f1f; background: #1a0404; }
 
@@ -5054,6 +5054,48 @@ input[type="range"].slap-range-sm::-moz-range-thumb {
 }
 
 /* ============================================================
+   BARRAS DE PROGRESO (slap-progress): el "cursor" real (la zona que
+   el navegador usa para calcular la posición 0–100%) ocupa EXACTAMENTE
+   lo mismo que la barra (4px), igual de fino que el track. Así el
+   icono nunca queda "metido" dentro de la barra y no parece que la
+   canción empiece más tarde o termine antes de lo real.
+   El icono se ve grande gracias a transform: scale(), que es puramente
+   visual y NO afecta a la posición/tamaño que usa el navegador para
+   calcular el valor del slider.
+   ============================================================ */
+input[type="range"].slap-progress::-webkit-slider-thumb {
+  width: 4px;
+  height: 4px;
+  margin-top: 0;
+  transform: scale(8.75); /* icono visible ≈ 35px, igual que antes */
+}
+input[type="range"].slap-progress::-webkit-slider-thumb:hover {
+  transform: scale(10.0625); /* mismo +15% de antes, sobre el tamaño visible */
+}
+input[type="range"].slap-progress::-moz-range-thumb {
+  width: 4px;
+  height: 4px;
+  transform: scale(8.75);
+}
+input[type="range"].slap-progress::-moz-range-thumb:hover {
+  transform: scale(10.0625);
+}
+/* Mini-reproductor: icono visible más pequeño (≈24px), mismo cursor de 4px */
+input[type="range"].slap-progress.slap-range-sm::-webkit-slider-thumb {
+  margin-top: 0;
+  transform: scale(6);
+}
+input[type="range"].slap-progress.slap-range-sm::-webkit-slider-thumb:hover {
+  transform: scale(6.9);
+}
+input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb {
+  transform: scale(6);
+}
+input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
+  transform: scale(6.9);
+}
+
+/* ============================================================
    ROBLOX ID — aparece bajo el título de la canción en los
    reproductores grandes. Es un simple texto pequeño y gris;
    al pulsarlo se copia el ID y aparece un aviso de "Copiado".
@@ -5406,7 +5448,7 @@ input[type="range"].slap-range-sm::-moz-range-thumb {
 
         <div id="soundtrack-progress-row">
           <span id="soundtrack-time-current">0:00</span>
-          <input type="range" id="soundtrack-progress-bar" class="slap-range" min="0" max="100" value="0" step="0.1">
+          <input type="range" id="soundtrack-progress-bar" class="slap-range slap-progress" min="0" max="100" value="0" step="0.1">
           <span id="soundtrack-time-total">0:00</span>
         </div>
 
@@ -5466,7 +5508,7 @@ input[type="range"].slap-range-sm::-moz-range-thumb {
     <div id="mini-player-info">
       <div id="mini-player-track-name">—</div>
       <div id="mini-player-progress-row">
-        <input type="range" id="mini-player-progress-bar" class="slap-range slap-range-sm" min="0" max="100" value="0" step="0.1">
+        <input type="range" id="mini-player-progress-bar" class="slap-range slap-range-sm slap-progress" min="0" max="100" value="0" step="0.1">
       </div>
     </div>
     <div id="mini-player-controls">
@@ -5745,7 +5787,7 @@ input[type="range"].slap-range-sm::-moz-range-thumb {
 
     <div id="music-progress-row">
       <span id="music-time-current">0:00</span>
-      <input type="range" id="music-progress-bar" class="slap-range" min="0" max="100" value="0" step="0.1">
+      <input type="range" id="music-progress-bar" class="slap-range slap-progress" min="0" max="100" value="0" step="0.1">
       <span id="music-time-total">0:00</span>
     </div>
 
@@ -10301,7 +10343,28 @@ const GLOVES = [
     },
     misc: true
   },
-  
+
+  {
+    id: 'stick',
+    name: 'Stick',
+    type: 'slaps',
+    status: 'scavenger',
+    cost: 0,              // en slaps
+    quote: 'El guante que todos estabais… da igual, el guante se ha ido.',
+    releaseDate: '01/00/2025',
+    power: 0,                 // 1-5, opcional
+    speed: 17,                 // 1-5, opcional
+    mechanics: [
+      'Este "guante" se encuentra abajo de los portales donde está el cadáver de The Guide; tienes que hacer clic en el palo del cartel que hay.',
+      'Este "guante" no otorga slaps.',
+    ],
+    abilities: [
+      '[Clic] Lanza al suelo a quien toques por 5 segundos',
+    ],
+    tutorialUrl: null,
+    songs: null,
+  },
+
   {
     id: 'brick',
     name: 'Brick',
@@ -10382,6 +10445,54 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: null,
+  },
+
+  {
+    id: 'hive',
+    name: 'Hive',
+    type: 'slaps',
+    cost: 3250,              // en slaps
+    quote: '¿Te gusta el jazz?',
+    releaseDate: '05/07/2024',
+    power: 48,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'La gente marcada con miel tiene su velocidad reducida y es incapaz de saltar.',
+      'Las personas con abejas pierden control de su avatar y se mueven aleatoriamente por el mapa por un buen rato.',
+      "Mientras tienes un enjambre, no puedes caerte del mapa."
+    ],
+    abilities: [
+      "[Clic] Coloca miel y marca a esa persona. También lanza miel al suelo.",
+      '[E] Buzzy Bees: Coloca abejas en tu guante y las envías a quien golpees y a las demás personas marcadas. (16s cooldown / 1s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+  },
+
+  {
+    id: 'defense',
+    name: 'Defense',
+    type: 'slaps',
+    cost: 4500,              // en slaps
+    quote: 'El hermano mayor del guante Diamond.',
+    releaseDate: '16/08/2021',
+    power: 50,                 // 1-5, opcional
+    speed: 16,                 // 1-5, opcional
+    mechanics: [
+      'El cubo permite tu paso, pero no el de otros, siendo una zona segura para ti.',
+      'La barrera solo impide el paso de personas; las habilidades todavía pueden pasar, incluyendo casos como la habilidad de rob.',
+      "El cubo dura 30 segundos: 6 segundos donde el cubo es fijo y 24 segundos donde el cubo se hace progresivamente mas pequeño.",
+      "Puedes invocar otro cubo antes de que el anterior desaparezca completamente, haciendo desaparecer el anterior cubo."
+    ],
+    abilities: [
+      '[E] Barrier: Coloca en tu ubicación un cubo translucido cian que actúa como barrera. (25s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: {
+      "Spear of Justice": {id: "spearofjustice", roblox:"9133837518"},
+      "Bossa Me": {id: "bossame", roblox:"1837768517"},
+      "Hammer of Justice": {id: "hammerofjustice", roblox:"109606503605402"}
+    },
   },
 
   {
@@ -10593,6 +10704,33 @@ const GLOVES = [
   },
 
   {
+    id: 'phase',
+    name: 'Phase',
+    type: 'logro',
+    obtainMethod: 'Recoge el orbe de Phase, que aparece con una probabilidad de 5% cada 10 minutos.',
+    badges: [
+      { name: 'Unphased', url: 'https://www.roblox.com/badges/2124886261/Unphased' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¡NO ES UNA FASE, MAMÁ!',
+    releaseDate: '23/12/2021',
+    power: 50,
+    speed: 15,
+    mechanics: [
+      'Mientras estás en estado permeable, no puedes recibir ningún tipo de daño o knockback.',
+      'Mientras tienes la habilidad activa, viajas a 30 de velocidad.',
+      'El corazón puede flotar, manteniéndose en el mismo eje vertical hasta que se termine la habilidad.',
+      'La habilidad dura 6 segundos.',
+    ],
+    abilities: [
+      '[E] Permeable: Conviértete en un corazón morado flotante. (14s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=URzbTYFo63w',
+    songs: null,
+  },
+
+  {
     id: 'bomb',
     name: 'Bomb',
     type: 'logro',
@@ -10633,13 +10771,56 @@ const GLOVES = [
     speed: 16,
     mechanics: [
       'Las personas afectadas por los cristales obtienen una reelentización similar a la de Snow.',
+      "Los cristales tienen 30 de poder.",
       'El shard tiene un rango casi infinito.',
+      "Los cristales pueden apagar Overkills."
     ],
     abilities: [
       '[E] Ice Shards: Lanza 3 cristales de hielo en la dirección que estás mirando tras un pequeño delay, congelando a quien toque. (10s cooldown)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=ybkhfXgloW8',
     songs: null,
+  },
+
+  {
+    id: 'tycoon',
+    name: 'Tycoon',
+    type: 'logro',
+    obtainMethod: 'Mantente girando en el plato durante 600 segundos (10 minutos) seguidos sin caerte o bajar. Hay un contador arriba de la pantalla que te indica el tiempo que llevas. Tiene que ser en un servidor público con al menos 7 personas.',
+    badges: [
+      { name: 'Plate Master', url: 'https://www.roblox.com/badges/2124919840/Short-fuse' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '$$$$$$$',
+    releaseDate: '28/10/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'El tycoon es vulnerable a otros jugadores, rompiéndose con tan solo un botón situado al final de la cinta.',
+      "Pulsar el botón lanza cubos que te otorgan dinero.",
+      'Los cubos tienen físicas, así que pueden ser bloqueados por guantes como Diamond o Fort, o simplemente lanzados pasando por encima.',
+      "El tycoon puede mejorarse y darte beneficios a medida que ganas dinero:",
+      '[10$] Ganas 10 de poder (60 de poder en total). Coloca un poste de electricidad que te conecta con tu tycoon, revelando su ubicación siempre.',
+      "[50$] Ganas 2 de velocidad. Se coloca un rayo amarillo en el palo del poste.",
+      "[100$] Se agrega otro dropper, duplicando las ganancias por clic y aumentando la velocidad de la cinta transportadora.",
+      "[250$] Ganas 20 más de poder (80 de poder en total). Se coloca un orbe rojo que se conecta al poste, mejorándolo.",
+      "[500$] El tycoon pierde el botón para generar dinero, pero ahora salen cubos automáticamente. El botón de autodestrucción pasa a requerir 100 clics para activarse.",
+      "[750$] Ganas 4 más de velocidad. Se coloca otro rayo amarillo debajo del que ya había.",
+      "[1000$] Se agrega un 3er dropper, aumentando las ganancias del tycoon.",
+      "[1500$] Ganas 50 más de poder (130 de poder en total). Se coloca otro orbe rojo conectado al poste.",
+      "[2500$] Ganas 10 más de velocidad. Se coloca un 3er y último rayo amarillo debajo de los que ya había.",
+      "[5000$] Modo Dios: Ganas 100 más de poder (230 de poder en total) y 5 de velocidad. Desaparece el botón de autodestrucción completamente y agrega en su lugar un orbe rojo enorme. También se agrega una radio dorada que coloca música y se puede pulsar para cambiar de canción."
+    ],
+    abilities: [
+      '[E] Mini Tycoon: Coloca un Tycoon en miniatura que consta de solo 1 dropper manual y una cinta. (12s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=UBddALLXGlQ',
+    songs: {
+      "Candyland": {id: "candyland", roblox: "11642205799"},
+      "Zenith Tycoon Music": {id: "zenith", roblox: "132220049431002"}
+    },
+    misc: true
   },
 
   {
@@ -10695,6 +10876,36 @@ const GLOVES = [
       '[R] Change Part: Rota entre diferentes bloques. (0s cooldown)'
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=lnObhmrwqDk',
+    songs: null,
+  },
+
+  {
+    id: 'voodoo',
+    name: 'Voodoo',
+    type: 'logro',
+    obtainMethod: 'Sobrevive 1 hora invisible como Ghost sin morir o hacerte visible. No se puede conseguir en servidores privados.',
+    badges: [
+      { name: 'Insanity', url: 'https://www.roblox.com/badges/2132544202/Insanity' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Imagínate pinchar un muñeco vudú en el hombro de vez en cuando.',
+    releaseDate: '20/01/2023',
+    power: 52,
+    speed: 16,
+    mechanics: [
+      "Si no golpeas a nadie durante 10 segundos, tu habilidad se desactiva.",
+      'El muñeco vudú puede ser golpeado para realizar un golpe extra a tu objetivo.',
+      'El muñeco lanza volando a la persona en la misma dirección en que lo golpeas.',
+      'Otras personas también pueden golpear el muñeco.',
+      "Golpear al muñeco vudú ejerce un golpe de 62 de poder."
+
+    ],
+    abilities: [
+      '[E] Voodoo Possession: Tu guante empieza a brillar con colores morados y se activa tu habilidad. (10s cooldown / 1s spawn)',
+      '[Clic con habilidad activa] Crea un muñeco vudú de quien has pegado.'
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=8J1hcK0WnCI',
     songs: null,
   },
 
@@ -10779,6 +10990,42 @@ const GLOVES = [
       '[E] Shovel: Empieza a cavar en el suelo y te entierra, permitiéndote movilidad subterránea. (4s cooldown / 3s spawn)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=yxgfXUrZH4I',
+    songs: null,
+  },
+
+  {
+    id: 'glovel',
+    name: 'Glovel',
+    type: 'logro',
+    obtainMethod: 'Usa el guante Adiós mientras estás sentado encima de un Car Keys en forma de coche. Tras ser teletransportado a otra dimensión, gana en una carrera al otro coche.',
+    badges: [
+      { name: "Slappy Wheels", url: 'https://www.roblox.com/badges/1294103285471925/Slappy-Wheels' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Atropello a este tío o paso por su lado? ¿Qué opináis, chat?',
+    releaseDate: '27/01/2025',
+    power: 50,
+    speed: 17,
+    mechanics: [
+      'El coche se controla como un coche clásico de Roblox: W para acelerar, S para frenar, y luego A y D para girar.',
+      "El coche tiene su propia barra de vida; tras destruirse, vuelves a tu forma humana y se aplica un cooldown.",
+      "Atropellar gente te otorga XP; cada cierto XP, subes de nivel, otorgándote un punto de habilidad.",
+      "Puedes gastar los puntos de habilidad para mejorar estadísticas del coche (situadas arriba de tu pantalla). Destruir tu coche reinicia los puntos de habilidad, pero no te los quita, permitiéndote agregarlos otra vez, pero dándote un pequeño momento de vulnerabilidad.",
+      "Destruir tu coche reinicia los puntos de habilidad, pero no te los quita, permitiéndote agregarlos otra vez, pero dándote un pequeño momento de vulnerabilidad.",
+      "Las habilidades se pueden mejorar hasta 5 veces, bloqueándose para que no se pueda mejorar más. Este guante fue lanzado junto a su maestría, así que para poder desbloquear las mejoras extra, requieres de ella.",
+      "[Kockback] Mejora el empuje realizado tras atropellar a alguien.",
+      "[Max Speed] Incrementa el máximo de velocidad que puedes alcanzar.",
+      "[Acceleration] Disminuye el tiempo que tardas en pasar de 0 de velocidad a tu velocidad maxima.",
+      "[Steer Angle] Incrementa la fuerza y el ángulo al girar.",
+      "[Reverse / Brakes] Aumenta la velocidad en la que frenas y la velocidad hacia atras.",
+      "[Armor] Aumenta la vida máxima del coche.",
+      "[Utiliy] Incrementa ligeramente la velocidad máxima y el ángulo al girar y agrega un asiento extra en cada número de mejora impar (1, 3 y 5)."
+    ],
+    abilities: [
+      '[E] DA WHIP: Te transforma en un coche, conservando ítems y ropa de tu skip para customizarlo. (14s cooldown / 4s spawn)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=aibN6n1YKrA',
     songs: null,
   },
 
@@ -10881,7 +11128,7 @@ const GLOVE_TYPE_META = {
    El antiguo estado genérico "event" se ha separado en halloween / christmas. */
 const GLOVE_STATUS_META = {
   unobtainable: { label: 'No disponible',      icon: '🔴', cls: 'gstatus-unobtainable' },
-  limited:      { label: 'Por tiempo limitado', icon: '🟡', cls: 'gstatus-limited' },
+  scavenger:    { label: 'Guante Escondido',      icon: '🔎', cls: 'gstatus-scavenger' },
   halloween:    { label: 'Solo en Halloween',   icon: '🎃', cls: 'gstatus-halloween' },
   christmas:    { label: 'Solo en Navidad',     icon: '🎄', cls: 'gstatus-christmas' },
 };
