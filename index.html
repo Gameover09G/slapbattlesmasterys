@@ -5874,6 +5874,15 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
+    version: "1.2.1 - Musica y Killstreaks.",
+    date: "23/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Mas guantes!!"},
+      { emoji: "🎵", color: "#5e5e5e", text: "Expansion grande de soundtrack (Boss fights y mega rock)."},
+    ]
+  },
+  
+  {
     version: "1.2.0 - Musica y Killstreaks.",
     date: "22/06/2026",
     entries: [
@@ -10531,6 +10540,8 @@ const GLOVES = [
       'Scourge of the Universe':   { id: 'scourgeuniverse',      roblox: '9133858357' },
       'Universal Collapse':        { id: 'universalcollapse',    roblox: '9127529330' },
       'Stained, Brutal Calamity':  { id: 'stainedbrutalcalamity',roblox: '9133520457' },
+      'The Filthy Mind':  { id: 'thefilthymind',roblox: '' },
+      'Final Boss':  { id: 'finalboss',roblox: '9127194464' },
       'Sixes and Sevens':          { id: 'sixesandsevens',       roblox: '14562731021' },
       'Unholy Insurgency':         { id: 'unholyinsurgency',     roblox: '9133787486' },
       'True Love [Metal Remix]':   { id: 'truelove',             roblox: '9133539469' },
@@ -10651,6 +10662,62 @@ const GLOVES = [
   },
 
   /* ── EJEMPLO TIPO: LOGRO (admite 1 o varios badges) ── */
+  {
+    id: 'megarock',
+    name: 'MEGAROCK',
+    type: 'logro',
+    obtainMethod: 'Pasa 10 horas y 15 minutos dentro de un Diamond, Megarock o Custom. Cada hora se agrega un I arriba de tu piedra.',
+    badges: [
+      { name: 'WHY', url: 'https://www.roblox.com/badges/2124847850/Evaded' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'MEGA ROCK, WOOOOOOOO.',
+    releaseDate: '20/08/2021',
+    power: 30,
+    speed: 13,
+    mechanics: [
+      'Mientras estás en estado de MEGAROCK, eres inmune a absolutamente todo tipo de daño o knockback, incluso a ataques como el de rob.',
+      'Si alguna persona tiene contacto con tu MEGAROCK, es absorbida y matada instantáneamente.',
+      'La MEGAROCK tiene 2 segundos de delay antes de que pueda matar.',
+      "La MEGAROCK crece cada vez que traga a una persona nueva (que no haya muerto previamente por tu MEGAROCK), con un máximo de 28 personas."
+    ],
+    abilities: [
+      '[E] MEGAROCKMODE: Conviértete en una piedra enorme que absorbe a quien toca. (4s cooldown / 2s spawn)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=UtEzaFG6uM0',
+    songs: {
+      // Formato con ID de Roblox: { id: 'archivoSin_ost_', roblox: 'ID_NUMERICO_AQUI' }
+      // Si no tiene ID de Roblox, puedes usar el formato simple: 'Nombre': 'idArchivo'
+      "Raining Tacos":                    { id: 'rainingtacos',               roblox: '142376088' },
+      "Town Talk (Remastered)":                    { id: 'towntalk',               roblox: '1845756489' },
+      "Clair de Lune":                    { id: 'clairdelune',               roblox: '1845756489' },
+      "Cool Vibes":                    { id: 'coolvibes',               roblox: '1840684529' },
+      "Prima Bossa Nova":                    { id: 'primabossanova',               roblox: '1837070127' },
+      "Lazy Sunday":                    { id: 'lazysunday',               roblox: '1842241530' },
+      "No More (Remastered)":                    { id: 'nomore',               roblox: '1846458016' },
+      "The Only Thing They Fear Is You":                    { id: 'fearisyou',               roblox: '9133618135' },
+      "Ruler of Everything":                    { id: 'rulerofeverything',               roblox: '9133474365' },
+      "The Bidding":                    { id: 'thebidding',               roblox: '9133869203' },
+      "Touch-Tone Telephone":                    { id: 'touchtonetelephone',               roblox: '9133547891' },
+      "Deja Vu":                    { id: 'dejavu',               roblox: '9133580044' },
+      "Mario Kart Wii Title Theme":                    { id: 'mariokartwii',               roblox: '9133686782' },
+      "Windmill Isle (Day)":                    { id: 'windmillisleday',               roblox: '9133811812' },
+      "BFG Division":                    { id: 'division',               roblox: '9126911315' },
+      "Rum n' Bass":                    { id: 'rumnbass',               roblox: '9126996687' },
+      "Subway Surfers Main Theme":                    { id: 'subwaysurfers',               roblox: '9133649527' },
+      "BattleBlock Theater Main Menu":                    { id: 'battleblocktheater',               roblox: '9126974203' },
+      "Fångad aven korvring":                    { id: 'fangadavenkorvring',               roblox: '9127413903' },
+      "Distorted Trumpets":                    { id: 'distortedtrumpets',               roblox: '9133385850' },
+      "Bloonds TD5 Main Theme":                    { id: 'bloonstd5',               roblox: '9126982954' },
+      "Creeper Rap (Ending A)":                    { id: 'creeperrap',               roblox: '' },
+      "Red Sun in the Sky":                    { id: 'redsunsky',               roblox: '' },
+      "Bad Piggies Theme":                    { id: 'badpiggies',               roblox: '' },
+      "It's just a burning memory":                    { id: 'burningmemory',               roblox: '' },
+      "Riding around in a rover":                    { id: 'ridingaroundinarover',               roblox: '' },
+    },
+  },
+  
   {
     id: 'redacted',
     name: '[REDACTED]',
@@ -10995,8 +11062,8 @@ const GLOVES = [
   },
 
   {
-    id: 'glovel',
-    name: 'Glovel',
+    id: 'carkeys',
+    name: 'Car Keys',
     type: 'logro',
     obtainMethod: 'Usa el guante Adiós mientras estás sentado encima de un Car Keys en forma de coche. Tras ser teletransportado a otra dimensión, gana en una carrera al otro coche.',
     badges: [
