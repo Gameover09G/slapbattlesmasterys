@@ -4471,7 +4471,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 #music-progress-bar {
   flex: 1;
-  accent-color: var(--yellow-bright);
   cursor: pointer;
   height: 4px;
 }
@@ -4520,7 +4519,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #music-volume-icon { font-size: 0.95rem; }
 #music-volume-bar {
   width: 70px;
-  accent-color: var(--yellow-bright);
   cursor: pointer;
   height: 4px;
 }
@@ -4624,7 +4622,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #mini-player-progress-row { width: 100%; }
 #mini-player-progress-bar {
   width: 130px;
-  accent-color: var(--yellow-bright);
   cursor: pointer;
   height: 3px;
 }
@@ -4924,7 +4921,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 #soundtrack-progress-bar {
   flex: 1;
-  accent-color: var(--yellow-bright);
   cursor: pointer;
   height: 4px;
 }
@@ -4971,7 +4967,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #soundtrack-volume-icon { font-size: 0.95rem; }
 #soundtrack-volume-bar {
   width: 70px;
-  accent-color: var(--yellow-bright);
   cursor: pointer;
   height: 4px;
 }
@@ -4986,6 +4981,142 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   #soundtrack-header-title { font-size: 1.1rem; }
   #soundtrack-volume-bar { width: 50px; }
 }
+
+
+/* ============================================================
+   SLAP SLIDER THUMB — slapicon.png para barras de progreso y
+   volumen de TODOS los reproductores (guantes, soundtrack, mini)
+   ============================================================ */
+/* El appearance:none en el INPUT MISMO es obligatorio para que el
+   thumb personalizado sea visible en Chrome/Safari/Firefox */
+input[type="range"].slap-range {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  background: transparent;
+}
+/* Track (la barra horizontal) */
+input[type="range"].slap-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #444;
+}
+input[type="range"].slap-range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #444;
+}
+/* Thumb (el icono de slap) */
+input[type="range"].slap-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 35px;
+  height: 35px;
+  margin-top: -16px;
+  border-radius: 50%;
+  background-image: url('slapicon.png');
+  background-size: cover;
+  background-position: center;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+input[type="range"].slap-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+input[type="range"].slap-range::-moz-range-thumb {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-image: url('slapicon.png');
+  background-size: cover;
+  background-position: center;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+input[type="range"].slap-range::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+/* Mini-reproductor: thumb más pequeño (doble del anterior sm) */
+input[type="range"].slap-range-sm::-webkit-slider-thumb {
+  width: 24px;
+  height: 24px;
+  margin-top: -10px;
+}
+input[type="range"].slap-range-sm::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================================
+   ROBLOX ID — aparece bajo el título de la canción en los
+   reproductores grandes. Es un simple texto pequeño y gris;
+   al pulsarlo se copia el ID y aparece un aviso de "Copiado".
+   ============================================================ */
+.music-roblox-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: -2px 0 6px;
+}
+.music-roblox-row.hidden { display: none; }
+.music-roblox-value {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: .3px;
+  cursor: pointer;
+  user-select: none;
+  transition: color .15s ease, transform .1s ease;
+}
+.music-roblox-value:hover { color: var(--text-yellow); }
+.music-roblox-value:active { transform: scale(0.95); }
+.music-roblox-row.empty .music-roblox-value { cursor: default; }
+.music-roblox-row.empty .music-roblox-value:hover { color: var(--text-muted); }
+.music-roblox-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%) translateY(6px);
+  background: var(--yellow-bright);
+  color: #111;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.music-roblox-row.copied .music-roblox-toast {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* Botón de Roblox ID por fila en la lista de canciones del Soundtrack */
+.soundtrack-song-roblox-btn {
+  flex-shrink: 0;
+  border: 1.5px solid var(--yellow-dark);
+  background: var(--bg-card-inner);
+  color: var(--text-yellow);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.63rem;
+  font-family: 'Fredoka', sans-serif;
+  padding: 2px 6px;
+  white-space: nowrap;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.soundtrack-song-roblox-btn:hover { background: var(--yellow-dark); color: #111; transform: scale(1.06); }
+.soundtrack-song-roblox-btn:active { transform: scale(0.92); }
 
 </style>
 </head>
@@ -5268,9 +5399,14 @@ body.todo-selecting #grid-view { padding-top: 72px; }
         <div id="soundtrack-track-name">—</div>
         <div id="soundtrack-track-source"></div>
 
+        <div id="soundtrack-roblox-row" class="music-roblox-row hidden">
+          <span id="soundtrack-roblox-value" class="music-roblox-value" onclick="copyRobloxId('soundtrack')">—</span>
+          <span class="music-roblox-toast">¡Copiado!</span>
+        </div>
+
         <div id="soundtrack-progress-row">
           <span id="soundtrack-time-current">0:00</span>
-          <input type="range" id="soundtrack-progress-bar" min="0" max="100" value="0" step="0.1">
+          <input type="range" id="soundtrack-progress-bar" class="slap-range" min="0" max="100" value="0" step="0.1">
           <span id="soundtrack-time-total">0:00</span>
         </div>
 
@@ -5281,7 +5417,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
           <button id="soundtrack-btn-next" onclick="stNextTrack()" title="Siguiente canción">⏭</button>
           <div id="soundtrack-volume-wrap">
             <span id="soundtrack-volume-icon">🔊</span>
-            <input type="range" id="soundtrack-volume-bar" min="0" max="100" value="70" step="1" oninput="stSetVolume(this.value)">
+            <input type="range" id="soundtrack-volume-bar" class="slap-range" min="0" max="100" value="70" step="1" oninput="stSetVolume(this.value)">
           </div>
         </div>
       </div>
@@ -5330,14 +5466,14 @@ body.todo-selecting #grid-view { padding-top: 72px; }
     <div id="mini-player-info">
       <div id="mini-player-track-name">—</div>
       <div id="mini-player-progress-row">
-        <input type="range" id="mini-player-progress-bar" min="0" max="100" value="0" step="0.1">
+        <input type="range" id="mini-player-progress-bar" class="slap-range slap-range-sm" min="0" max="100" value="0" step="0.1">
       </div>
     </div>
     <div id="mini-player-controls">
-      <button id="mini-player-btn-play" onclick="musicTogglePlay(); syncMiniPlayer();" title="Pausa / Reproducir">⏸</button>
-      <button id="mini-player-btn-next" onclick="musicNextTrack()" title="Siguiente canción">⏭</button>
-      <button id="mini-player-btn-expand" onclick="reopenFullMusicPlayer()" title="Abrir reproductor completo">⛶</button>
-      <button id="mini-player-btn-close" onclick="musicStopAndHideMini()" title="Detener música">✕</button>
+      <button id="mini-player-btn-play" onclick="miniPlayerTogglePlay()" title="Pausa / Reproducir">⏸</button>
+      <button id="mini-player-btn-next" onclick="miniPlayerNextTrack()" title="Siguiente canción">⏭</button>
+      <button id="mini-player-btn-expand" onclick="miniPlayerExpandFull()" title="Abrir reproductor completo">⛶</button>
+      <button id="mini-player-btn-close" onclick="miniPlayerStop()" title="Detener música">✕</button>
     </div>
   </div>
 </div>
@@ -5602,9 +5738,14 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 
     <div id="music-track-name">Cargando...</div>
 
+    <div id="music-roblox-row" class="music-roblox-row hidden">
+      <span id="music-roblox-value" class="music-roblox-value" onclick="copyRobloxId('gloves')">—</span>
+      <span class="music-roblox-toast">¡Copiado!</span>
+    </div>
+
     <div id="music-progress-row">
       <span id="music-time-current">0:00</span>
-      <input type="range" id="music-progress-bar" min="0" max="100" value="0" step="0.1">
+      <input type="range" id="music-progress-bar" class="slap-range" min="0" max="100" value="0" step="0.1">
       <span id="music-time-total">0:00</span>
     </div>
 
@@ -5615,7 +5756,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
       <button id="music-btn-next" onclick="musicNextTrack()" title="Siguiente canción">⏭</button>
       <div id="music-volume-wrap">
         <span id="music-volume-icon">🔊</span>
-        <input type="range" id="music-volume-bar" min="0" max="100" value="70" step="1" oninput="musicSetVolume(this.value)">
+        <input type="range" id="music-volume-bar" class="slap-range" min="0" max="100" value="70" step="1" oninput="musicSetVolume(this.value)">
       </div>
     </div>
   </div>
@@ -9202,9 +9343,14 @@ function switchPage(page) {
   const btnCal     = document.getElementById('nav-calendar');
   const btnSt      = document.getElementById('nav-soundtrack');
 
-  // Al cambiar de página se detiene la reproducción del Soundtrack
-  // (si la hubiera) para no dejar música sonando sin reproductor visible.
-  stStopAudio();
+  // Si el mini-reproductor está llevando el Soundtrack, la música sigue.
+  // Solo detenemos el Soundtrack si va a la propia página Soundtrack
+  // (que muestra el reproductor grande) y NO hay mini activo, o si
+  // era el motor activo sin mini. En todos los demás casos, el mini
+  // se ocupa de la reproducción persistente.
+  if (page !== 'soundtrack' && stAudio && miniPlayerSource !== 'soundtrack') {
+    stStopAudio();
+  }
 
   // Reset todos
   [gridView, slapView, calView, stView].forEach(v => { if (v) v.style.display = 'none'; });
@@ -9227,7 +9373,23 @@ function switchPage(page) {
   } else if (page === 'soundtrack') {
     if (stView) stView.style.display = '';
     if (btnSt)  btnSt.classList.add('active');
-    openSoundtrackAlbumsList();
+    // Si la música del Soundtrack viene del mini-reproductor, la ocultamos
+    // y volvemos a mostrar el reproductor grande con la pista en curso.
+    if (miniPlayerSource === 'soundtrack' && stAudio) {
+      hideMiniPlayer();
+      // Restaurar vista del álbum actual si sigue definido
+      if (stCurrentAlbum) {
+        document.getElementById('soundtrack-albums-view').style.display = 'none';
+        document.getElementById('soundtrack-player-view').style.display = '';
+        document.getElementById('soundtrack-album-title').textContent =
+          stCurrentAlbum.isAll ? '🎵 Todo el Soundtrack' : stCurrentAlbum.name;
+        renderSoundtrackSongList();
+      } else {
+        openSoundtrackAlbumsList();
+      }
+    } else {
+      openSoundtrackAlbumsList();
+    }
   }
 }
 
@@ -10105,6 +10267,14 @@ let gloveDetailOpen = null;
                    default_(id del guante).png) que al hacer clic abre un reproductor de música.
                    Cada canción usa el archivo de audio ost_(idCancion).mp3 y, en el reproductor,
                    la imagen central del vinilo es ostbanner_(idCancion).png.
+     misc        : boolean (opcional) — dentro de la página del guante no cambia nada (el vinilo
+                   se ve y funciona exactamente igual). Pero en el apartado de Soundtrack, en vez
+                   de tener su propio álbum, sus canciones se agrupan junto a las de TODOS los
+                   demás guantes con misc:true dentro de un único álbum llamado "Extra"
+                   (carátula album_extra.png), que siempre aparece al final de la lista de
+                   álbumes (después de los álbumes normales y de los álbumes custom de
+                   EXTRA_ALBUMS). Dentro de ese álbum, cada canción muestra su nombre y, debajo,
+                   el nombre del guante del que proviene (igual que en "Todo el Soundtrack").
    ────────────────────────────────────────────────────────────── */
 const GLOVES = [
 
@@ -10126,7 +10296,10 @@ const GLOVES = [
       'Este guante solo posee pasivas.',
     ],
     tutorialUrl: null,
-    songs: null,
+    songs: {
+      'Maniacs Of Noise':{ id: 'maniacsofnoise',roblox: '9133768844' }
+    },
+    misc: true
   },
   
   {
@@ -10240,14 +10413,16 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: {
-      'Finale': 'finale',
-      'Scourge of the Universe': 'scourgeuniverse',
-      'Universal Collapse': 'universalcollapse',
-      'Stained, Brutal Calamity': 'stainedbrutalcalamity',
-      'Sixes and Sevens': 'sixesandsevens',
-      'Unholy Insurgency': 'unholyinsurgency',
-      'True Love [Metal Remix]': 'truelove',
-      'Threats of The Ocean Floor': 'threatsoceanfloor',
+      // Formato con ID de Roblox: { id: 'archivoSin_ost_', roblox: 'ID_NUMERICO_AQUI' }
+      // Si no tiene ID de Roblox, puedes usar el formato simple: 'Nombre': 'idArchivo'
+      'Finale':                    { id: 'finale',               roblox: '9133399582' },
+      'Scourge of the Universe':   { id: 'scourgeuniverse',      roblox: '9133858357' },
+      'Universal Collapse':        { id: 'universalcollapse',    roblox: '9127529330' },
+      'Stained, Brutal Calamity':  { id: 'stainedbrutalcalamity',roblox: '9133520457' },
+      'Sixes and Sevens':          { id: 'sixesandsevens',       roblox: '14562731021' },
+      'Unholy Insurgency':         { id: 'unholyinsurgency',     roblox: '9133787486' },
+      'True Love [Metal Remix]':   { id: 'truelove',             roblox: '9133539469' },
+      'Threats of The Ocean Floor':{ id: 'threatsoceanfloor',    roblox: '17755766444' },
     },
   },
 
@@ -10628,6 +10803,66 @@ const GLOVES = [
     tutorialUrl: null,
     songs: null,
   },
+
+];
+
+
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║      ÁLBUMES EXTRA DEL SOUNDTRACK (fuera de los guantes)  ║
+   ╚══════════════════════════════════════════════════════════╝
+   Aquí se pueden añadir álbumes de música que NO pertenecen a ningún
+   guante (bandas sonoras de eventos, mapas, easter eggs, etc.).
+   Usan el MISMO sistema de "clase" (objeto dentro de un array) que
+   GLOVES, y el campo "songs" usa exactamente el mismo formato que el
+   de la música de los guantes (mira 'killstreak' en GLOVES como
+   ejemplo de referencia).
+
+   Campos:
+     id     : string  — identificador único del álbum (sin espacios,
+                        en minúsculas). La carátula del álbum debe
+                        llamarse album_(id).png
+     name   : string  — nombre visible del álbum.
+     songs  : Object{nombreVisible: idCancion} | null — mismo formato
+                que en los guantes:
+                  · Formato con ID de Roblox:
+                      'Nombre de la canción': { id: 'archivoSinOst', roblox: 'ID_NUMERICO' }
+                  · Formato simple (sin ID de Roblox):
+                      'Nombre de la canción': 'archivoSinOst'
+                Cada canción usa el audio ost_(idCancion).mp3 y, en el
+                reproductor, la carátula ostbanner_(idCancion).png.
+   ────────────────────────────────────────────────────────────── */
+const EXTRA_ALBUMS = [
+  {
+    id: 'guide',
+    name: 'The Guide Boss Fight',
+    songs: {
+      'First Stance': { id: 'firststance', roblox: '18382734796' },
+      'Heating Things Up': { id: 'heatingthingsup', roblox: '18382733928' },
+      'Final Showdown': { id: 'finalshowdown', roblox: '18382732931' },
+      'Meloncholy Intentions (NO USADA)': { id: 'meloncholyintentions', roblox: '18318163712' },
+    },
+  },
+  {
+    id: 'evilbarzil',
+    name: 'Evil Barzil',
+    songs: {
+      "Dave's Theme": { id: 'davetheme', roblox: '132617292240833' },
+      "Mortis's Theme": { id: 'mortistheme', roblox: '1846682104' },
+      'Evil Barzil': { id: 'evilbarzilost', roblox: '103403379593775' },
+      'Samba Fire (B)': { id: 'sambafireb', roblox: '1841922709' },
+    },
+  },
+  /* ── EJEMPLO (mismo formato que el guante Killstreak) ──
+  {
+    id: 'miAlbum',
+    name: 'Mi Álbum',
+    songs: {
+      'Nombre de la canción 1': { id: 'archivoCancion1', roblox: '' },
+      'Nombre de la canción 2': { id: 'archivoCancion2', roblox: '' },
+    },
+  },
+  */
 
 ];
 
@@ -11083,6 +11318,117 @@ let musicShuffleOn   = false;
 let musicShuffleBag  = [];   // índices pendientes por sonar en esta ronda
 let musicShuffleHistory = []; // índices ya sonados en esta ronda (para "anterior")
 
+/* 'gloves' | 'soundtrack' | null — qué motor controla el mini-reproductor.
+   Solo puede sonar uno de los dos a la vez. */
+let miniPlayerSource = null;
+
+/* ── Normaliza una entrada de songs ───────────────────────────────────────
+   Acepta formato antiguo ('songId' string) y nuevo ({id, roblox} objeto).
+   Siempre devuelve { songId, robloxId }. */
+function normalizeSongEntry(value) {
+  if (typeof value === 'string') return { songId: value, robloxId: '' };
+  if (value && typeof value === 'object') {
+    return { songId: (value.id || '').toString(), robloxId: (value.roblox || '').toString().trim() };
+  }
+  return { songId: '', robloxId: '' };
+}
+
+/* ── Detiene el motor que NO se va a usar ────────────────────────────────
+   keep: 'gloves' | 'soundtrack' */
+function stopOtherEngine(keep) {
+  if (keep !== 'gloves' && musicAudio) {
+    musicAudio.pause(); musicAudio.src = ''; musicAudio = null;
+    musicIsPlaying = false;
+    const d = document.getElementById('music-vinyl-disc-big');
+    if (d) d.classList.remove('spinning');
+  }
+  if (keep !== 'soundtrack' && stAudio) {
+    stAudio.pause(); stAudio.src = ''; stAudio = null;
+    stIsPlaying = false;
+  }
+}
+
+/* ── Copia el ID de Roblox de la canción actual al portapapeles ──────────
+   source: 'gloves' | 'soundtrack'. Se llama al pulsar el propio texto del ID. */
+function copyRobloxId(source) {
+  const track = source === 'soundtrack' ? stTrackList[stTrackIndex] : musicTrackList[musicTrackIndex];
+  if (!track || !track.robloxId) return;
+  const rowId = source === 'soundtrack' ? 'soundtrack-roblox-row' : 'music-roblox-row';
+  const row = document.getElementById(rowId);
+  const toast = row ? row.querySelector('.music-roblox-toast') : null;
+  const finish = (ok) => {
+    if (!row || !toast) return;
+    toast.textContent = ok ? '✅ ¡Copiado!' : '⚠ Error al copiar';
+    row.classList.add('copied');
+    clearTimeout(row._copyTimeout);
+    row._copyTimeout = setTimeout(() => { row.classList.remove('copied'); }, 1300);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(track.robloxId).then(() => finish(true)).catch(() => finish(false));
+  } else {
+    try {
+      const t = document.createElement('textarea');
+      t.value = track.robloxId; t.style.position='fixed'; t.style.opacity='0';
+      document.body.appendChild(t); t.select(); document.execCommand('copy');
+      document.body.removeChild(t); finish(true);
+    } catch(e) { finish(false); }
+  }
+}
+
+/* ── Copia ID de Roblox desde un botón inline en la lista de canciones ── */
+function copyRobloxIdDirect(robloxId, btn) {
+  if (!robloxId) return;
+  const finish = (ok) => {
+    if (!btn) return;
+    const prev = btn.textContent;
+    btn.textContent = ok ? '✅' : '⚠';
+    setTimeout(() => { btn.textContent = prev; }, 1400);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(robloxId).then(() => finish(true)).catch(() => finish(false));
+  } else {
+    try {
+      const t = document.createElement('textarea');
+      t.value = robloxId; t.style.position='fixed'; t.style.opacity='0';
+      document.body.appendChild(t); t.select(); document.execCommand('copy');
+      document.body.removeChild(t); finish(true);
+    } catch(e) { finish(false); }
+  }
+}
+
+/* ── Sincroniza el estado play/pausa del mini-reproductor ────────────────*/
+function updateMiniPlayerPlayState() {
+  const playing = miniPlayerSource === 'soundtrack' ? stIsPlaying : musicIsPlaying;
+  const btn  = document.getElementById('mini-player-btn-play');
+  const disc = document.getElementById('mini-player-disc');
+  if (btn)  btn.textContent = playing ? '⏸' : '▶';
+  if (disc) disc.classList.toggle('spinning', playing);
+}
+
+/* ── Botones del mini-reproductor ────────────────────────────────────────*/
+function miniPlayerTogglePlay() {
+  if (miniPlayerSource === 'soundtrack') stTogglePlay(); else musicTogglePlay();
+}
+function miniPlayerNextTrack() {
+  if (miniPlayerSource === 'soundtrack') stNextTrack(); else musicNextTrack();
+}
+function miniPlayerStop() {
+  if (miniPlayerSource === 'soundtrack') {
+    stStopAudio(); hideMiniPlayer(); miniPlayerSource = null;
+  } else {
+    musicStopAndHideMini();
+  }
+}
+function miniPlayerExpandFull() {
+  if (miniPlayerSource === 'soundtrack') {
+    document.getElementById('mini-player-fab').classList.remove('expanded');
+    hideMiniPlayer();
+    switchPage('soundtrack');
+  } else {
+    reopenFullMusicPlayer();
+  }
+}
+
 function musicFormatTime(sec) {
   if (!isFinite(sec) || sec < 0) sec = 0;
   const m = Math.floor(sec / 60);
@@ -11113,7 +11459,7 @@ function openMusicPlayer() {
   const entries = Object.entries(glove.songs);
   if (!entries.length) return;
 
-  musicTrackList  = entries.map(([name, songId]) => ({ name, songId }));
+  musicTrackList  = entries.map(([name, val]) => ({ name, ...normalizeSongEntry(val) }));
   musicTrackIndex = 0;
   musicShuffleOn  = false;
   musicShuffleBag = [];
@@ -11159,15 +11505,16 @@ function closeMusicPlayer() {
   musicResetVinylCase();
 
   if (musicAudio) {
+    miniPlayerSource = 'gloves';
     syncMiniPlayer();
     showMiniPlayer();
   } else if (wasOpen) {
-    // No hay audio cargado (p. ej. todas las pistas fallaron): no mostramos nada.
+    miniPlayerSource = null;
     hideMiniPlayer();
   }
 }
 
-/* Detiene la música por completo y oculta el mini-reproductor */
+/* Detiene la música de guantes y oculta el mini-reproductor */
 function musicStopAndHideMini() {
   if (musicAudio) {
     musicAudio.pause();
@@ -11175,6 +11522,7 @@ function musicStopAndHideMini() {
     musicAudio = null;
   }
   musicIsPlaying = false;
+  miniPlayerSource = null;
   document.getElementById('music-vinyl-disc-big').classList.remove('spinning');
   hideMiniPlayer();
 }
@@ -11205,6 +11553,9 @@ function musicLoadTrack(index, autoplay) {
   musicTrackIndex = index;
   const track = musicTrackList[index];
 
+  stopOtherEngine('gloves');
+  miniPlayerSource = 'gloves';
+
   if (musicAudio) {
     musicAudio.pause();
     musicAudio = null;
@@ -11213,6 +11564,12 @@ function musicLoadTrack(index, autoplay) {
   musicAudio.volume = musicVolume;
 
   document.getElementById('music-track-name').textContent = track.name;
+
+  // Fila de ID de Roblox (siempre visible; muestra "—" si la canción no tiene ID)
+  const robloxRow = document.getElementById('music-roblox-row');
+  document.getElementById('music-roblox-value').textContent = track.robloxId || '—';
+  robloxRow.classList.remove('hidden');
+  robloxRow.classList.toggle('empty', !track.robloxId);
 
   const centerImg = document.getElementById('music-vinyl-center-img');
   centerImg.onerror = () => { centerImg.onerror = null; centerImg.src = 'preview_placeholder.png'; };
@@ -11267,19 +11624,14 @@ function musicLoadTrack(index, autoplay) {
 function musicUpdatePlayButton() {
   const btn  = document.getElementById('music-btn-playpause');
   const disc = document.getElementById('music-vinyl-disc-big');
-  const miniBtn  = document.getElementById('mini-player-btn-play');
-  const miniDisc = document.getElementById('mini-player-disc');
   if (musicIsPlaying) {
     btn.textContent = '⏸';
     disc.classList.add('spinning');
-    if (miniBtn)  miniBtn.textContent = '⏸';
-    if (miniDisc) miniDisc.classList.add('spinning');
   } else {
     btn.textContent = '▶';
     disc.classList.remove('spinning');
-    if (miniBtn)  miniBtn.textContent = '▶';
-    if (miniDisc) miniDisc.classList.remove('spinning');
   }
+  if (miniPlayerSource === 'gloves') updateMiniPlayerPlayState();
 }
 
 function musicTogglePlay() {
@@ -11386,19 +11738,23 @@ function musicSetVolume(val) {
    cargada; la música sigue sonando y persiste entre páginas.
    ============================================================ */
 
-/* Refresca nombre, carátula y progreso del mini-reproductor con la pista actual */
+/* Refresca nombre, carátula y progreso del mini-reproductor.
+   Funciona con ambas fuentes (guantes y Soundtrack). */
 function syncMiniPlayer() {
-  if (!musicAudio || !musicTrackList.length) return;
-  const track = musicTrackList[musicTrackIndex];
+  const fromSt = miniPlayerSource === 'soundtrack';
+  const audio  = fromSt ? stAudio : musicAudio;
+  const list   = fromSt ? stTrackList : musicTrackList;
+  const idx    = fromSt ? stTrackIndex : musicTrackIndex;
+  if (!audio || !list.length) return;
+  const track = list[idx];
   document.getElementById('mini-player-track-name').textContent = track.name;
-
   const img = document.getElementById('mini-player-disc-img');
   img.onerror = () => { img.onerror = null; img.src = 'preview_placeholder.png'; };
   img.src = 'ostbanner_' + track.songId + '.png';
-
   const bar = document.getElementById('mini-player-progress-bar');
-  bar.max = musicAudio.duration || 0;
-  bar.value = musicAudio.currentTime || 0;
+  bar.max   = audio.duration    || 0;
+  bar.value = audio.currentTime || 0;
+  updateMiniPlayerPlayState();
 }
 
 function showMiniPlayer() {
@@ -11406,7 +11762,6 @@ function showMiniPlayer() {
   fab.classList.add('show');
   fab.setAttribute('aria-hidden', 'false');
   syncMiniPlayer();
-  musicUpdatePlayButton();
 }
 
 function hideMiniPlayer() {
@@ -11427,10 +11782,16 @@ function reopenFullMusicPlayer() {
   hideMiniPlayer();
 
   // Reusa la pista/posición actuales en vez de reiniciar desde cero
-  document.getElementById('music-track-name').textContent = musicTrackList[musicTrackIndex].name;
+  const curTrack = musicTrackList[musicTrackIndex];
+  document.getElementById('music-track-name').textContent = curTrack.name;
+  // Fila Roblox (siempre visible; muestra "—" si la canción no tiene ID)
+  const rrRow = document.getElementById('music-roblox-row');
+  document.getElementById('music-roblox-value').textContent = curTrack.robloxId || '—';
+  rrRow.classList.remove('hidden');
+  rrRow.classList.toggle('empty', !curTrack.robloxId);
   const centerImg = document.getElementById('music-vinyl-center-img');
   centerImg.onerror = () => { centerImg.onerror = null; centerImg.src = 'preview_placeholder.png'; };
-  centerImg.src = 'ostbanner_' + musicTrackList[musicTrackIndex].songId + '.png';
+  centerImg.src = 'ostbanner_' + curTrack.songId + '.png';
   const progressBar = document.getElementById('music-progress-bar');
   if (musicAudio) {
     progressBar.max = musicAudio.duration || 0;
@@ -11448,14 +11809,17 @@ function reopenFullMusicPlayer() {
   document.getElementById('music-player-overlay').classList.add('open');
 }
 
-/* Barra de progreso del mini-reproductor: permite buscar posición */
+/* Barra de progreso del mini-reproductor: permite buscar posición (ambas fuentes) */
 (function setupMiniPlayerProgressBar() {
   const bar = document.getElementById('mini-player-progress-bar');
   if (!bar) return;
-  bar.addEventListener('input', () => { musicSeeking = true; });
+  bar.addEventListener('input', () => {
+    if (miniPlayerSource === 'soundtrack') stSeeking = true; else musicSeeking = true;
+  });
   bar.addEventListener('change', () => {
-    if (musicAudio) musicAudio.currentTime = Number(bar.value);
-    musicSeeking = false;
+    const audio = miniPlayerSource === 'soundtrack' ? stAudio : musicAudio;
+    if (audio) audio.currentTime = Number(bar.value);
+    musicSeeking = false; stSeeking = false;
   });
 })();
 
@@ -11500,22 +11864,45 @@ let stSeeking        = false;
 
 /* Construye la lista de álbumes a partir de GLOVES */
 function buildSoundtrackAlbums() {
-  const albums    = [];
-  const allTracks = [];
+  const albums     = [];
+  const allTracks  = [];
+  const miscTracks = []; // canciones de guantes con misc:true, van todas al álbum "Extra"
 
   GLOVES.forEach(g => {
     if (!g.songs || typeof g.songs !== 'object') return;
     const entries = Object.entries(g.songs);
     if (!entries.length) return;
-    const tracks = entries.map(([name, songId]) => ({ name, songId, gloveId: g.id, gloveName: g.name }));
-    albums.push({ id: g.id, name: g.name, isAll: false, gloveId: g.id, tracks });
+    const tracks = entries.map(([name, val]) => ({ name, ...normalizeSongEntry(val), gloveId: g.id, gloveName: g.name }));
+    allTracks.push(...tracks);
+    if (g.misc) {
+      // No tiene álbum propio: sus canciones se agrupan en "Extra"
+      miscTracks.push(...tracks);
+    } else {
+      albums.push({ id: g.id, name: g.name, isAll: false, gloveId: g.id, tracks });
+    }
+  });
+
+  // Álbumes extra (fuera de los guantes) — mismo sistema, mismo formato de canciones
+  EXTRA_ALBUMS.forEach(a => {
+    if (!a.songs || typeof a.songs !== 'object') return;
+    const entries = Object.entries(a.songs);
+    if (!entries.length) return;
+    const tracks = entries.map(([name, val]) => ({ name, ...normalizeSongEntry(val), gloveId: a.id, gloveName: a.name }));
+    albums.push({ id: a.id, name: a.name, isAll: false, gloveId: a.id, isExtra: true, tracks });
     allTracks.push(...tracks);
   });
 
   albums.sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
+  // Álbum "Extra": agrupa las canciones de TODOS los guantes marcados con misc:true.
+  // Se añade DESPUÉS de ordenar para que quede siempre al final de la lista
+  // (tras los álbumes normales y los álbumes extra/personalizados).
+  if (miscTracks.length) {
+    albums.push({ id: '__misc__', name: 'Extra', isAll: false, gloveId: 'extra', isExtra: true, multiSource: true, tracks: miscTracks });
+  }
+
   // El álbum "Todo el Soundtrack" siempre va primero, tenga o no canciones
-  albums.unshift({ id: '__all__', name: 'Todo el Soundtrack', isAll: true, gloveId: null, tracks: allTracks });
+  albums.unshift({ id: '__all__', name: 'Todo el Soundtrack', isAll: true, gloveId: null, multiSource: true, tracks: allTracks });
 
   return albums;
 }
@@ -11543,7 +11930,7 @@ function renderSoundtrackAlbums() {
 
     const coverHtml = album.isAll
       ? `<div class="soundtrack-album-cover is-all">🎶</div>`
-      : `<img class="soundtrack-album-cover" src="default_${album.gloveId}.png" alt="${album.name}" onerror="this.onerror=null;this.src='preview_placeholder.png'">`;
+      : `<img class="soundtrack-album-cover" src="${album.isExtra ? 'album_' : 'default_'}${album.gloveId}.png" alt="${album.name}" onerror="this.onerror=null;this.src='preview_placeholder.png'">`;
 
     row.innerHTML = `
       ${coverHtml}
@@ -11583,12 +11970,22 @@ function openSoundtrackAlbum(albumId) {
   stLoadTrack(0, true);
 }
 
-/* Vuelve de la vista de reproductor a la lista de álbumes */
+/* Vuelve de la vista de reproductor a la lista de álbumes.
+   Si hay música sonando, pasa al mini-reproductor en vez de cortarla. */
 function closeSoundtrackAlbum() {
-  stStopAudio();
   document.getElementById('soundtrack-player-view').style.display = 'none';
   document.getElementById('soundtrack-albums-view').style.display = '';
-  stCurrentAlbum = null;
+  // Igual que closeMusicPlayer() para guantes: lo que importa es si hay una
+  // pista CARGADA (stAudio), no si en ese instante stIsPlaying ya es true.
+  // stIsPlaying se actualiza de forma asíncrona (tras la promesa de .play()),
+  // así que comprobarlo aquí podía cortar la música por una carrera de tiempos
+  // (p. ej. al volver justo después de activar otra canción).
+  if (stAudio) {
+    miniPlayerSource = 'soundtrack';
+    showMiniPlayer();
+  } else {
+    stCurrentAlbum = null;
+  }
 }
 
 function renderSoundtrackSongList() {
@@ -11599,13 +11996,17 @@ function renderSoundtrackSongList() {
     row.className = 'soundtrack-song-row' + (i === stTrackIndex ? ' active' : '');
     row.dataset.index = i;
     row.onclick = () => stSelectTrack(i);
-    const sourceHtml = stCurrentAlbum.isAll ? `<div class="soundtrack-song-source">${track.gloveName}</div>` : '';
+    const sourceHtml = stCurrentAlbum.multiSource ? `<div class="soundtrack-song-source">${track.gloveName}</div>` : '';
+    const robloxBtnHtml = track.robloxId
+      ? `<button class="soundtrack-song-roblox-btn" title="Copiar ID de Roblox" onclick="event.stopPropagation();copyRobloxIdDirect('${track.robloxId.replace(/'/g,"\\'")}',this)">🎮 ID</button>`
+      : '';
     row.innerHTML = `
       <span class="soundtrack-song-index">${i + 1}</span>
       <div class="soundtrack-song-text">
         <div class="soundtrack-song-name">${track.name}</div>
         ${sourceHtml}
       </div>
+      ${robloxBtnHtml}
       <span class="soundtrack-song-playicon">${i === stTrackIndex && stIsPlaying ? '🔊' : ''}</span>
     `;
     wrap.appendChild(row);
@@ -11633,6 +12034,9 @@ function stLoadTrack(index, autoplay) {
   stTrackIndex = index;
   const track = stTrackList[index];
 
+  stopOtherEngine('soundtrack');
+  miniPlayerSource = 'soundtrack';
+
   if (stAudio) {
     stAudio.pause();
     stAudio = null;
@@ -11641,7 +12045,13 @@ function stLoadTrack(index, autoplay) {
   stAudio.volume = stVolume;
 
   document.getElementById('soundtrack-track-name').textContent   = track.name;
-  document.getElementById('soundtrack-track-source').textContent = stCurrentAlbum.isAll ? track.gloveName : '';
+  document.getElementById('soundtrack-track-source').textContent = stCurrentAlbum && stCurrentAlbum.multiSource ? track.gloveName : '';
+
+  // Fila de ID de Roblox en el reproductor de Soundtrack (siempre visible; "—" si no tiene ID)
+  const stRobloxRow = document.getElementById('soundtrack-roblox-row');
+  document.getElementById('soundtrack-roblox-value').textContent = track.robloxId || '—';
+  stRobloxRow.classList.remove('hidden');
+  stRobloxRow.classList.toggle('empty', !track.robloxId);
 
   // Carátula cuadrada (sin disco girando)
   const coverImg = document.getElementById('soundtrack-cover-img');
@@ -11666,11 +12076,16 @@ function stLoadTrack(index, autoplay) {
     if (stAudio !== thisAudio) return;
     document.getElementById('soundtrack-time-total').textContent = musicFormatTime(thisAudio.duration);
     progressBar.max = thisAudio.duration || 0;
+    document.getElementById('mini-player-progress-bar').max = thisAudio.duration || 0;
   });
   thisAudio.addEventListener('timeupdate', () => {
     if (stAudio !== thisAudio || stSeeking) return;
     progressBar.value = thisAudio.currentTime;
     document.getElementById('soundtrack-time-current').textContent = musicFormatTime(thisAudio.currentTime);
+    if (miniPlayerSource === 'soundtrack') {
+      const mb = document.getElementById('mini-player-progress-bar');
+      if (mb && !mb.matches(':active')) mb.value = thisAudio.currentTime;
+    }
   });
   thisAudio.addEventListener('ended', () => {
     if (stAudio !== thisAudio) return;
@@ -11685,6 +12100,7 @@ function stLoadTrack(index, autoplay) {
     stAudio.play().then(() => {
       stIsPlaying = true;
       stUpdatePlayButton();
+      syncMiniPlayer();
     }).catch(() => {
       stIsPlaying = false;
       stUpdatePlayButton();
@@ -11701,6 +12117,7 @@ function stUpdatePlayButton() {
   const btn = document.getElementById('soundtrack-btn-playpause');
   if (btn) btn.textContent = stIsPlaying ? '⏸' : '▶';
   stUpdateActiveSongRow();
+  if (miniPlayerSource === 'soundtrack') updateMiniPlayerPlayState();
 }
 
 function stTogglePlay() {
@@ -11799,6 +12216,10 @@ function stStopAudio() {
     stAudio = null;
   }
   stIsPlaying = false;
+  if (miniPlayerSource === 'soundtrack') {
+    miniPlayerSource = null;
+    hideMiniPlayer();
+  }
 }
 
 /* Barra de progreso: permite arrastrar para buscar posición */
