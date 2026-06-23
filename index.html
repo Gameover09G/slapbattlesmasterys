@@ -2356,6 +2356,106 @@ body {
 }
 
 /* ============================================================
+   SHARE FAB (fixed above random-fab)
+   ============================================================ */
+#share-fab {
+  position: fixed;
+  bottom: 148px;
+  right: 18px;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, opacity .2s, border-color .2s;
+  font-family: 'Fredoka One', cursive;
+  animation: fabAppear .35s cubic-bezier(.34,1.56,.64,1) both;
+  opacity: 0.45;
+  font-size: 15px;
+}
+#share-fab:hover {
+  opacity: 1;
+  transform: scale(1.12);
+  border-color: #39ff14;
+  box-shadow: 0 0 14px rgba(57,255,20,0.35), 0 4px 12px rgba(0,0,0,0.6);
+}
+#share-fab:active { transform: scale(0.93); }
+#share-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+
+/* ============================================================
+   SHARE COLLAGE MODAL
+   ============================================================ */
+#share-collage-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(6px);
+}
+#share-collage-overlay.open { display: flex; }
+
+#share-collage-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  max-width: 95vw;
+  max-height: 92vh;
+}
+
+#share-collage-img-wrap {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px #222, 0 20px 60px rgba(0,0,0,0.8);
+  max-width: 90vw;
+  max-height: 75vh;
+}
+#share-collage-canvas {
+  display: block;
+  max-width: 90vw;
+  max-height: 75vh;
+  border-radius: 14px;
+}
+
+#share-collage-actions {
+  display: flex;
+  gap: 12px;
+}
+#share-collage-actions button {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: 2px solid #333;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: filter .15s, transform .12s;
+}
+#share-collage-actions button:hover  { filter: brightness(1.2); transform: translateY(-1px); }
+#share-collage-actions button:active { transform: translateY(2px); }
+#btn-share-save   { background: linear-gradient(180deg,#39ff14 0%,#1a8f00 100%); color: #000; }
+#btn-share-close  { background: #1a1a1a; color: #999; border-color: #333; }
+
+#share-collage-loading {
+  color: #ffd700;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  padding: 40px;
+}
+
+/* ============================================================
    TODO FAB
    ============================================================ */
 #todo-fab {
@@ -5470,6 +5570,13 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
 </div>
 
 <!-- ========================================================
+     SHARE FAB (fixed above random-fab) — genera collage PNG
+     ======================================================== -->
+<button id="share-fab" onclick="openShareCollage()" title="Compartir maestrías completadas">
+  <span class="fab-icon">📤</span>
+</button>
+
+<!-- ========================================================
      RANDOM FAB (fixed, dedicated button)
      ======================================================== -->
 <button id="random-fab" onclick="startRandomSelector()" title="Selector random de maestría">
@@ -5551,6 +5658,22 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
     <button id="btn-todo-cancel-select" onclick="cancelTodoSelection()">✕ Cancelar</button>
   </div>
   <button id="btn-todo-confirm" onclick="confirmTodoSelection()">✅ Agregar</button>
+</div>
+
+<!-- ========================================================
+     SHARE COLLAGE MODAL
+     ======================================================== -->
+<div id="share-collage-overlay" onclick="if(event.target===this)closeShareCollage()">
+  <div id="share-collage-modal">
+    <div id="share-collage-loading">⏳ Generando collage...</div>
+    <div id="share-collage-img-wrap" style="display:none">
+      <canvas id="share-collage-canvas"></canvas>
+    </div>
+    <div id="share-collage-actions" style="display:none">
+      <button id="btn-share-save" onclick="saveShareCollage()">💾 Guardar PNG</button>
+      <button id="btn-share-close" onclick="closeShareCollage()">✕ Cerrar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ========================================================
@@ -5878,7 +6001,8 @@ const CHANGELOGS = [
     date: "23/06/2026",
     entries: [
       { emoji: "🥊", color: "#11ffff", text: "Mas guantes!!"},
-      { emoji: "🎵", color: "#5e5e5e", text: "Expansion grande de soundtrack (Boss fights y mega rock)."},
+      { emoji: "🎵", color: "#5e5e5e", text: "Expansion grande de soundtrack (Boss fights y megarock)."},
+      { emoji: "🖼️", color: "#FFD700",  text: "Guarda y comparte imagenes de tus maestrias completadas!" },
     ]
   },
   
@@ -12550,6 +12674,342 @@ function stStopAudio() {
     stSeeking = false;
   });
 })();
+
+/* ============================================================
+   SHARE COLLAGE — genera un PNG con collage inclinado de
+   todas las maestrías completadas, lista a la derecha y
+   marca de agua abajo-izquierda.
+   ============================================================ */
+
+function openShareCollage() {
+  const completed = MASTERIES.filter(m => completedSet.has(m.id));
+  if (!completed.length) {
+    alert('¡Aún no has completado ninguna maestría!');
+    return;
+  }
+
+  const overlay = document.getElementById('share-collage-overlay');
+  const loading  = document.getElementById('share-collage-loading');
+  const imgWrap  = document.getElementById('share-collage-img-wrap');
+  const actions  = document.getElementById('share-collage-actions');
+
+  loading.style.display  = 'block';
+  imgWrap.style.display  = 'none';
+  actions.style.display  = 'none';
+  overlay.classList.add('open');
+
+  // Defer to next frame so overlay renders first
+  requestAnimationFrame(() => {
+    setTimeout(() => generateShareCollage(completed, loading, imgWrap, actions), 60);
+  });
+}
+
+function closeShareCollage() {
+  document.getElementById('share-collage-overlay').classList.remove('open');
+}
+
+function saveShareCollage() {
+  const canvas = document.getElementById('share-collage-canvas');
+  const link = document.createElement('a');
+  link.download = 'maestrias_completadas.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function generateShareCollage(completed, loading, imgWrap, actions) {
+  const W = 1280, H = 720;
+  const canvas = document.getElementById('share-collage-canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // ── 1. Background ─────────────────────────────────────────
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#080808');
+  bgGrad.addColorStop(0.5, '#111008');
+  bgGrad.addColorStop(1, '#0a0a05');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Diagonal stripe texture
+  ctx.save();
+  ctx.globalAlpha = 0.035;
+  for (let x = -H; x < W + H; x += 32) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H, H);
+    ctx.lineWidth = 14; ctx.strokeStyle = '#ffd700'; ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── 2. Get banner images from already-loaded DOM elements ──
+  // This avoids CORS issues: the browser already has these images loaded
+  const getBannerImg = (id) => {
+    // First try: the card's img element (already loaded, same-origin, no canvas taint)
+    const el = document.querySelector(`.mastery-card[data-id="${id}"] .card-banner-img`);
+    if (el && el.complete && el.naturalWidth > 0) return el;
+    return null;
+  };
+
+  const bannerImgs = completed.map(m => getBannerImg(m.id));
+  const anyLoaded = bannerImgs.some(img => img !== null);
+
+  // ── 3. Layout constants ───────────────────────────────────
+  const PANEL_X = Math.round(W * 0.565);
+  const COLLAGE_W = PANEL_X + 40; // collage bleeds slightly behind panel
+  const count = completed.length;
+  const MARGIN = 10;
+  const TILT = -8;
+  const TILT_RAD = (TILT * Math.PI) / 180;
+
+  // Compute optimal tile grid to fill collage area
+  const GRID_W = COLLAGE_W + 80;
+  const GRID_H = H + 120;
+  let cols, rows, tileW, tileH;
+  for (cols = 1; cols <= count; cols++) {
+    rows = Math.ceil(count / cols);
+    tileW = Math.floor((GRID_W - MARGIN * (cols + 1)) / cols);
+    tileH = Math.round(tileW * (9 / 16));
+    if (rows * (tileH + MARGIN) + MARGIN <= GRID_H + tileH) break;
+  }
+  const maxTileH = Math.floor((GRID_H - MARGIN * (rows + 1)) / rows);
+  if (tileH > maxTileH) { tileH = maxTileH; tileW = Math.round(tileH * (16 / 9)); }
+
+  // ── 4. Draw tilted collage ────────────────────────────────
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, 0, PANEL_X + 36, H); ctx.clip();
+
+  const cxR = COLLAGE_W / 2, cyR = H / 2;
+  ctx.translate(cxR, cyR); ctx.rotate(TILT_RAD); ctx.translate(-cxR, -cyR);
+
+  const totalGridH = rows * (tileH + MARGIN) + MARGIN;
+  const startY = (H - totalGridH) / 2 - 24;
+  const startX = MARGIN - 8;
+
+  // Helper: draw image cover-fit into a rect
+  const drawCover = (img, x, y, w, h) => {
+    const iA = img.naturalWidth / img.naturalHeight;
+    const tA = w / h;
+    let sx, sy, sw, sh;
+    if (iA > tA) { sh = img.naturalHeight; sw = sh * tA; sx = (img.naturalWidth - sw) / 2; sy = 0; }
+    else          { sw = img.naturalWidth;  sh = sw / tA; sx = 0; sy = (img.naturalHeight - sh) / 2; }
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  };
+
+  // Tile palette for fallback backgrounds
+  const tilePalettes = [
+    ['#1a1040','#2d1b6e'], ['#0d2540','#1a4a7a'], ['#1a0d0d','#5a1515'],
+    ['#0d1a0d','#1a5a1a'], ['#1a1a0d','#5a5a15'], ['#1a0d1a','#5a155a']
+  ];
+
+  for (let i = 0; i < count; i++) {
+    const col = i % cols, row = Math.floor(i / cols);
+    const x = startX + col * (tileW + MARGIN);
+    const y = startY + row * (tileH + MARGIN);
+
+    ctx.save();
+    // Drop shadow for each tile
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur = 16; ctx.shadowOffsetX = 4; ctx.shadowOffsetY = 6;
+    ctx.beginPath(); ctx.roundRect(x, y, tileW, tileH, 8); ctx.clip();
+
+    const img = bannerImgs[i];
+    if (img) {
+      drawCover(img, x, y, tileW, tileH);
+    } else {
+      // Stylized fallback: gradient + glove name
+      const pal = tilePalettes[i % tilePalettes.length];
+      const grad = ctx.createLinearGradient(x, y, x + tileW, y + tileH);
+      grad.addColorStop(0, pal[0]); grad.addColorStop(1, pal[1]);
+      ctx.fillStyle = grad; ctx.fillRect(x, y, tileW, tileH);
+      // Subtle grid pattern on fallback
+      ctx.save(); ctx.globalAlpha = 0.12; ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 0.5;
+      for (let gx = x; gx < x + tileW; gx += 20) {
+        ctx.beginPath(); ctx.moveTo(gx, y); ctx.lineTo(gx, y + tileH); ctx.stroke();
+      }
+      for (let gy = y; gy < y + tileH; gy += 20) {
+        ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x + tileW, gy); ctx.stroke();
+      }
+      ctx.restore();
+      // Name label on fallback tile
+      ctx.restore(); ctx.save();
+      ctx.beginPath(); ctx.roundRect(x, y, tileW, tileH, 8); ctx.clip();
+      ctx.font = `bold ${Math.max(11, Math.round(tileH * 0.22))}px 'Fredoka One', sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillText(completed[i].name, x + tileW / 2 + 1, y + tileH / 2 + 1);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(completed[i].name, x + tileW / 2, y + tileH / 2);
+    }
+
+    // Bottom gradient vignette
+    ctx.restore(); ctx.save();
+    ctx.beginPath(); ctx.roundRect(x, y, tileW, tileH, 8); ctx.clip();
+    const vig = ctx.createLinearGradient(x, y + tileH * 0.45, x, y + tileH);
+    vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, 'rgba(0,0,0,0.72)');
+    ctx.fillStyle = vig; ctx.fillRect(x, y, tileW, tileH);
+
+    // Name label at bottom of each tile (when banner loaded)
+    if (bannerImgs[i]) {
+      ctx.font = `bold ${Math.max(9, Math.round(tileH * 0.17))}px 'Fredoka One', sans-serif`;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillText(completed[i].name, x + 7, y + tileH - 4);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(completed[i].name, x + 6, y + tileH - 5);
+    }
+
+    // Gold border
+    ctx.strokeStyle = 'rgba(255,215,0,0.6)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(x, y, tileW, tileH, 8); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore(); // end collage clip+rotate
+
+  // ── 5. Panel background with fade edge ────────────────────
+  const fadeGrad = ctx.createLinearGradient(PANEL_X - 90, 0, PANEL_X + 10, 0);
+  fadeGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  fadeGrad.addColorStop(0.6, 'rgba(8,8,6,0.88)');
+  fadeGrad.addColorStop(1, 'rgba(8,8,6,0.97)');
+  ctx.fillStyle = fadeGrad;
+  ctx.fillRect(PANEL_X - 90, 0, 110, H);
+  ctx.fillStyle = 'rgba(8,8,6,0.97)';
+  ctx.fillRect(PANEL_X + 20, 0, W - PANEL_X - 20, H);
+
+  // ── 6. Right panel content ────────────────────────────────
+  const PX = PANEL_X + 38;
+  const PW = W - PX - 28;
+
+  // ── 6a. Top accent bar ───────────────────────────────────
+  const accentGrad = ctx.createLinearGradient(PX, 0, PX + PW, 0);
+  accentGrad.addColorStop(0, '#ffd700');
+  accentGrad.addColorStop(0.6, '#ff8c00');
+  accentGrad.addColorStop(1, '#ffd700');
+  ctx.fillStyle = accentGrad;
+  ctx.fillRect(PX, 0, PW, 4);
+
+  // ── 6b. Big counter badge ────────────────────────────────
+  const BADGE_Y = 28;
+  const BADGE_R = 44;
+  const BADGE_CX = PX + BADGE_R;
+  const BADGE_CY = BADGE_Y + BADGE_R;
+
+  // Badge glow
+  const glowGrad = ctx.createRadialGradient(BADGE_CX, BADGE_CY, 0, BADGE_CX, BADGE_CY, BADGE_R * 1.8);
+  glowGrad.addColorStop(0, 'rgba(255,215,0,0.25)');
+  glowGrad.addColorStop(1, 'rgba(255,215,0,0)');
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath(); ctx.arc(BADGE_CX, BADGE_CY, BADGE_R * 1.8, 0, Math.PI * 2); ctx.fill();
+
+  // Badge circle
+  const badgeGrad = ctx.createLinearGradient(BADGE_CX - BADGE_R, BADGE_CY - BADGE_R, BADGE_CX + BADGE_R, BADGE_CY + BADGE_R);
+  badgeGrad.addColorStop(0, '#ffd700'); badgeGrad.addColorStop(1, '#c87000');
+  ctx.fillStyle = badgeGrad;
+  ctx.beginPath(); ctx.arc(BADGE_CX, BADGE_CY, BADGE_R, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(BADGE_CX, BADGE_CY, BADGE_R, 0, Math.PI * 2); ctx.stroke();
+
+  // Badge number
+  ctx.font = `bold ${count >= 100 ? 26 : 32}px 'Fredoka One', sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#000';
+  ctx.fillText(count, BADGE_CX, BADGE_CY + 1);
+
+  // ── 6c. Title text ───────────────────────────────────────
+  const TITLE_X = PX + BADGE_R * 2 + 16;
+  const TITLE_W = W - TITLE_X - 28;
+
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillStyle = '#ffd700';
+  ctx.font = `bold 20px 'Fredoka One', sans-serif`;
+  // Wrap "He completado las maestrías de:" to fit
+  const titleLines = ['He completado', 'las maestrías de:'];
+  titleLines.forEach((line, li) => {
+    ctx.fillText(line, TITLE_X, BADGE_Y + li * 24 + 4);
+  });
+
+  // Total mastery count line
+  ctx.fillStyle = '#39ff14';
+  ctx.font = `14px 'Fredoka', sans-serif`;
+  ctx.fillText(`${count} de ${MASTERIES.filter(m => !m.locked).length} completadas`, TITLE_X, BADGE_Y + 56);
+
+  // ── 6d. Divider ──────────────────────────────────────────
+  const DIV_Y = BADGE_Y + BADGE_R * 2 + 18;
+  const divGrad = ctx.createLinearGradient(PX, 0, PX + PW, 0);
+  divGrad.addColorStop(0, '#ffd700'); divGrad.addColorStop(0.7, '#ff8c00'); divGrad.addColorStop(1, 'rgba(255,215,0,0)');
+  ctx.strokeStyle = divGrad; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(PX, DIV_Y); ctx.lineTo(PX + PW, DIV_Y); ctx.stroke();
+
+  // ── 6e. Mastery name list ────────────────────────────────
+  const LIST_TOP = DIV_Y + 14;
+  const LIST_BOT = H - 46;
+  const LIST_H = LIST_BOT - LIST_TOP;
+  const TOTAL = completed.length;
+
+  // Decide columns
+  const maxPerCol = Math.floor(LIST_H / 26);
+  const listCols = TOTAL > maxPerCol ? 2 : 1;
+  const perCol = Math.ceil(TOTAL / listCols);
+  const lineH = Math.min(26, Math.floor(LIST_H / perCol));
+  const colW = Math.floor(PW / listCols);
+  const listFontSize = Math.min(17, Math.max(11, lineH - 4));
+
+  ctx.font = `${listFontSize}px 'Fredoka', sans-serif`;
+
+  completed.forEach((m, i) => {
+    const col = Math.floor(i / perCol);
+    const row = i % perCol;
+    const ix = PX + col * colW;
+    const iy = LIST_TOP + row * lineH;
+    if (iy + lineH > LIST_BOT + 4) return; // overflow guard
+
+    // Row hover bg (alternating subtle rows)
+    if (row % 2 === 0) {
+      ctx.fillStyle = 'rgba(255,215,0,0.04)';
+      ctx.fillRect(ix, iy - 1, colW - 4, lineH);
+    }
+
+    // Green bullet
+    const dotR = Math.max(3, listFontSize * 0.22);
+    ctx.fillStyle = '#39ff14';
+    ctx.shadowColor = 'rgba(57,255,20,0.8)'; ctx.shadowBlur = 6;
+    ctx.beginPath(); ctx.arc(ix + dotR + 3, iy + lineH / 2, dotR, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Mastery name
+    ctx.fillStyle = '#f0f0f0';
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    let name = m.name;
+    const maxW = colW - dotR * 2 - 16;
+    ctx.font = `${listFontSize}px 'Fredoka', sans-serif`;
+    while (ctx.measureText(name).width > maxW && name.length > 2) name = name.slice(0, -1);
+    if (name !== m.name) name += '…';
+    ctx.fillText(name, ix + dotR * 2 + 10, iy + lineH / 2);
+  });
+
+  // ── 6f. Bottom accent bar ────────────────────────────────
+  ctx.fillStyle = accentGrad;
+  ctx.fillRect(PX, H - 4, PW, 4);
+
+  // ── 7. Watermark ─────────────────────────────────────────
+  ctx.font = `12px 'Fredoka', sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.fillText('https://gameover09g.github.io/slapbattlesmasterys/', 14, H - 10);
+
+  // ── 8. Separator glow line between collage and panel ─────
+  const sepGrad = ctx.createLinearGradient(0, 0, 0, H);
+  sepGrad.addColorStop(0, 'rgba(255,215,0,0)');
+  sepGrad.addColorStop(0.3, 'rgba(255,215,0,0.35)');
+  sepGrad.addColorStop(0.7, 'rgba(255,215,0,0.35)');
+  sepGrad.addColorStop(1, 'rgba(255,215,0,0)');
+  ctx.strokeStyle = sepGrad; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(PANEL_X, 0); ctx.lineTo(PANEL_X, H); ctx.stroke();
+
+  // ── 9. Show result ────────────────────────────────────────
+  loading.style.display = 'none';
+  imgWrap.style.display = 'block';
+  actions.style.display = 'flex';
+}
 
 </script>
 
