@@ -11925,50 +11925,37 @@ function _resumeSharedCtx() {
 
 /* Conecta un <audio> al AnalyserNode correspondiente.
    Devuelve { analyser, source } o { analyser: null, source: null } si falla. */
-/* ── Conexión al AnalyserNode via captureStream ───────────────────────────────
-   DIFERENCIA CLAVE frente a createMediaElementSource():
-   · captureStream() + createMediaStreamSource() no tiene restricciones CORS,
-     por lo que funciona con file://, http:// y cualquier origen.
-   · El elemento <audio> sigue reproduciendo por su cuenta (salida nativa del
-     sistema); el AnalyserNode solo "escucha" sin interceptar nada.
-   · Aunque el AudioContext esté suspended, el audio SIEMPRE suena.
-     El contexto solo necesita estar 'running' para que getByteFrequencyData()
-     devuelva datos reales (las barras siguen la música); en otro caso se usa
-     la animación senoidal de fallback.                                       */
 function _connectAudioToAnalyser(audioEl, existingAnalyser, existingSource) {
   const ctx = _getSharedCtx();
   if (!ctx || !audioEl) return { analyser: existingAnalyser, source: existingSource };
 
-  /* Si el source ya apunta a ESTE elemento de audio, reutilizamos todo */
-  if (existingSource && existingSource._slap_el === audioEl) {
+  /* Si ya tenemos un source node apuntando a ESTE mismo elemento, reutilizamos */
+  if (existingSource && existingSource.mediaElement === audioEl) {
     return { analyser: existingAnalyser, source: existingSource };
   }
 
-  /* Desconectar source anterior */
-  if (existingSource) { try { existingSource.disconnect(); } catch(_) {} }
+  /* Desconectar source anterior si lo hay */
+  if (existingSource) {
+    try { existingSource.disconnect(); } catch(_) {}
+  }
 
   try {
-    /* captureStream() — disponible en Chrome, Firefox y Edge modernos.
-       mozCaptureStream() es el prefijo legacy de Firefox.               */
-    const stream = (audioEl.captureStream && audioEl.captureStream())
-                || (audioEl.mozCaptureStream && audioEl.mozCaptureStream());
-    if (!stream) return { analyser: existingAnalyser, source: existingSource };
+    const source = ctx.createMediaElementSource(audioEl);
 
-    const source = ctx.createMediaStreamSource(stream);
-    source._slap_el = audioEl; /* marca para reutilización */
-
+    /* Crear el AnalyserNode la primera vez; reutilizarlo en cambios de pista */
     let analyser = existingAnalyser;
     if (!analyser) {
       analyser = ctx.createAnalyser();
-      analyser.fftSize = 128;              // 64 bins de frecuencia
+      analyser.fftSize = 128;            // 64 bins de frecuencia
       analyser.smoothingTimeConstant = 0.82;
-      /* NO conectamos analyser → destination: el <audio> ya envía el sonido
-         al sistema por su propia ruta; aquí solo leemos datos.             */
+      analyser.connect(ctx.destination); // → altavoces
     }
 
     source.connect(analyser);
     return { analyser, source };
   } catch(e) {
+    /* createMediaElementSource puede lanzar si el elemento ya fue capturado
+       en otro contexto (raro, pero posible).  Devolvemos lo que había. */
     return { analyser: existingAnalyser, source: existingSource };
   }
 }
@@ -11976,27 +11963,23 @@ function _connectAudioToAnalyser(audioEl, existingAnalyser, existingSource) {
 function musicConnectNewAudio() {
   if (!musicAudio) return;
   musicAudio.volume = Math.min(1, Math.max(0, musicVolume));
-  /* Conectamos el analyser via captureStream (sin CORS, sin afectar playback) */
+
   const r = _connectAudioToAnalyser(musicAudio, _musicAnalyser, _musicWASource);
   _musicAnalyser = r.analyser;
   _musicWASource = r.source;
+
   musicStartVisualizer();
 }
 
 function stConnectNewAudio() {
   if (!stAudio) return;
   stAudio.volume = Math.min(1, Math.max(0, stVolume));
+
   const r = _connectAudioToAnalyser(stAudio, _stAnalyser, _stWASource);
   _stAnalyser = r.analyser;
   _stWASource = r.source;
-  stStartVisualizer();
-}
 
-/* Reanuda el AudioContext en un gesto de usuario para que el analyser
-   empiece a devolver datos reales.  El audio ya suena independientemente. */
-function _resumeCtxOnGesture() {
-  const ctx = _getSharedCtx();
-  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  stStartVisualizer();
 }
 
 /* ── Barras del ecualizador ───────────────────────────────────────────────── */
@@ -12444,7 +12427,7 @@ function musicLoadTrack(index, autoplay) {
   };
 
   if (autoplay) {
-    _resumeCtxOnGesture();
+    _resumeSharedCtx(); /* desbloquear AudioContext: estamos en gesto de usuario */
     musicAudio.play().then(() => {
       musicIsPlaying = true;
       musicUpdatePlayButton();
@@ -12477,13 +12460,12 @@ function musicTogglePlay() {
   if (musicIsPlaying) {
     musicAudio.pause();
     musicIsPlaying = false;
-    musicUpdatePlayButton();
   } else {
-    _resumeCtxOnGesture(); /* activa el analyser; el audio ya suena solo */
+    _resumeSharedCtx(); /* desbloquear AudioContext en gesto de usuario */
     musicAudio.play().catch(() => {});
     musicIsPlaying = true;
-    musicUpdatePlayButton();
   }
+  musicUpdatePlayButton();
 }
 
 function musicNextTrack() {
@@ -12959,7 +12941,7 @@ function stLoadTrack(index, autoplay) {
   };
 
   if (autoplay) {
-    _resumeCtxOnGesture();
+    _resumeSharedCtx(); /* desbloquear AudioContext: estamos en gesto de usuario */
     stAudio.play().then(() => {
       stIsPlaying = true;
       stUpdatePlayButton();
@@ -12988,13 +12970,12 @@ function stTogglePlay() {
   if (stIsPlaying) {
     stAudio.pause();
     stIsPlaying = false;
-    stUpdatePlayButton();
   } else {
-    _resumeCtxOnGesture();
+    _resumeSharedCtx(); /* desbloquear AudioContext en gesto de usuario */
     stAudio.play().catch(() => {});
     stIsPlaying = true;
-    stUpdatePlayButton();
   }
+  stUpdatePlayButton();
 }
 
 /* Bolsa aleatoria tipo "bag shuffle" (igual que en el reproductor de guantes) */
