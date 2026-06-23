@@ -12048,11 +12048,12 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
     if (playing) {
       if (freqData) {
         /* Mapear la barra a un rango del espectro.
-           Usamos escala logarítmica para que las frecuencias bajas y medias
-           (las más musicalmente relevantes) ocupen más barras. */
+           Usamos escala ligeramente sub-lineal (0.85) para dar un poco más
+           de peso a las frecuencias bajas/medias sin apilar todo a la izquierda.
+           Esto reparte la energía de forma más equilibrada entre todas las barras. */
         const bins  = freqData.length;
-        const t0    = Math.floor(Math.pow(i / bars,       1.4) * bins);
-        const t1    = Math.floor(Math.pow((i + 1) / bars, 1.4) * bins);
+        const t0    = Math.floor(Math.pow(i / bars,       0.85) * bins);
+        const t1    = Math.floor(Math.pow((i + 1) / bars, 0.85) * bins);
         const end   = Math.max(t0 + 1, t1);
         let   peak  = 0;
         for (let b = t0; b < end && b < bins; b++) {
@@ -12060,11 +12061,15 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
         }
         amp = 0.04 + (peak / 255) * 0.96;
       } else {
-        /* Fallback senoidal (mientras el AudioContext no está activo) */
+        /* Fallback senoidal (mientras el AudioContext no está activo).
+           Las ondas están centradas en 0.5 para que las barras oscilen
+           simétricamente alrededor del centro sin sesgo hacia la izquierda. */
         const s    = seeds[i];
-        const wave = (Math.sin(t * s.speed  + s.phase)  * 0.5 + 0.5) * 0.7
-                   + (Math.sin(t * s.speed2 + s.phase2) * 0.5 + 0.5) * 0.3;
-        amp = 0.10 + wave * 0.85;
+        const wave = Math.sin(t * s.speed  + s.phase)  * 0.35
+                   + Math.sin(t * s.speed2 + s.phase2) * 0.15;
+        /* wave ∈ [-0.5, 0.5] → amp ∈ [0.12, 0.62], centrado en 0.37 */
+        amp = 0.37 + wave;
+        amp = Math.max(0.08, Math.min(0.92, amp));
       }
     }
 
