@@ -12005,6 +12005,13 @@ const _stVizSeeds    = _vizMakeBarSeeds(VIZ_BAR_COUNT);
 /* Buffer de datos de frecuencia compartido; se crea la primera vez */
 let _vizFreqBuf = null;
 
+/* ── Auto-ganancia por banda: cada barra recuerda su pico histórico y se
+   normaliza contra él, así las frecuencias altas (poca energía real) se
+   escalan igual que las bajas (mucha energía) → todas las barras se mueven. */
+const _vizBandMax = new Map(); /* clave: canvas id → Float32Array */
+const _VIZ_DECAY  = 0.994;    /* el pico histórico decae lentamente (~0.4% por frame) */
+const _VIZ_FLOOR  = 8;        /* valor mínimo de pico para evitar división por cero */
+
 function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
   if (!canvas) return;
   if (canvas.offsetParent === null) return; /* oculto: no dibujar */
@@ -12035,41 +12042,44 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
       _vizFreqBuf = new Uint8Array(binCount);
     }
     analyser.getByteFrequencyData(_vizFreqBuf);
-    /* Verificar que hay señal real (evita mostrar datos "vacíos" del contexto
-       justo tras resumirse antes de que lleguen muestras del decodificador) */
     let sum = 0;
     for (let k = 0; k < binCount; k++) sum += _vizFreqBuf[k];
     if (sum > 0) freqData = _vizFreqBuf;
   }
+
+  /* ── Array de picos históricos por banda (uno por canvas) ── */
+  const cid = canvas.id || 'default';
+  if (!_vizBandMax.has(cid) || _vizBandMax.get(cid).length !== bars) {
+    _vizBandMax.set(cid, new Float32Array(bars).fill(_VIZ_FLOOR));
+  }
+  const bandMax = _vizBandMax.get(cid);
 
   for (let i = 0; i < bars; i++) {
     let amp = 0.05; /* mínimo en reposo / pausa */
 
     if (playing) {
       if (freqData) {
-        /* Mapear la barra a un rango del espectro.
-           Usamos escala ligeramente sub-lineal (0.85) para dar un poco más
-           de peso a las frecuencias bajas/medias sin apilar todo a la izquierda.
-           Esto reparte la energía de forma más equilibrada entre todas las barras. */
-        const bins  = freqData.length;
-        const t0    = Math.floor(Math.pow(i / bars,       0.85) * bins);
-        const t1    = Math.floor(Math.pow((i + 1) / bars, 0.85) * bins);
-        const end   = Math.max(t0 + 1, t1);
-        let   peak  = 0;
+        /* Mapeo lineal de barras a bins de frecuencia.
+           La auto-ganancia por banda compensa la diferencia de energía
+           entre graves (izquierda) y agudos (derecha). */
+        const bins = freqData.length;
+        const t0   = Math.floor((i / bars) * bins);
+        const t1   = Math.floor(((i + 1) / bars) * bins);
+        const end  = Math.max(t0 + 1, t1);
+        let   peak = 0;
         for (let b = t0; b < end && b < bins; b++) {
           if (freqData[b] > peak) peak = freqData[b];
         }
-        amp = 0.04 + (peak / 255) * 0.96;
+        /* Actualizar pico histórico con decay suave */
+        bandMax[i] = Math.max(bandMax[i] * _VIZ_DECAY, Math.max(peak, _VIZ_FLOOR));
+        /* Normalizar: cada banda se escala contra su propio máximo histórico */
+        amp = 0.08 + (peak / bandMax[i]) * 0.88;
       } else {
-        /* Fallback senoidal (mientras el AudioContext no está activo).
-           Las ondas están centradas en 0.5 para que las barras oscilen
-           simétricamente alrededor del centro sin sesgo hacia la izquierda. */
+        /* Fallback senoidal (mientras el AudioContext no está activo) */
         const s    = seeds[i];
         const wave = Math.sin(t * s.speed  + s.phase)  * 0.35
                    + Math.sin(t * s.speed2 + s.phase2) * 0.15;
-        /* wave ∈ [-0.5, 0.5] → amp ∈ [0.12, 0.62], centrado en 0.37 */
-        amp = 0.37 + wave;
-        amp = Math.max(0.08, Math.min(0.92, amp));
+        amp = Math.max(0.08, Math.min(0.92, 0.37 + wave));
       }
     }
 
