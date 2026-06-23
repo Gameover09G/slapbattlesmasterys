@@ -12005,13 +12005,6 @@ const _stVizSeeds    = _vizMakeBarSeeds(VIZ_BAR_COUNT);
 /* Buffer de datos de frecuencia compartido; se crea la primera vez */
 let _vizFreqBuf = null;
 
-/* ── Auto-ganancia por banda: cada barra recuerda su pico histórico y se
-   normaliza contra él, así las frecuencias altas (poca energía real) se
-   escalan igual que las bajas (mucha energía) → todas las barras se mueven. */
-const _vizBandMax = new Map(); /* clave: canvas id → Float32Array */
-const _VIZ_DECAY  = 0.994;    /* el pico histórico decae lentamente (~0.4% por frame) */
-const _VIZ_FLOOR  = 8;        /* valor mínimo de pico para evitar división por cero */
-
 function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
   if (!canvas) return;
   if (canvas.offsetParent === null) return; /* oculto: no dibujar */
@@ -12047,39 +12040,35 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
     if (sum > 0) freqData = _vizFreqBuf;
   }
 
-  /* ── Array de picos históricos por banda (uno por canvas) ── */
-  const cid = canvas.id || 'default';
-  if (!_vizBandMax.has(cid) || _vizBandMax.get(cid).length !== bars) {
-    _vizBandMax.set(cid, new Float32Array(bars).fill(_VIZ_FLOOR));
-  }
-  const bandMax = _vizBandMax.get(cid);
-
   for (let i = 0; i < bars; i++) {
     let amp = 0.05; /* mínimo en reposo / pausa */
 
     if (playing) {
       if (freqData) {
-        /* Mapeo lineal de barras a bins de frecuencia.
-           La auto-ganancia por banda compensa la diferencia de energía
-           entre graves (izquierda) y agudos (derecha). */
-        const bins = freqData.length;
-        const t0   = Math.floor((i / bars) * bins);
-        const t1   = Math.floor(((i + 1) / bars) * bins);
-        const end  = Math.max(t0 + 1, t1);
+        /* Patrón espejo: las barras se intercalan izquierda↔derecha hacia el centro.
+           Las barras pares (0,2,4…) leen desde el extremo izquierdo del espectro
+           y las impares (1,3,5…) desde el extremo derecho, ambas avanzando al centro.
+           Así los graves y agudos se alternan visualmente barra a barra. */
+        const bins    = freqData.length;
+        const half    = Math.ceil(bars / 2);
+        const rank    = Math.floor(i / 2);       /* 0,0,1,1,2,2… distancia al borde */
+        const fromEnd = (i % 2 === 0);           /* par → desde izq, impar → desde der */
+        const binIdx  = fromEnd
+          ? Math.floor((rank / half) * bins)
+          : Math.floor(((half - 1 - rank) / half) * bins + bins / 2);
+        const t0  = Math.min(binIdx, bins - 1);
+        const t1  = Math.min(binIdx + Math.max(1, Math.floor(bins / half)), bins);
         let   peak = 0;
-        for (let b = t0; b < end && b < bins; b++) {
+        for (let b = t0; b < t1; b++) {
           if (freqData[b] > peak) peak = freqData[b];
         }
-        /* Actualizar pico histórico con decay suave */
-        bandMax[i] = Math.max(bandMax[i] * _VIZ_DECAY, Math.max(peak, _VIZ_FLOOR));
-        /* Normalizar: cada banda se escala contra su propio máximo histórico */
-        amp = 0.08 + (peak / bandMax[i]) * 0.88;
+        amp = 0.04 + (peak / 255) * 0.96;
       } else {
         /* Fallback senoidal (mientras el AudioContext no está activo) */
         const s    = seeds[i];
-        const wave = Math.sin(t * s.speed  + s.phase)  * 0.35
-                   + Math.sin(t * s.speed2 + s.phase2) * 0.15;
-        amp = Math.max(0.08, Math.min(0.92, 0.37 + wave));
+        const wave = (Math.sin(t * s.speed  + s.phase)  * 0.5 + 0.5) * 0.7
+                   + (Math.sin(t * s.speed2 + s.phase2) * 0.5 + 0.5) * 0.3;
+        amp = 0.10 + wave * 0.85;
       }
     }
 
