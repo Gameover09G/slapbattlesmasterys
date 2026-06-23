@@ -4456,6 +4456,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 
 #music-player-frame {
   position: relative;
+  z-index: 1;
+  overflow: hidden;
   width: min(92vw, 380px);
   display: flex;
   flex-direction: column;
@@ -4618,7 +4620,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 #music-volume-icon { font-size: 0.95rem; }
 #music-volume-bar {
-  width: 70px;
   cursor: pointer;
   height: 4px;
 }
@@ -4626,7 +4627,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 @media (max-width: 480px) {
   #music-vinyl-stage, #music-vinyl-disc-big { width: 170px; height: 170px; }
   #music-vinyl-center { width: 70px; height: 70px; }
-  #music-volume-bar { width: 50px; }
 }
 
 /* ============================================================
@@ -4964,6 +4964,9 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 
 /* Mitad derecha: reproductor con carátula cuadrada (sin disco girando) */
 #soundtrack-player-panel {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
   background: #1e1e1e;
   border: 2px solid #333;
   border-radius: 18px;
@@ -5066,7 +5069,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 #soundtrack-volume-icon { font-size: 0.95rem; }
 #soundtrack-volume-bar {
-  width: 70px;
   cursor: pointer;
   height: 4px;
 }
@@ -5079,7 +5081,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   #soundtrack-albums-header { padding: 12px 14px; gap: 10px; }
   .soundtrack-header-icon { font-size: 1.6rem; }
   #soundtrack-header-title { font-size: 1.1rem; }
-  #soundtrack-volume-bar { width: 50px; }
 }
 
 
@@ -5259,6 +5260,129 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
 }
 .soundtrack-song-roblox-btn:hover { background: var(--yellow-dark); color: #111; transform: scale(1.06); }
 .soundtrack-song-roblox-btn:active { transform: scale(0.92); }
+
+/* ── Badge de info de la canción (aparece junto al nombre en el reproductor) ── */
+.music-info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #111;
+  background: linear-gradient(135deg, var(--yellow-bright), #ff8c00);
+  border-radius: 5px;
+  padding: 2px 7px;
+  margin-left: 6px;
+  white-space: nowrap;
+  vertical-align: middle;
+  box-shadow: 0 1px 5px rgba(255,140,0,0.35);
+  letter-spacing: 0.2px;
+  flex-shrink: 0;
+}
+.music-info-badge::before { content: '★'; font-size: 0.65rem; }
+
+/* Info badge en la lista de canciones (inline pequeño) */
+.soundtrack-song-info-badge {
+  flex-shrink: 0;
+  border: 1.5px solid #ff8c00;
+  background: rgba(255,140,0,0.12);
+  color: #ff8c00;
+  border-radius: 5px;
+  font-size: 0.6rem;
+  font-family: 'Fredoka', sans-serif;
+  padding: 2px 5px;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Wrapper del nombre de canción + badge info en reproductores grandes ── */
+.music-track-name-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Volumen mejorado ── */
+/* Wrap del volumen: ahora muestra icono + slider + porcentaje */
+#soundtrack-volume-wrap,
+#music-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 2px solid #333;
+  flex-wrap: nowrap;
+}
+.music-volume-pct {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  min-width: 34px;
+  text-align: right;
+  transition: color .15s ease;
+  user-select: none;
+}
+
+/* Slider de volumen — más ancho y con sistema de cursor pequeño como el de progreso */
+#music-volume-bar,
+#soundtrack-volume-bar {
+  width: 110px !important;
+  cursor: pointer;
+  height: 4px;
+}
+@media (max-width: 480px) {
+  #music-volume-bar,
+  #soundtrack-volume-bar { width: 72px !important; }
+}
+
+/* Thumb del volumen: cursor pequeño (mismo sistema que slap-progress) */
+input[type="range"].slap-volume::-webkit-slider-thumb {
+  width: 4px;
+  height: 4px;
+  margin-top: 0;
+  transform: scale(8.75);
+}
+input[type="range"].slap-volume::-webkit-slider-thumb:hover {
+  transform: scale(10.0625);
+}
+input[type="range"].slap-volume::-moz-range-thumb {
+  width: 4px;
+  height: 4px;
+  transform: scale(8.75);
+}
+input[type="range"].slap-volume::-moz-range-thumb:hover {
+  transform: scale(10.0625);
+}
+/* Track de volumen: color uniforme en todo el rango (0–100%) */
+input[type="range"].slap-volume::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #555;
+}
+input[type="range"].slap-volume::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #555;
+}
+
+/* Audio Visualizer: barras detrás del contenido de cada reproductor */
+.audio-visualizer-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
 
 </style>
 </head>
@@ -5535,6 +5659,7 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
       </div>
 
       <div id="soundtrack-player-panel">
+        <canvas id="soundtrack-visualizer-canvas" class="audio-visualizer-canvas" aria-hidden="true"></canvas>
         <div id="soundtrack-cover-wrap">
           <img id="soundtrack-cover-img" alt="Carátula">
         </div>
@@ -5559,7 +5684,8 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
           <button id="soundtrack-btn-next" onclick="stNextTrack()" title="Siguiente canción">⏭</button>
           <div id="soundtrack-volume-wrap">
             <span id="soundtrack-volume-icon">🔊</span>
-            <input type="range" id="soundtrack-volume-bar" class="slap-range" min="0" max="100" value="70" step="1" oninput="stSetVolume(this.value)">
+            <input type="range" id="soundtrack-volume-bar" class="slap-range slap-volume slap-progress" min="0" max="100" value="70" step="0.5" oninput="stSetVolume(this.value)">
+            <span class="music-volume-pct" id="soundtrack-volume-pct">70%</span>
           </div>
         </div>
       </div>
@@ -5890,6 +6016,7 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
      ======================================================== -->
 <div id="music-player-overlay" onclick="if(event.target===this)closeMusicPlayer()">
   <div id="music-player-frame">
+    <canvas id="music-visualizer-canvas" class="audio-visualizer-canvas" aria-hidden="true"></canvas>
     <button id="music-player-close" onclick="closeMusicPlayer()" title="Cerrar">✕</button>
 
     <div id="music-vinyl-stage">
@@ -5921,7 +6048,8 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
       <button id="music-btn-next" onclick="musicNextTrack()" title="Siguiente canción">⏭</button>
       <div id="music-volume-wrap">
         <span id="music-volume-icon">🔊</span>
-        <input type="range" id="music-volume-bar" class="slap-range" min="0" max="100" value="70" step="1" oninput="musicSetVolume(this.value)">
+        <input type="range" id="music-volume-bar" class="slap-range slap-volume slap-progress" min="0" max="100" value="70" step="0.5" oninput="musicSetVolume(this.value)">
+        <span class="music-volume-pct" id="music-volume-pct">70%</span>
       </div>
     </div>
   </div>
@@ -6001,8 +6129,7 @@ const CHANGELOGS = [
     date: "23/06/2026",
     entries: [
       { emoji: "🥊", color: "#11ffff", text: "Mas guantes!!"},
-      { emoji: "🎵", color: "#5e5e5e", text: "Expansion grande de soundtrack (Boss fights y megarock)."},
-      { emoji: "🖼️", color: "#FFD700",  text: "Guarda y comparte imagenes de tus maestrias completadas!" },
+      { emoji: "🎵", color: "#5e5e5e", text: "Expansion grande de soundtrack (Boss fights y mega rock)."},
     ]
   },
   
@@ -11750,6 +11877,239 @@ let musicIsPlaying   = false;
 let musicVolume      = 0.7;
 let musicSeeking     = false;
 
+/* ── Control de volumen: 100% nativo (audio.volume) ─────────────────────────
+   El volumen se aplica directamente sobre audio.volume (0–1).
+   ────────────────────────────────────────────────────────────────────────── */
+function musicApplyGain(vol) {
+  if (!musicAudio) return;
+  try { musicAudio.volume = Math.min(1, Math.max(0, vol)); } catch(_) {}
+}
+
+function stApplyGain(vol) {
+  if (!stAudio) return;
+  try { stAudio.volume = Math.min(1, Math.max(0, vol)); } catch(_) {}
+}
+
+/* ── Visualizador de Audio REAL via Web Audio API ────────────────────────────
+   Arquitectura:
+     AudioContext (compartido) → AnalyserNode (por reproductor) → destination
+     MediaElementSourceNode  (un nuevo nodo por cada <audio> nuevo)
+
+   Para evitar el problema de AudioContext "suspended": el contexto se crea al
+   primer intento de conexión, pero SÓLO se reanuda (_resumeSharedCtx) dentro
+   de gestores de gesto de usuario (botones de play).  Mientras el contexto
+   esté suspendido el audio nativo sigue sonando con normalidad; en cuanto el
+   usuario pulse play/pausa el contexto se activa y las barras responden al
+   audio real.  Como fallback se mantiene la animación senoidal.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+let _sharedAudioCtx   = null; // AudioContext compartido
+let _musicAnalyser    = null; // AnalyserNode del reproductor de guantes
+let _stAnalyser       = null; // AnalyserNode del reproductor de soundtrack
+let _musicWASource    = null; // MediaElementSourceNode actual para musicAudio
+let _stWASource       = null; // MediaElementSourceNode actual para stAudio
+
+function _getSharedCtx() {
+  if (_sharedAudioCtx) return _sharedAudioCtx;
+  try {
+    _sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch(e) { return null; }
+  return _sharedAudioCtx;
+}
+
+/* Llámalo siempre dentro de un gesto de usuario para desbloquear el contexto */
+function _resumeSharedCtx() {
+  const ctx = _getSharedCtx();
+  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+}
+
+/* Conecta un <audio> al AnalyserNode correspondiente.
+   Devuelve { analyser, source } o { analyser: null, source: null } si falla. */
+function _connectAudioToAnalyser(audioEl, existingAnalyser, existingSource) {
+  const ctx = _getSharedCtx();
+  if (!ctx || !audioEl) return { analyser: existingAnalyser, source: existingSource };
+
+  /* Si ya tenemos un source node apuntando a ESTE mismo elemento, reutilizamos */
+  if (existingSource && existingSource.mediaElement === audioEl) {
+    return { analyser: existingAnalyser, source: existingSource };
+  }
+
+  /* Desconectar source anterior si lo hay */
+  if (existingSource) {
+    try { existingSource.disconnect(); } catch(_) {}
+  }
+
+  try {
+    const source = ctx.createMediaElementSource(audioEl);
+
+    /* Crear el AnalyserNode la primera vez; reutilizarlo en cambios de pista */
+    let analyser = existingAnalyser;
+    if (!analyser) {
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 128;            // 64 bins de frecuencia
+      analyser.smoothingTimeConstant = 0.82;
+      analyser.connect(ctx.destination); // → altavoces
+    }
+
+    source.connect(analyser);
+    return { analyser, source };
+  } catch(e) {
+    /* createMediaElementSource puede lanzar si el elemento ya fue capturado
+       en otro contexto (raro, pero posible).  Devolvemos lo que había. */
+    return { analyser: existingAnalyser, source: existingSource };
+  }
+}
+
+function musicConnectNewAudio() {
+  if (!musicAudio) return;
+  musicAudio.volume = Math.min(1, Math.max(0, musicVolume));
+
+  const r = _connectAudioToAnalyser(musicAudio, _musicAnalyser, _musicWASource);
+  _musicAnalyser = r.analyser;
+  _musicWASource = r.source;
+
+  musicStartVisualizer();
+}
+
+function stConnectNewAudio() {
+  if (!stAudio) return;
+  stAudio.volume = Math.min(1, Math.max(0, stVolume));
+
+  const r = _connectAudioToAnalyser(stAudio, _stAnalyser, _stWASource);
+  _stAnalyser = r.analyser;
+  _stWASource = r.source;
+
+  stStartVisualizer();
+}
+
+/* ── Barras del ecualizador ───────────────────────────────────────────────── */
+const VIZ_BAR_COUNT = 28;
+const VIZ_COLOR = '200,154,0'; /* var(--yellow-dark) en RGB */
+
+/* Seeds de fallback (animación senoidal si WebAudio no está disponible) */
+function _vizMakeBarSeeds(count) {
+  const seeds = [];
+  for (let i = 0; i < count; i++) {
+    seeds.push({
+      phase:  Math.random() * Math.PI * 2,
+      speed:  1.6 + Math.random() * 2.2,
+      speed2: 0.6 + Math.random() * 1.4,
+      phase2: Math.random() * Math.PI * 2,
+    });
+  }
+  return seeds;
+}
+const _musicVizSeeds = _vizMakeBarSeeds(VIZ_BAR_COUNT);
+const _stVizSeeds    = _vizMakeBarSeeds(VIZ_BAR_COUNT);
+
+/* Buffer de datos de frecuencia compartido; se crea la primera vez */
+let _vizFreqBuf = null;
+
+function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
+  if (!canvas) return;
+  if (canvas.offsetParent === null) return; /* oculto: no dibujar */
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (w === 0 || h === 0) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+  }
+  const ctx2d = canvas.getContext('2d');
+  ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx2d.clearRect(0, 0, w, h);
+
+  const playing = isPlayingFn();
+  const bars = seeds.length;
+  const gap  = 3;
+  const barW = (w - gap * (bars - 1)) / bars;
+  const midY = h / 2;
+
+  /* ── Obtener datos de frecuencia REALES si el analyser está activo ── */
+  let freqData = null;
+  const ctxRunning = _sharedAudioCtx && _sharedAudioCtx.state === 'running';
+
+  if (analyser && playing && ctxRunning) {
+    const binCount = analyser.frequencyBinCount; // fftSize / 2
+    if (!_vizFreqBuf || _vizFreqBuf.length !== binCount) {
+      _vizFreqBuf = new Uint8Array(binCount);
+    }
+    analyser.getByteFrequencyData(_vizFreqBuf);
+    /* Verificar que hay señal real (evita mostrar datos "vacíos" del contexto
+       justo tras resumirse antes de que lleguen muestras del decodificador) */
+    let sum = 0;
+    for (let k = 0; k < binCount; k++) sum += _vizFreqBuf[k];
+    if (sum > 0) freqData = _vizFreqBuf;
+  }
+
+  for (let i = 0; i < bars; i++) {
+    let amp = 0.05; /* mínimo en reposo / pausa */
+
+    if (playing) {
+      if (freqData) {
+        /* Mapear la barra a un rango del espectro.
+           Usamos escala logarítmica para que las frecuencias bajas y medias
+           (las más musicalmente relevantes) ocupen más barras. */
+        const bins  = freqData.length;
+        const t0    = Math.floor(Math.pow(i / bars,       1.4) * bins);
+        const t1    = Math.floor(Math.pow((i + 1) / bars, 1.4) * bins);
+        const end   = Math.max(t0 + 1, t1);
+        let   peak  = 0;
+        for (let b = t0; b < end && b < bins; b++) {
+          if (freqData[b] > peak) peak = freqData[b];
+        }
+        amp = 0.04 + (peak / 255) * 0.96;
+      } else {
+        /* Fallback senoidal (mientras el AudioContext no está activo) */
+        const s    = seeds[i];
+        const wave = (Math.sin(t * s.speed  + s.phase)  * 0.5 + 0.5) * 0.7
+                   + (Math.sin(t * s.speed2 + s.phase2) * 0.5 + 0.5) * 0.3;
+        amp = 0.10 + wave * 0.85;
+      }
+    }
+
+    const barH  = amp * (h * 0.42);
+    const x     = i * (barW + gap);
+    const alpha = playing ? (0.28 + amp * 0.48) : 0.18;
+    ctx2d.fillStyle = `rgba(${VIZ_COLOR},${alpha.toFixed(2)})`;
+    /* Barra simétrica desde el centro vertical (estilo ecualizador) */
+    ctx2d.fillRect(x, midY - barH, barW, barH * 2);
+  }
+}
+
+let _musicVizRAF = null;
+function musicStartVisualizer() {
+  if (_musicVizRAF) return;
+  const tick = () => {
+    _musicVizRAF = requestAnimationFrame(tick);
+    _drawVisualizerBars(
+      document.getElementById('music-visualizer-canvas'),
+      _musicVizSeeds,
+      () => musicIsPlaying,
+      performance.now() / 1000,
+      _musicAnalyser
+    );
+  };
+  tick();
+}
+
+let _stVizRAF = null;
+function stStartVisualizer() {
+  if (_stVizRAF) return;
+  const tick = () => {
+    _stVizRAF = requestAnimationFrame(tick);
+    _drawVisualizerBars(
+      document.getElementById('soundtrack-visualizer-canvas'),
+      _stVizSeeds,
+      () => stIsPlaying,
+      performance.now() / 1000,
+      _stAnalyser
+    );
+  };
+  tick();
+}
+
+
 /* Modo aleatorio: "bag shuffle" — se baraja una bolsa con todos los índices
    pendientes y se van sacando uno a uno; ninguna canción se repite hasta que
    no se han reproducido todas las demás. Al agotarse, se rebaraja de nuevo. */
@@ -11761,15 +12121,29 @@ let musicShuffleHistory = []; // índices ya sonados en esta ronda (para "anteri
    Solo puede sonar uno de los dos a la vez. */
 let miniPlayerSource = null;
 
+/* ── Helper de escape HTML para insertar texto en innerHTML de forma segura ── */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /* ── Normaliza una entrada de songs ───────────────────────────────────────
-   Acepta formato antiguo ('songId' string) y nuevo ({id, roblox} objeto).
-   Siempre devuelve { songId, robloxId }. */
+   Acepta formato antiguo ('songId' string) y nuevo ({id, roblox, info} objeto).
+   Siempre devuelve { songId, robloxId, trackInfo }. */
 function normalizeSongEntry(value) {
-  if (typeof value === 'string') return { songId: value, robloxId: '' };
+  if (typeof value === 'string') return { songId: value, robloxId: '', trackInfo: '' };
   if (value && typeof value === 'object') {
-    return { songId: (value.id || '').toString(), robloxId: (value.roblox || '').toString().trim() };
+    return {
+      songId:    (value.id    || '').toString(),
+      robloxId:  (value.roblox|| '').toString().trim(),
+      trackInfo: (value.info  || '').toString().trim()
+    };
   }
-  return { songId: '', robloxId: '' };
+  return { songId: '', robloxId: '', trackInfo: '' };
 }
 
 /* ── Detiene el motor que NO se va a usar ────────────────────────────────
@@ -12000,9 +12374,16 @@ function musicLoadTrack(index, autoplay) {
     musicAudio = null;
   }
   musicAudio = new Audio('ost_' + track.songId + '.mp3');
-  musicAudio.volume = musicVolume;
+  musicAudio.volume = Math.min(1, musicVolume);
+  musicConnectNewAudio(); // aplica volumen e inicia el visualizador
 
-  document.getElementById('music-track-name').textContent = track.name;
+  /* Nombre + badge de info */
+  const musicNameEl = document.getElementById('music-track-name');
+  if (track.trackInfo) {
+    musicNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">${escapeHtml(track.trackInfo)}</span></span>`;
+  } else {
+    musicNameEl.textContent = track.name;
+  }
 
   // Fila de ID de Roblox (siempre visible; muestra "—" si la canción no tiene ID)
   const robloxRow = document.getElementById('music-roblox-row');
@@ -12046,6 +12427,7 @@ function musicLoadTrack(index, autoplay) {
   };
 
   if (autoplay) {
+    _resumeSharedCtx(); /* desbloquear AudioContext: estamos en gesto de usuario */
     musicAudio.play().then(() => {
       musicIsPlaying = true;
       musicUpdatePlayButton();
@@ -12079,6 +12461,7 @@ function musicTogglePlay() {
     musicAudio.pause();
     musicIsPlaying = false;
   } else {
+    _resumeSharedCtx(); /* desbloquear AudioContext en gesto de usuario */
     musicAudio.play().catch(() => {});
     musicIsPlaying = true;
   }
@@ -12151,10 +12534,16 @@ function musicToggleShuffle() {
 }
 
 function musicSetVolume(val) {
-  musicVolume = Math.max(0, Math.min(100, Number(val))) / 100;
+  const pct = Math.max(0, Math.min(100, Number(val)));
+  musicVolume = pct / 100;
   if (musicAudio) musicAudio.volume = musicVolume;
-  const icon = document.getElementById('music-volume-icon');
+  const icon    = document.getElementById('music-volume-icon');
+  const pctSpan = document.getElementById('music-volume-pct');
   icon.textContent = musicVolume === 0 ? '🔇' : (musicVolume < 0.5 ? '🔉' : '🔊');
+  if (pctSpan) {
+    pctSpan.textContent = Math.round(pct) + '%';
+  }
+  musicApplyGain(musicVolume);
 }
 
 /* Barra de progreso: permite arrastrar para buscar posición */
@@ -12222,7 +12611,12 @@ function reopenFullMusicPlayer() {
 
   // Reusa la pista/posición actuales en vez de reiniciar desde cero
   const curTrack = musicTrackList[musicTrackIndex];
-  document.getElementById('music-track-name').textContent = curTrack.name;
+  const rrNameEl = document.getElementById('music-track-name');
+  if (curTrack.trackInfo) {
+    rrNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(curTrack.name)}<span class="music-info-badge">${escapeHtml(curTrack.trackInfo)}</span></span>`;
+  } else {
+    rrNameEl.textContent = curTrack.name;
+  }
   // Fila Roblox (siempre visible; muestra "—" si la canción no tiene ID)
   const rrRow = document.getElementById('music-roblox-row');
   document.getElementById('music-roblox-value').textContent = curTrack.robloxId || '—';
@@ -12439,12 +12833,16 @@ function renderSoundtrackSongList() {
     const robloxBtnHtml = track.robloxId
       ? `<button class="soundtrack-song-roblox-btn" title="Copiar ID de Roblox" onclick="event.stopPropagation();copyRobloxIdDirect('${track.robloxId.replace(/'/g,"\\'")}',this)">🎮 ID</button>`
       : '';
+    const infoBadgeHtml = track.trackInfo
+      ? `<span class="soundtrack-song-info-badge" title="${escapeHtml(track.trackInfo)}">★ ${escapeHtml(track.trackInfo)}</span>`
+      : '';
     row.innerHTML = `
       <span class="soundtrack-song-index">${i + 1}</span>
       <div class="soundtrack-song-text">
-        <div class="soundtrack-song-name">${track.name}</div>
+        <div class="soundtrack-song-name">${escapeHtml(track.name)}</div>
         ${sourceHtml}
       </div>
+      ${infoBadgeHtml}
       ${robloxBtnHtml}
       <span class="soundtrack-song-playicon">${i === stTrackIndex && stIsPlaying ? '🔊' : ''}</span>
     `;
@@ -12481,9 +12879,16 @@ function stLoadTrack(index, autoplay) {
     stAudio = null;
   }
   stAudio = new Audio('ost_' + track.songId + '.mp3');
-  stAudio.volume = stVolume;
+  stAudio.volume = Math.min(1, stVolume);
+  stConnectNewAudio(); // aplica volumen e inicia el visualizador
 
-  document.getElementById('soundtrack-track-name').textContent   = track.name;
+  /* Nombre + badge de info */
+  const stNameEl = document.getElementById('soundtrack-track-name');
+  if (track.trackInfo) {
+    stNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">${escapeHtml(track.trackInfo)}</span></span>`;
+  } else {
+    stNameEl.textContent = track.name;
+  }
   document.getElementById('soundtrack-track-source').textContent = stCurrentAlbum && stCurrentAlbum.multiSource ? track.gloveName : '';
 
   // Fila de ID de Roblox en el reproductor de Soundtrack (siempre visible; "—" si no tiene ID)
@@ -12536,6 +12941,7 @@ function stLoadTrack(index, autoplay) {
   };
 
   if (autoplay) {
+    _resumeSharedCtx(); /* desbloquear AudioContext: estamos en gesto de usuario */
     stAudio.play().then(() => {
       stIsPlaying = true;
       stUpdatePlayButton();
@@ -12565,6 +12971,7 @@ function stTogglePlay() {
     stAudio.pause();
     stIsPlaying = false;
   } else {
+    _resumeSharedCtx(); /* desbloquear AudioContext en gesto de usuario */
     stAudio.play().catch(() => {});
     stIsPlaying = true;
   }
@@ -12641,10 +13048,16 @@ function stToggleShuffle() {
 }
 
 function stSetVolume(val) {
-  stVolume = Math.max(0, Math.min(100, Number(val))) / 100;
+  const pct = Math.max(0, Math.min(100, Number(val)));
+  stVolume = pct / 100;
   if (stAudio) stAudio.volume = stVolume;
-  const icon = document.getElementById('soundtrack-volume-icon');
+  const icon    = document.getElementById('soundtrack-volume-icon');
+  const pctSpan = document.getElementById('soundtrack-volume-pct');
   if (icon) icon.textContent = stVolume === 0 ? '🔇' : (stVolume < 0.5 ? '🔉' : '🔊');
+  if (pctSpan) {
+    pctSpan.textContent = Math.round(pct) + '%';
+  }
+  stApplyGain(stVolume);
 }
 
 /* Detiene por completo la reproducción del Soundtrack (p. ej. al cambiar de página) */
