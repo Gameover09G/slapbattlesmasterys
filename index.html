@@ -4553,7 +4553,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   text-align: center;
   text-shadow: 1px 1px 0 #000;
   max-width: 100%;
-  overflow: visible; /* visible para que el tooltip no quede recortado */
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -4998,7 +4999,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   text-align: center;
   text-shadow: 1px 1px 0 #000;
   max-width: 100%;
-  overflow: visible; /* visible para que el tooltip no quede recortado */
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 #soundtrack-track-source {
@@ -5259,13 +5261,12 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
 .soundtrack-song-roblox-btn:hover { background: var(--yellow-dark); color: #111; transform: scale(1.06); }
 .soundtrack-song-roblox-btn:active { transform: scale(0.92); }
 
-/* ── Icono de info con tooltip hover (aparece junto al nombre en el reproductor) ── */
+/* ── Icono de info (el tooltip es un div global en body, manejado por JS) ── */
 .music-info-badge {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   line-height: 1;
   margin-left: 5px;
   cursor: default;
@@ -5275,34 +5276,31 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
   transition: filter .2s;
 }
 .music-info-badge:hover {
-  filter: drop-shadow(0 0 7px rgba(255,215,0,0.9));
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.95));
 }
-.music-info-badge::before { content: none; }
-/* Tooltip */
-.music-info-badge .music-info-tooltip {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
+
+/* Tooltip global — único en el DOM, movido por JS */
+#music-info-global-tooltip {
+  display: none;
   position: fixed;
+  z-index: 99999;
   background: #1a1a1a;
   border: 2px solid var(--yellow-bright);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 13px;
   font-family: 'Fredoka', sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--text-light);
   white-space: normal;
   width: max-content;
-  max-width: 240px;
+  max-width: 260px;
   text-align: center;
   line-height: 1.4;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 0 10px rgba(255,215,0,0.2);
-  transition: opacity .18s ease, visibility .18s ease;
-  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.75), 0 0 10px rgba(255,215,0,0.2);
+  pointer-events: none;
   transform: translateX(-50%);
 }
-/* Flechita del tooltip */
-.music-info-badge .music-info-tooltip::after {
+#music-info-global-tooltip::after {
   content: '';
   position: absolute;
   top: 100%;
@@ -5311,11 +5309,6 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
   border: 6px solid transparent;
   border-top-color: var(--yellow-bright);
 }
-.music-info-badge:hover .music-info-tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
 
 
 /* ── Wrapper del nombre de canción + badge info en reproductores grandes ── */
@@ -5327,7 +5320,6 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
   gap: 4px;
   width: 100%;
   text-align: center;
-  overflow: visible;
 }
 
 /* ── Volumen mejorado ── */
@@ -12405,7 +12397,7 @@ function musicLoadTrack(index, autoplay) {
   /* Nombre + badge de info */
   const musicNameEl = document.getElementById('music-track-name');
   if (track.trackInfo) {
-    musicNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">🛈<span class="music-info-tooltip">${escapeHtml(track.trackInfo)}</span></span></span>`;
+    musicNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge" data-info="${escapeHtml(track.trackInfo)}">🛈</span></span>`;
   } else {
     musicNameEl.textContent = track.name;
   }
@@ -12638,7 +12630,7 @@ function reopenFullMusicPlayer() {
   const curTrack = musicTrackList[musicTrackIndex];
   const rrNameEl = document.getElementById('music-track-name');
   if (curTrack.trackInfo) {
-    rrNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(curTrack.name)}<span class="music-info-badge">🛈<span class="music-info-tooltip">${escapeHtml(curTrack.trackInfo)}</span></span></span>`;
+    rrNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(curTrack.name)}<span class="music-info-badge" data-info="${escapeHtml(curTrack.trackInfo)}">🛈</span></span>`;
   } else {
     rrNameEl.textContent = curTrack.name;
   }
@@ -12908,7 +12900,7 @@ function stLoadTrack(index, autoplay) {
   /* Nombre + badge de info */
   const stNameEl = document.getElementById('soundtrack-track-name');
   if (track.trackInfo) {
-    stNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">🛈<span class="music-info-tooltip">${escapeHtml(track.trackInfo)}</span></span></span>`;
+    stNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge" data-info="${escapeHtml(track.trackInfo)}">🛈</span></span>`;
   } else {
     stNameEl.textContent = track.name;
   }
@@ -13466,20 +13458,31 @@ async function generateShareCollage(completed, loading, imgWrap, actions) {
   </div>
 </div>
 
+<!-- Tooltip global para el icono de info de canciones -->
+<div id="music-info-global-tooltip"></div>
+
 <script>
-/* ── Tooltip de info: posicionamiento con position:fixed ──────────────────
-   Como el tooltip usa position:fixed, hay que calcular sus coordenadas
-   en viewport para colocarlo justo encima del icono 🛈               */
-document.addEventListener('mouseover', function(e) {
-  const badge = e.target.closest('.music-info-badge');
-  if (!badge) return;
-  const tooltip = badge.querySelector('.music-info-tooltip');
-  if (!tooltip) return;
-  const rect = badge.getBoundingClientRect();
-  tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-  tooltip.style.top  = (rect.top - 10) + 'px';
-  tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
-});
+(function() {
+  const tooltip = document.getElementById('music-info-global-tooltip');
+
+  document.addEventListener('mouseover', function(e) {
+    const badge = e.target.closest('.music-info-badge');
+    if (!badge) return;
+    const info = badge.getAttribute('data-info');
+    if (!info) return;
+    tooltip.textContent = info;
+    tooltip.style.display = 'block';
+    const rect = badge.getBoundingClientRect();
+    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+    tooltip.style.top  = (rect.top - tooltip.offsetHeight - 10) + 'px';
+  });
+
+  document.addEventListener('mouseout', function(e) {
+    const badge = e.target.closest('.music-info-badge');
+    if (!badge) return;
+    tooltip.style.display = 'none';
+  });
+})();
 </script>
 
 </body>
