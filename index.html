@@ -6138,6 +6138,16 @@ input[type="range"].slap-volume::-moz-range-track {
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
+    version: "1.2.2 - Mejoras musicales y informacion irrelevante.",
+    date: "23/06/2026",
+    entries: [
+      { emoji: "📋", color: "#F9FFD4", text: "Al final de la pagina web he tenido que agregar politica de usuario, sistemas de copyright y cosas mas que nada porque al ser una pagina web publica, por pequeña que sea es OBLIGADO especificarlo."},
+      { emoji: "🎵", color: "#5e5e5e", text: "Agregado un visualizador de audio yo que se para que pero bueno, se ve guapo."},
+      { emoji: "🔎", color: "#a78bfa", text: "ya que muchos no saben de donde salen las canciones, al lado del titulo de la cancion sonando, si colocas el cursor encima te aparece exactamente de donde proviene o otra informacion importante."},
+    ]
+  },
+  
+  {
     version: "1.2.1 - Musica y Killstreaks.",
     date: "23/06/2026",
     entries: [
@@ -12085,15 +12095,6 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
       }
     }
 
-    /* Atenuación de la mitad izquierda: las barras del extremo izquierdo
-       se multiplican por 0.45 y van aumentando linealmente hasta 1.0 en el centro.
-       Las barras de la mitad derecha (i >= bars/2) no se tocan. */
-    if (i < bars / 2) {
-      const t = i / (bars / 2);          /* 0 en el extremo izq → 1 en el centro */
-      const dampen = 0.45 + t * 0.55;
-      amp *= dampen;
-    }
-
     const barH  = amp * (h * 0.42);
     const x     = i * (barW + gap);
     const alpha = playing ? (0.28 + amp * 0.48) : 0.18;
@@ -13492,6 +13493,403 @@ async function generateShareCollage(completed, loading, imgWrap, actions) {
     tooltip.style.display = 'none';
   });
 })();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════════ -->
+<style>
+#site-footer {
+  background: #0d0d0d;
+  border-top: 3px solid #222;
+  padding: 36px 28px 24px;
+  font-family: 'Fredoka', sans-serif;
+  color: #666;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+#site-footer .footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Top row: branding + links */
+#site-footer .footer-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+#site-footer .footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#site-footer .footer-brand-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: var(--yellow-bright);
+  letter-spacing: 1px;
+}
+#site-footer .footer-brand-sub {
+  font-size: 0.78rem;
+  color: #555;
+  max-width: 280px;
+}
+
+/* Link columns */
+#site-footer .footer-links {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+#site-footer .footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 130px;
+}
+#site-footer .footer-col-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  letter-spacing: 1.2px;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+#site-footer .footer-col a,
+#site-footer .footer-col button {
+  color: #666;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  text-align: left;
+  transition: color .15s;
+}
+#site-footer .footer-col a:hover,
+#site-footer .footer-col button:hover { color: var(--yellow-bright); }
+
+/* Divider */
+#site-footer .footer-divider {
+  border: none;
+  border-top: 1px solid #1e1e1e;
+}
+
+/* Disclaimer */
+#site-footer .footer-disclaimer {
+  font-size: 0.74rem;
+  color: #444;
+  line-height: 1.6;
+  text-align: center;
+}
+#site-footer .footer-disclaimer a { color: #555; text-decoration: underline; }
+#site-footer .footer-disclaimer a:hover { color: var(--yellow-bright); }
+
+/* Bottom bar */
+#site-footer .footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+#site-footer .footer-copy {
+  font-size: 0.76rem;
+  color: #3a3a3a;
+}
+#site-footer .footer-copy strong { color: #555; }
+
+/* Cookie banner */
+#cookie-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #111;
+  border-top: 2px solid #2a2a2a;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  z-index: 8888;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  color: #888;
+  transform: translateY(100%);
+  transition: transform .4s ease;
+}
+#cookie-banner.visible { transform: translateY(0); }
+#cookie-banner a { color: var(--yellow-bright); text-decoration: none; }
+#cookie-banner a:hover { text-decoration: underline; }
+#cookie-banner .cookie-btns { display: flex; gap: 8px; flex-shrink: 0; }
+#cookie-accept {
+  background: var(--yellow-bright);
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: filter .15s;
+}
+#cookie-accept:hover { filter: brightness(1.12); }
+#cookie-reject {
+  background: transparent;
+  color: #666;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+#cookie-reject:hover { color: #aaa; border-color: #555; }
+
+/* Modal de Términos / Privacidad / Cookies */
+.footer-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 9990;
+  align-items: center;
+  justify-content: center;
+}
+.footer-modal-overlay.open { display: flex; }
+.footer-modal {
+  background: #1c1c1c;
+  border: 2px solid #2e2e2e;
+  border-radius: 14px;
+  width: min(640px, 92vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.85);
+  overflow: hidden;
+}
+.footer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 2px solid #2a2a2a;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: var(--yellow-bright);
+}
+.footer-modal-close {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color .15s;
+}
+.footer-modal-close:hover { color: #fff; }
+.footer-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.86rem;
+  color: #aaa;
+  line-height: 1.7;
+  flex: 1;
+}
+.footer-modal-body h3 {
+  font-family: 'Fredoka One', cursive;
+  color: var(--text-white);
+  font-size: 0.95rem;
+  margin: 18px 0 6px;
+}
+.footer-modal-body h3:first-child { margin-top: 0; }
+.footer-modal-body p { margin-bottom: 10px; }
+
+@media (max-width: 600px) {
+  #site-footer .footer-top { flex-direction: column; }
+  #site-footer .footer-links { gap: 24px; }
+  #site-footer .footer-bottom { flex-direction: column; align-items: flex-start; }
+  #cookie-banner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+
+<footer id="site-footer">
+  <div class="footer-inner">
+
+    <!-- Marca + columnas de links -->
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand-title">🥊 Slap Battles Mastery Tracker</div>
+        <div class="footer-brand-sub">Seguimiento no oficial de maestrías del juego Slap Battles de Roblox. Hecho por fans, para fans.</div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">Legal</div>
+          <button onclick="openFooterModal('terms')">Términos de uso</button>
+          <button onclick="openFooterModal('privacy')">Política de privacidad</button>
+          <button onclick="openFooterModal('cookies')">Política de cookies</button>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Proyecto</div>
+          <a href="https://gameover09g.github.io/slapbattlesmasterys/" target="_blank" rel="noopener">Sitio web</a>
+          <a href="https://github.com/gameover09g" target="_blank" rel="noopener">GitHub</a>
+          <button onclick="openFooterModal('about')">Acerca de</button>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Juego</div>
+          <a href="https://www.roblox.com/games/6403373529" target="_blank" rel="noopener">Slap Battles en Roblox</a>
+          <a href="https://www.roblox.com" target="_blank" rel="noopener">Roblox.com</a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="footer-divider">
+
+    <!-- Disclaimer -->
+    <p class="footer-disclaimer">
+      Este sitio es un proyecto de fans <strong style="color:#555">no oficial y no afiliado</strong> a Roblox Corporation ni a los creadores de Slap Battles.
+      «Slap Battles», «Roblox» y sus respectivos logotipos son marcas registradas de sus propietarios.
+      Todo el contenido del juego (imágenes, nombres, música) pertenece a sus respectivos autores y se utiliza únicamente con fines informativos y de seguimiento personal.
+      <br>
+      Este sitio no recopila datos personales ni utiliza cookies de rastreo. El almacenamiento local (localStorage) se usa exclusivamente para guardar tu progreso en tu propio dispositivo.
+    </p>
+
+    <hr class="footer-divider">
+
+    <!-- Copyright -->
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        © <strong>gameover09g</strong> · <span id="footer-year"></span> · Slap Battles Mastery Tracker
+      </div>
+      <div class="footer-copy" style="color:#2e2e2e">
+        Versión fan-made · Contenido del juego © sus respectivos autores
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- Modales legales -->
+<div class="footer-modal-overlay" id="modal-terms">
+  <div class="footer-modal">
+    <div class="footer-modal-header">
+      📄 Términos de uso
+      <button class="footer-modal-close" onclick="closeFooterModal('terms')">✕</button>
+    </div>
+    <div class="footer-modal-body">
+      <h3>1. Uso del sitio</h3>
+      <p>Este sitio web es una herramienta de seguimiento de maestrías del juego Slap Battles (Roblox), desarrollada de forma independiente por un fan. El uso es completamente gratuito y personal.</p>
+      <h3>2. Contenido de terceros</h3>
+      <p>Las imágenes, nombres, música y demás contenido relacionado con Slap Battles y Roblox pertenecen a sus respectivos propietarios. Este sitio no reclama ningún derecho sobre dicho contenido.</p>
+      <h3>3. Sin garantías</h3>
+      <p>El sitio se ofrece «tal cual», sin garantías de ningún tipo. La información sobre maestrías puede no estar siempre actualizada. El autor no se hace responsable de errores u omisiones.</p>
+      <h3>4. Modificaciones</h3>
+      <p>Estos términos pueden actualizarse en cualquier momento sin previo aviso. El uso continuado del sitio implica la aceptación de los términos vigentes.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer-modal-overlay" id="modal-privacy">
+  <div class="footer-modal">
+    <div class="footer-modal-header">
+      🔒 Política de privacidad
+      <button class="footer-modal-close" onclick="closeFooterModal('privacy')">✕</button>
+    </div>
+    <div class="footer-modal-body">
+      <h3>Datos que recopilamos</h3>
+      <p>Este sitio <strong style="color:#fff">no recopila ningún dato personal</strong>. No hay registro de usuarios, no hay formularios de datos personales y no se envía ninguna información a servidores externos.</p>
+      <h3>Almacenamiento local</h3>
+      <p>Tu progreso (maestrías completadas, notas, preferencias) se guarda exclusivamente en el <strong style="color:#fff">localStorage</strong> de tu navegador, en tu propio dispositivo. Estos datos nunca salen de tu equipo.</p>
+      <h3>Servicios de terceros</h3>
+      <p>El sitio carga fuentes tipográficas desde Google Fonts. Google puede registrar esta solicitud según su propia política de privacidad.</p>
+      <h3>Contacto</h3>
+      <p>Para cualquier consulta relacionada con la privacidad, puedes contactar a través de GitHub: <a href="https://github.com/gameover09g" target="_blank" rel="noopener">github.com/gameover09g</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="footer-modal-overlay" id="modal-cookies">
+  <div class="footer-modal">
+    <div class="footer-modal-header">
+      🍪 Política de cookies
+      <button class="footer-modal-close" onclick="closeFooterModal('cookies')">✕</button>
+    </div>
+    <div class="footer-modal-body">
+      <h3>¿Usamos cookies?</h3>
+      <p>Este sitio <strong style="color:#fff">no utiliza cookies</strong> de rastreo, analítica ni publicidad.</p>
+      <h3>Almacenamiento local (localStorage)</h3>
+      <p>Para guardar tu progreso utilizamos el <strong style="color:#fff">localStorage</strong> del navegador, que es técnicamente distinto a una cookie. Esta información:</p>
+      <p>— Se guarda únicamente en tu dispositivo.<br>— No se transmite a ningún servidor.<br>— Puedes borrarla en cualquier momento desde los ajustes de tu navegador.</p>
+      <h3>Datos guardados</h3>
+      <p>Maestrías completadas, fechas de completado, notas personales, preferencias de visualización y progreso de misiones.</p>
+      <h3>Cómo borrar tus datos</h3>
+      <p>Ve a los ajustes de tu navegador → Privacidad → Borrar datos de sitios web, o usa las herramientas de desarrollador (F12 → Application → localStorage).</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer-modal-overlay" id="modal-about">
+  <div class="footer-modal">
+    <div class="footer-modal-header">
+      🥊 Acerca de este sitio
+      <button class="footer-modal-close" onclick="closeFooterModal('about')">✕</button>
+    </div>
+    <div class="footer-modal-body">
+      <h3>¿Qué es esto?</h3>
+      <p>Slap Battles Mastery Tracker es una herramienta no oficial creada por fans para llevar el seguimiento de las maestrías del juego Slap Battles en Roblox.</p>
+      <h3>Autor</h3>
+      <p>Desarrollado por <strong style="color:#fff">gameover09g</strong>. Proyecto personal sin ánimo de lucro.</p>
+      <h3>Características</h3>
+      <p>— Seguimiento de maestrías completadas con fechas.<br>— Reproductor de música del juego.<br>— Visualizador de misiones y progreso.<br>— Totalmente offline: todo se guarda en tu navegador.</p>
+      <h3>Descargo de responsabilidad</h3>
+      <p>Este proyecto no está afiliado, patrocinado ni respaldado por Roblox Corporation ni por los creadores de Slap Battles. Todo el contenido del juego pertenece a sus respectivos autores.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Footer: año actual ── */
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+/* ── Cookie banner ── */
+function dismissCookieBanner() {
+  document.getElementById('cookie-banner').classList.remove('visible');
+  localStorage.setItem('cookieNoticeAck', '1');
+}
+if (!localStorage.getItem('cookieNoticeAck')) {
+  setTimeout(() => document.getElementById('cookie-banner').classList.add('visible'), 1200);
+}
+
+/* ── Modales legales ── */
+function openFooterModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFooterModal(id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+/* Cerrar al hacer clic fuera del modal */
+document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+});
 </script>
 
 </body>
