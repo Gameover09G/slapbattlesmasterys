@@ -12074,16 +12074,24 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
         for (let b = t0; b < end; b++) {
           if (freqData[b] > peak) peak = freqData[b];
         }
-        /* Curva de potencia 0.6: las barras siguen llegando al mismo máximo
-           pero suben de forma más gradual y natural, sin dispararse de golpe */
-        amp = 0.08 + Math.pow(peak / 255, 0.6) * 0.88;
+        /* Suelo mínimo del 12% para que ninguna barra quede completamente plana */
+        amp = 0.12 + (peak / 255) * 0.84;
       } else {
         /* Fallback senoidal (mientras el AudioContext no está activo) */
         const s    = seeds[i];
         const wave = (Math.sin(t * s.speed  + s.phase)  * 0.5 + 0.5) * 0.7
                    + (Math.sin(t * s.speed2 + s.phase2) * 0.5 + 0.5) * 0.3;
-        amp = 0.08 + wave * 0.55;
+        amp = 0.10 + wave * 0.85;
       }
+    }
+
+    /* Atenuación de la mitad izquierda: las barras del extremo izquierdo
+       se multiplican por 0.45 y van aumentando linealmente hasta 1.0 en el centro.
+       Las barras de la mitad derecha (i >= bars/2) no se tocan. */
+    if (i < bars / 2) {
+      const t = i / (bars / 2);          /* 0 en el extremo izq → 1 en el centro */
+      const dampen = 0.45 + t * 0.55;
+      amp *= dampen;
     }
 
     const barH  = amp * (h * 0.42);
