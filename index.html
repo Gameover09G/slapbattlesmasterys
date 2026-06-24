@@ -5261,42 +5261,66 @@ input[type="range"].slap-progress.slap-range-sm::-moz-range-thumb:hover {
 .soundtrack-song-roblox-btn:hover { background: var(--yellow-dark); color: #111; transform: scale(1.06); }
 .soundtrack-song-roblox-btn:active { transform: scale(0.92); }
 
-/* ── Badge de info de la canción (aparece junto al nombre en el reproductor) ── */
+/* ── Icono de info con tooltip hover (aparece junto al nombre en el reproductor) ── */
 .music-info-badge {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: #111;
-  background: linear-gradient(135deg, var(--yellow-bright), #ff8c00);
-  border-radius: 5px;
-  padding: 2px 7px;
-  margin-left: 6px;
-  white-space: nowrap;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  margin-left: 5px;
+  cursor: default;
+  flex-shrink: 0;
   vertical-align: middle;
-  box-shadow: 0 1px 5px rgba(255,140,0,0.35);
-  letter-spacing: 0.2px;
-  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.5));
+  transition: filter .2s;
 }
-.music-info-badge::before { content: '★'; font-size: 0.65rem; }
-
-/* Info badge en la lista de canciones (inline pequeño) */
-.soundtrack-song-info-badge {
-  flex-shrink: 0;
-  border: 1.5px solid #ff8c00;
-  background: rgba(255,140,0,0.12);
-  color: #ff8c00;
-  border-radius: 5px;
-  font-size: 0.6rem;
+.music-info-badge:hover {
+  filter: drop-shadow(0 0 7px rgba(255,215,0,0.9));
+}
+.music-info-badge::before { content: none; }
+/* Tooltip */
+.music-info-badge .music-info-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  border: 2px solid var(--yellow-bright);
+  border-radius: 8px;
+  padding: 8px 12px;
   font-family: 'Fredoka', sans-serif;
-  padding: 2px 5px;
-  white-space: nowrap;
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  text-align: center;
+  line-height: 1.4;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 0 10px rgba(255,215,0,0.2);
+  transition: opacity .18s ease, visibility .18s ease;
+  z-index: 100;
 }
+/* Flechita del tooltip */
+.music-info-badge .music-info-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--yellow-bright);
+}
+.music-info-badge:hover .music-info-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+
 
 /* ── Wrapper del nombre de canción + badge info en reproductores grandes ── */
 .music-track-name-wrap {
@@ -10787,16 +10811,16 @@ const GLOVES = [
     songs: {
       // Formato con ID de Roblox: { id: 'archivoSin_ost_', roblox: 'ID_NUMERICO_AQUI' }
       // Si no tiene ID de Roblox, puedes usar el formato simple: 'Nombre': 'idArchivo'
-      'Finale':                    { id: 'finale',               roblox: '9133399582' },
-      'Scourge of the Universe':   { id: 'scourgeuniverse',      roblox: '9133858357' },
-      'Universal Collapse':        { id: 'universalcollapse',    roblox: '9127529330' },
-      'Stained, Brutal Calamity':  { id: 'stainedbrutalcalamity',roblox: '9133520457' },
-      'The Filthy Mind':  { id: 'thefilthymind',roblox: '' },
-      'Final Boss':  { id: 'finalboss',roblox: '9127194464' },
-      'Sixes and Sevens':          { id: 'sixesandsevens',       roblox: '14562731021' },
-      'Unholy Insurgency':         { id: 'unholyinsurgency',     roblox: '9133787486' },
-      'True Love [Metal Remix]':   { id: 'truelove',             roblox: '9133539469' },
-      'Threats of The Ocean Floor':{ id: 'threatsoceanfloor',    roblox: '17755766444' },
+      'Finale':                    { id: 'finale',               roblox: '9133399582' , info: "Fase de 4 kills"},
+      'Scourge of the Universe':   { id: 'scourgeuniverse',      roblox: '9133858357' , info: "Fase de 10 kills"},
+      'Universal Collapse':        { id: 'universalcollapse',    roblox: '9127529330' , info: "Fase de 25 kills" },
+      'Stained, Brutal Calamity':  { id: 'stainedbrutalcalamity',roblox: '9133520457' , info: "Fase de 50 kills"},
+      'The Filthy Mind':  { id: 'thefilthymind',roblox: '', info: "Fase de 75 kills, primera version"},
+      'Final Boss':  { id: 'finalboss',roblox: '9127194464', info: "Fase de 75 kills, segunda version"},
+      'Sixes and Sevens':          { id: 'sixesandsevens',       roblox: '14562731021', info: "Fase de 75 kills, version actual" },
+      'Unholy Insurgency':         { id: 'unholyinsurgency',     roblox: '9133787486', info:"Fase de 100 kills" },
+      'True Love [Metal Remix]':   { id: 'truelove',             roblox: '9133539469', info: "Fase de 250 kills" },
+      'Threats of The Ocean Floor':{ id: 'threatsoceanfloor',    roblox: '17755766444', info: "Fase de 1000 kills" },
     },
   },
 
@@ -12384,7 +12408,7 @@ function musicLoadTrack(index, autoplay) {
   /* Nombre + badge de info */
   const musicNameEl = document.getElementById('music-track-name');
   if (track.trackInfo) {
-    musicNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">${escapeHtml(track.trackInfo)}</span></span>`;
+    musicNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">🛈<span class="music-info-tooltip">${escapeHtml(track.trackInfo)}</span></span></span>`;
   } else {
     musicNameEl.textContent = track.name;
   }
@@ -12617,7 +12641,7 @@ function reopenFullMusicPlayer() {
   const curTrack = musicTrackList[musicTrackIndex];
   const rrNameEl = document.getElementById('music-track-name');
   if (curTrack.trackInfo) {
-    rrNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(curTrack.name)}<span class="music-info-badge">${escapeHtml(curTrack.trackInfo)}</span></span>`;
+    rrNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(curTrack.name)}<span class="music-info-badge">🛈<span class="music-info-tooltip">${escapeHtml(curTrack.trackInfo)}</span></span></span>`;
   } else {
     rrNameEl.textContent = curTrack.name;
   }
@@ -12837,9 +12861,7 @@ function renderSoundtrackSongList() {
     const robloxBtnHtml = track.robloxId
       ? `<button class="soundtrack-song-roblox-btn" title="Copiar ID de Roblox" onclick="event.stopPropagation();copyRobloxIdDirect('${track.robloxId.replace(/'/g,"\\'")}',this)">🎮 ID</button>`
       : '';
-    const infoBadgeHtml = track.trackInfo
-      ? `<span class="soundtrack-song-info-badge" title="${escapeHtml(track.trackInfo)}">★ ${escapeHtml(track.trackInfo)}</span>`
-      : '';
+    const infoBadgeHtml = ''; /* el info se muestra solo en el reproductor grande, no en la lista */
     row.innerHTML = `
       <span class="soundtrack-song-index">${i + 1}</span>
       <div class="soundtrack-song-text">
@@ -12889,7 +12911,7 @@ function stLoadTrack(index, autoplay) {
   /* Nombre + badge de info */
   const stNameEl = document.getElementById('soundtrack-track-name');
   if (track.trackInfo) {
-    stNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">${escapeHtml(track.trackInfo)}</span></span>`;
+    stNameEl.innerHTML = `<span class="music-track-name-wrap">${escapeHtml(track.name)}<span class="music-info-badge">🛈<span class="music-info-tooltip">${escapeHtml(track.trackInfo)}</span></span></span>`;
   } else {
     stNameEl.textContent = track.name;
   }
