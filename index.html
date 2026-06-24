@@ -12045,24 +12045,24 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
 
     if (playing) {
       if (freqData) {
-        /* Patrón espejo: las barras se intercalan izquierda↔derecha hacia el centro.
-           Las barras pares (0,2,4…) leen desde el extremo izquierdo del espectro
-           y las impares (1,3,5…) desde el extremo derecho, ambas avanzando al centro.
-           Así los graves y agudos se alternan visualmente barra a barra. */
+        /* Mapeo logarítmico: igual que un ecualizador real.
+           Los bins de frecuencia se distribuyen en escala log para que
+           graves, medios y agudos ocupen proporciones visuales similares.
+           Usamos solo los primeros 3/4 del espectro (los últimos bins
+           son ultrasónicos y siempre vacíos en audio comprimido). */
         const bins    = freqData.length;
-        const half    = Math.ceil(bars / 2);
-        const rank    = Math.floor(i / 2);       /* 0,0,1,1,2,2… distancia al borde */
-        const fromEnd = (i % 2 === 0);           /* par → desde izq, impar → desde der */
-        const binIdx  = fromEnd
-          ? Math.floor((rank / half) * bins)
-          : Math.floor(((half - 1 - rank) / half) * bins + bins / 2);
-        const t0  = Math.min(binIdx, bins - 1);
-        const t1  = Math.min(binIdx + Math.max(1, Math.floor(bins / half)), bins);
-        let   peak = 0;
-        for (let b = t0; b < t1; b++) {
+        const usable  = Math.floor(bins * 0.75);
+        const logMin  = Math.log2(1);
+        const logMax  = Math.log2(usable + 1);
+        const t0 = Math.floor(Math.pow(2, logMin + (i / bars)       * (logMax - logMin)) - 1);
+        const t1 = Math.floor(Math.pow(2, logMin + ((i + 1) / bars) * (logMax - logMin)) - 1);
+        const end = Math.min(Math.max(t0 + 1, t1), bins);
+        let peak = 0;
+        for (let b = t0; b < end; b++) {
           if (freqData[b] > peak) peak = freqData[b];
         }
-        amp = 0.04 + (peak / 255) * 0.96;
+        /* Suelo mínimo del 12% para que ninguna barra quede completamente plana */
+        amp = 0.12 + (peak / 255) * 0.84;
       } else {
         /* Fallback senoidal (mientras el AudioContext no está activo) */
         const s    = seeds[i];
