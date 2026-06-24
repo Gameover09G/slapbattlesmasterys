@@ -6138,6 +6138,16 @@ input[type="range"].slap-volume::-moz-range-track {
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
+    version: "1.2.2 - Mejoras musicales y informacion irrelevante.",
+    date: "24/06/2026",
+    entries: [
+      { emoji: "📋", color: "#F9FFD4", text: "Al final de la pagina web he tenido que agregar politica de usuario, sistemas de copyright y cosas mas que nada porque al ser una pagina web publica, por pequeña que sea es OBLIGADO especificarlo."},
+      { emoji: "🎵", color: "#5e5e5e", text: "Agregado un visualizador de audio yo que se para que pero bueno, se ve guapo."},
+      { emoji: "🔎", color: "#a78bfa", text: "ya que muchos no saben de donde salen las canciones, al lado del titulo de la cancion sonando, si colocas el cursor encima te aparece exactamente de donde proviene o otra informacion importante."},
+    ]
+  },
+  
+  {
     version: "1.2.1 - Musica y Killstreaks.",
     date: "23/06/2026",
     entries: [
@@ -11959,8 +11969,8 @@ function _connectAudioToAnalyser(audioEl, existingAnalyser, existingSource) {
     let analyser = existingAnalyser;
     if (!analyser) {
       analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;            // 128 bins → más resolución espectral
-      analyser.smoothingTimeConstant = 0.5; // suavizado bajo: el smoothing manual lo gestiona
+      analyser.fftSize = 256;               // 128 bins → mucha más resolución espectral
+      analyser.smoothingTimeConstant = 0.5; // bajo: el smoothing visual lo gestiona por barra
       analyser.connect(ctx.destination); // → altavoces
     }
 
@@ -12015,19 +12025,18 @@ function _vizMakeBarSeeds(count) {
 const _musicVizSeeds = _vizMakeBarSeeds(VIZ_BAR_COUNT);
 const _stVizSeeds    = _vizMakeBarSeeds(VIZ_BAR_COUNT);
 
-/* Buffer de datos de frecuencia compartido; se crea la primera vez */
+/* Buffer de datos de frecuencia compartido */
 let _vizFreqBuf = null;
 
 /* ── Estado por canvas: smoothing manual + peak markers ──────────────────
-   Igual que AudioMotionAnalyzer: cada barra tiene su valor suavizado
-   y un marcador de pico que cae lentamente tras alcanzar el máximo.    */
-const _vizState = new Map(); /* canvas.id → { smooth[], peak[], peakVel[] } */
-
+   Inspirado en AudioMotionAnalyzer: cada barra tiene su valor suavizado
+   independiente y un marcador de pico con física de caída.              */
+const _vizState = new Map();
 function _getVizState(id, bars) {
   if (!_vizState.has(id) || _vizState.get(id).smooth.length !== bars) {
     _vizState.set(id, {
-      smooth:  new Float32Array(bars).fill(0.05),
-      peak:    new Float32Array(bars).fill(0.05),
+      smooth:  new Float32Array(bars).fill(0.04),
+      peak:    new Float32Array(bars).fill(0.04),
       peakVel: new Float32Array(bars).fill(0),
     });
   }
@@ -12053,7 +12062,7 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
   const gap     = 2;
   const barW    = (w - gap * (bars - 1)) / bars;
   const midY    = h / 2;
-  const maxH    = h * 0.44;   /* altura máxima (mitad arriba/abajo) */
+  const maxH    = h * 0.44;
 
   const state = _getVizState(canvas.id || 'default', bars);
 
@@ -12071,35 +12080,39 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
     if (sum > 0) freqData = _vizFreqBuf;
   }
 
-  /* Constantes de física (por frame ≈60fps) */
-  const SMOOTH_UP   = 0.18;   /* qué rápido sube el suavizado (bajo = más suave) */
-  const SMOOTH_DOWN = 0.07;   /* qué rápido baja (más bajo = cae más despacio)   */
-  const PEAK_HOLD   = 0.0008; /* gravedad del pico: más bajo = cae más lento      */
-  const PEAK_VEL    = 0.012;  /* velocidad inicial de caída del pico               */
+  /* Constantes de comportamiento por frame (~60fps)
+     Inspiradas en smoothing:0.7 y la física de peak de AudioMotionAnalyzer */
+  const SMOOTH_UP   = 0.18;   /* velocidad de subida de la barra  */
+  const SMOOTH_DOWN = 0.07;   /* velocidad de bajada (más lenta)  */
+  const PEAK_GRAV   = 0.0008; /* aceleración de caída del pico    */
+  const PEAK_VINI   = 0.010;  /* velocidad inicial de caída       */
 
   for (let i = 0; i < bars; i++) {
-    /* ── 1. Calcular amplitud raw ── */
+    /* ── 1. Amplitud raw desde el espectro ── */
     let raw = 0.04;
 
     if (playing) {
       if (freqData) {
-        /* Escala log: misma distribución que AudioMotionAnalyzer en mode:"log" */
+        /* Escala logarítmica (como frequencyScale:"log" de AudioMotionAnalyzer):
+           reparte graves, medios y agudos en proporciones musicalmente correctas.
+           Usamos 78% del espectro; el resto son bins ultrasónicos vacíos. */
         const bins   = freqData.length;
         const usable = Math.floor(bins * 0.78);
         const logMin = Math.log2(1);
         const logMax = Math.log2(usable + 1);
-        const t0 = Math.floor(Math.pow(2, logMin + (i       / bars) * (logMax - logMin)) - 1);
-        const t1 = Math.floor(Math.pow(2, logMin + ((i + 1) / bars) * (logMax - logMin)) - 1);
-        const end = Math.min(Math.max(t0 + 1, t1), bins);
-        let peak = 0;
-        for (let b = t0; b < end; b++) {
-          if (freqData[b] > peak) peak = freqData[b];
-        }
-        raw = 0.08 + Math.pow(peak / 255, 0.65) * 0.88;
+        const b0  = Math.floor(Math.pow(2, logMin + (i       / bars) * (logMax - logMin)) - 1);
+        const b1  = Math.floor(Math.pow(2, logMin + ((i + 1) / bars) * (logMax - logMin)) - 1);
+        const end = Math.min(Math.max(b0 + 1, b1), bins);
+        let   pk  = 0;
+        for (let b = b0; b < end; b++) if (freqData[b] > pk) pk = freqData[b];
 
-        /* Atenuación progresiva de la mitad izquierda (graves muy fuertes) */
+        /* Curva de potencia 0.65: reactivo pero sin dispararse.
+           Suelo mínimo 8% para que las barras nunca queden planas. */
+        raw = 0.08 + Math.pow(pk / 255, 0.65) * 0.88;
+
+        /* Atenuación progresiva de la mitad izquierda (graves siempre muy fuertes) */
         if (i < bars / 2) {
-          const pos     = i / (bars / 2);          /* 0=extremo izq, 1=centro */
+          const pos = i / (bars / 2); /* 0=extremo izq → 1=centro */
           raw *= 0.45 + pos * 0.55;
         }
       } else {
@@ -12111,51 +12124,51 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
       }
     }
 
-    /* ── 2. Smoothing manual (como smoothingTimeConstant de AudioMotionAnalyzer) ──
-       Sube rápido, baja despacio → las barras son fluidas pero reactivas     */
+    /* ── 2. Smoothing por barra (sube rápido, baja despacio) ──
+       Equivale al smoothingTimeConstant:0.7 de AudioMotionAnalyzer pero
+       con control asimétrico: los picos son rápidos, la caída es suave. */
     const prev = state.smooth[i];
     state.smooth[i] = raw > prev
-      ? prev + (raw - prev) * SMOOTH_UP
-      : prev + (raw - prev) * SMOOTH_DOWN;
+      ? prev + (raw  - prev) * SMOOTH_UP
+      : prev + (raw  - prev) * SMOOTH_DOWN;
     const amp = state.smooth[i];
 
-    /* ── 3. Peak marker: sube instantáneo al amp, luego cae con gravedad ── */
-    if (amp > state.peak[i]) {
+    /* ── 3. Peak marker con física de caída ──
+       El marcador sube instantáneamente con la barra y luego cae
+       acelerando (gravedad), igual que en AudioMotionAnalyzer. */
+    if (amp >= state.peak[i]) {
       state.peak[i]    = amp;
-      state.peakVel[i] = 0;          /* resetear velocidad de caída */
+      state.peakVel[i] = 0;
     } else {
-      state.peakVel[i] += PEAK_HOLD; /* aceleración hacia abajo     */
-      state.peak[i]    -= state.peakVel[i] + PEAK_VEL;
+      state.peakVel[i] += PEAK_GRAV;
+      state.peak[i]    -= state.peakVel[i] + PEAK_VINI;
       if (state.peak[i] < 0.04) { state.peak[i] = 0.04; state.peakVel[i] = 0; }
     }
     const peakAmp = state.peak[i];
 
     /* ── 4. Dibujo ── */
-    const x     = i * (barW + gap);
-    const barH  = amp * maxH;
+    const x    = i * (barW + gap);
+    const barH = amp * maxH;
     const alpha = playing ? (0.25 + amp * 0.55) : 0.15;
 
-    /* Gradiente vertical: más opaco en el centro, más tenue en los extremos */
+    /* Gradiente vertical: brillante en el centro, desvanecido en los extremos */
     const grad = ctx2d.createLinearGradient(0, midY - barH, 0, midY + barH);
-    grad.addColorStop(0,   `rgba(${VIZ_COLOR},${(alpha * 0.45).toFixed(2)})`);
+    grad.addColorStop(0,   `rgba(${VIZ_COLOR},${(alpha * 0.4).toFixed(2)})`);
     grad.addColorStop(0.4, `rgba(${VIZ_COLOR},${alpha.toFixed(2)})`);
-    grad.addColorStop(0.5, `rgba(${VIZ_COLOR},${Math.min(alpha * 1.15, 1).toFixed(2)})`);
+    grad.addColorStop(0.5, `rgba(${VIZ_COLOR},${Math.min(alpha * 1.2, 1).toFixed(2)})`);
     grad.addColorStop(0.6, `rgba(${VIZ_COLOR},${alpha.toFixed(2)})`);
-    grad.addColorStop(1,   `rgba(${VIZ_COLOR},${(alpha * 0.45).toFixed(2)})`);
-
+    grad.addColorStop(1,   `rgba(${VIZ_COLOR},${(alpha * 0.4).toFixed(2)})`);
     ctx2d.fillStyle = grad;
     ctx2d.fillRect(x, midY - barH, barW, barH * 2);
 
-    /* Peak marker: línea fina dorada brillante encima e igualmente abajo */
-    if (playing && peakAmp > 0.08) {
-      const pH     = peakAmp * maxH;
-      const pAlpha = Math.min(0.9, 0.4 + peakAmp * 0.6);
+    /* Peak marker: línea fina más brillante arriba y abajo (simétrico) */
+    if (playing && peakAmp > 0.09) {
+      const pH      = peakAmp * maxH;
+      const pAlpha  = Math.min(0.95, 0.45 + peakAmp * 0.55);
+      const markerH = Math.max(1.5, barW * 0.2);
       ctx2d.fillStyle = `rgba(255,215,80,${pAlpha.toFixed(2)})`;
-      const markerH = Math.max(1.5, barW * 0.18);
-      /* arriba */
-      ctx2d.fillRect(x, midY - pH - markerH, barW, markerH);
-      /* abajo (simétrico) */
-      ctx2d.fillRect(x, midY + pH,           barW, markerH);
+      ctx2d.fillRect(x, midY - pH - markerH, barW, markerH); /* arriba  */
+      ctx2d.fillRect(x, midY + pH,           barW, markerH); /* abajo   */
     }
   }
 }
@@ -13836,15 +13849,6 @@ async function generateShareCollage(completed, loading, imgWrap, actions) {
 
   </div>
 </footer>
-
-<!-- Cookie banner -->
-<div id="cookie-banner">
-  <span>🍪 Este sitio usa <strong style="color:#aaa">almacenamiento local</strong> únicamente para guardar tu progreso. No hay cookies de rastreo ni publicidad. <button onclick="openFooterModal('cookies')" style="background:none;border:none;color:var(--yellow-bright);cursor:pointer;font-family:'Fredoka',sans-serif;font-size:0.82rem;padding:0;">Más info</button></span>
-  <div class="cookie-btns">
-    <button id="cookie-reject" onclick="dismissCookieBanner()">Rechazar todo</button>
-    <button id="cookie-accept" onclick="dismissCookieBanner()">Aceptar</button>
-  </div>
-</div>
 
 <!-- Modales legales -->
 <div class="footer-modal-overlay" id="modal-terms">
