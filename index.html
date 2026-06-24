@@ -12074,18 +12074,20 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
         for (let b = t0; b < end; b++) {
           if (freqData[b] > peak) peak = freqData[b];
         }
-        /* Suelo mínimo del 12% para que ninguna barra quede completamente plana */
-        amp = 0.12 + (peak / 255) * 0.84;
+        /* Suelo mínimo del 8% para que ninguna barra quede completamente plana.
+           Curva de potencia 0.6 para suavizar los picos: las barras crecen
+           de forma natural pero sin dispararse al máximo de golpe. */
+        amp = 0.08 + Math.pow(peak / 255, 0.6) * 0.55;
       } else {
         /* Fallback senoidal (mientras el AudioContext no está activo) */
         const s    = seeds[i];
         const wave = (Math.sin(t * s.speed  + s.phase)  * 0.5 + 0.5) * 0.7
                    + (Math.sin(t * s.speed2 + s.phase2) * 0.5 + 0.5) * 0.3;
-        amp = 0.10 + wave * 0.85;
+        amp = 0.08 + wave * 0.45;
       }
     }
 
-    const barH  = amp * (h * 0.42);
+    const barH  = amp * (h * 0.38);
     const x     = i * (barW + gap);
     const alpha = playing ? (0.28 + amp * 0.48) : 0.18;
     ctx2d.fillStyle = `rgba(${VIZ_COLOR},${alpha.toFixed(2)})`;
