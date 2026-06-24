@@ -11969,8 +11969,8 @@ function _connectAudioToAnalyser(audioEl, existingAnalyser, existingSource) {
     let analyser = existingAnalyser;
     if (!analyser) {
       analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;               // 128 bins → mucha más resolución espectral
-      analyser.smoothingTimeConstant = 0.5; // bajo: el smoothing visual lo gestiona por barra
+      analyser.fftSize = 128;            // 64 bins de frecuencia
+      analyser.smoothingTimeConstant = 0.82;
       analyser.connect(ctx.destination); // → altavoces
     }
 
@@ -12006,7 +12006,8 @@ function stConnectNewAudio() {
 }
 
 /* ── Barras del ecualizador ───────────────────────────────────────────────── */
-const VIZ_BAR_COUNT = 28;
+const VIZ_BAR_COUNT = 28;   /* barras principales */
+const VIZ_BAR_SEC   = 18;   /* barras secundarias (complementarias) */
 const VIZ_COLOR = '200,154,0'; /* var(--yellow-dark) en RGB */
 
 /* Seeds de fallback (animación senoidal si WebAudio no está disponible) */
@@ -12022,28 +12023,30 @@ function _vizMakeBarSeeds(count) {
   }
   return seeds;
 }
-const _musicVizSeeds = _vizMakeBarSeeds(VIZ_BAR_COUNT);
-const _stVizSeeds    = _vizMakeBarSeeds(VIZ_BAR_COUNT);
+const _musicVizSeeds    = _vizMakeBarSeeds(VIZ_BAR_COUNT);
+const _stVizSeeds       = _vizMakeBarSeeds(VIZ_BAR_COUNT);
+const _musicVizSeedsSec = _vizMakeBarSeeds(VIZ_BAR_SEC);
+const _stVizSeedsSec    = _vizMakeBarSeeds(VIZ_BAR_SEC);
 
 /* Buffer de datos de frecuencia compartido */
 let _vizFreqBuf = null;
 
-/* ── Estado por canvas: smoothing manual + peak markers ──────────────────
-   Inspirado en AudioMotionAnalyzer: cada barra tiene su valor suavizado
-   independiente y un marcador de pico con física de caída.              */
+/* ── Estado por canvas: smoothing manual + peak markers ── */
 const _vizState = new Map();
-function _getVizState(id, bars) {
-  if (!_vizState.has(id) || _vizState.get(id).smooth.length !== bars) {
-    _vizState.set(id, {
-      smooth:  new Float32Array(bars).fill(0.04),
-      peak:    new Float32Array(bars).fill(0.04),
-      peakVel: new Float32Array(bars).fill(0),
+function _getVizState(id, bars, barsSec) {
+  const key = id + '_' + bars;
+  if (!_vizState.has(key) || _vizState.get(key).smooth.length !== bars) {
+    _vizState.set(key, {
+      smooth:     new Float32Array(bars).fill(0.04),
+      peak:       new Float32Array(bars).fill(0.04),
+      peakVel:    new Float32Array(bars).fill(0),
+      smoothSec:  new Float32Array(barsSec).fill(0.02),
     });
   }
-  return _vizState.get(id);
+  return _vizState.get(key);
 }
 
-function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
+function _drawVisualizerBars(canvas, seeds, seedsSec, isPlayingFn, t, analyser) {
   if (!canvas) return;
   if (canvas.offsetParent === null) return;
   const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -12059,12 +12062,13 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
 
   const playing = isPlayingFn();
   const bars    = seeds.length;
+  const barsSec = seedsSec.length;
   const gap     = 2;
   const barW    = (w - gap * (bars - 1)) / bars;
   const midY    = h / 2;
   const maxH    = h * 0.44;
 
-  const state = _getVizState(canvas.id || 'default', bars);
+  const state = _getVizState(canvas.id || 'default', bars, barsSec);
 
   /* ── Datos de frecuencia reales ── */
   let freqData = null;
@@ -12080,22 +12084,79 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
     if (sum > 0) freqData = _vizFreqBuf;
   }
 
-  /* Constantes de comportamiento por frame (~60fps)
-     Inspiradas en smoothing:0.7 y la física de peak de AudioMotionAnalyzer */
-  const SMOOTH_UP   = 0.18;   /* velocidad de subida de la barra  */
-  const SMOOTH_DOWN = 0.07;   /* velocidad de bajada (más lenta)  */
-  const PEAK_GRAV   = 0.0008; /* aceleración de caída del pico    */
-  const PEAK_VINI   = 0.010;  /* velocidad inicial de caída       */
+  /* Constantes de comportamiento */
+  const SMOOTH_UP   = 0.18;
+  const SMOOTH_DOWN = 0.07;
+  const PEAK_GRAV   = 0.0008;
+  const PEAK_VINI   = 0.010;
 
+  /* ════════════════════════════════════════════════════════
+     CAPA 1 — Barras secundarias (complementarias)
+     Más anchas, más bajas, más lentas, muy tenues.
+     Se dibujan PRIMERO para quedar detrás de las principales.
+     Leen el espectro al revés (agudos a la izquierda) para
+     que visualmente contrasten con las barras principales.
+     ════════════════════════════════════════════════════════ */
+  const secGap  = 4;
+  const secBarW = (w - secGap * (barsSec - 1)) / barsSec;
+  const secMaxH = maxH * 0.55; /* altura máxima: 55% de las principales */
+
+  for (let i = 0; i < barsSec; i++) {
+    let rawSec = 0.02;
+
+    if (playing) {
+      if (freqData) {
+        /* Mapeo invertido: la barra 0 lee agudos, la última lee graves.
+           Esto crea un patrón visual complementario a las barras principales. */
+        const bins   = freqData.length;
+        const usable = Math.floor(bins * 0.78);
+        const logMin = Math.log2(1);
+        const logMax = Math.log2(usable + 1);
+        const ri  = barsSec - 1 - i; /* índice invertido */
+        const b0  = Math.floor(Math.pow(2, logMin + (ri       / barsSec) * (logMax - logMin)) - 1);
+        const b1  = Math.floor(Math.pow(2, logMin + ((ri + 1) / barsSec) * (logMax - logMin)) - 1);
+        const end = Math.min(Math.max(b0 + 1, b1), bins);
+        let   pk  = 0;
+        for (let b = b0; b < end; b++) if (freqData[b] > pk) pk = freqData[b];
+        rawSec = 0.04 + Math.pow(pk / 255, 0.8) * 0.55;
+      } else {
+        const s    = seedsSec[i];
+        const wave = (Math.sin(t * s.speed  * 0.5 + s.phase)  * 0.5 + 0.5) * 0.6
+                   + (Math.sin(t * s.speed2 * 0.5 + s.phase2) * 0.5 + 0.5) * 0.4;
+        rawSec = 0.06 + wave * 0.38;
+      }
+    }
+
+    /* Smoothing más lento para las secundarias → movimiento más perezoso */
+    const prevSec = state.smoothSec[i];
+    state.smoothSec[i] = rawSec > prevSec
+      ? prevSec + (rawSec - prevSec) * 0.10
+      : prevSec + (rawSec - prevSec) * 0.04;
+    const ampSec = state.smoothSec[i];
+
+    const x       = i * (secBarW + secGap);
+    const barHSec = ampSec * secMaxH;
+
+    /* Muy tenues: alpha máximo ~0.22, color más apagado */
+    const alpSec = playing ? (0.06 + ampSec * 0.16) : 0.05;
+    const gradSec = ctx2d.createLinearGradient(0, midY - barHSec, 0, midY + barHSec);
+    gradSec.addColorStop(0,   `rgba(${VIZ_COLOR},0)`);
+    gradSec.addColorStop(0.3, `rgba(${VIZ_COLOR},${alpSec.toFixed(2)})`);
+    gradSec.addColorStop(0.5, `rgba(${VIZ_COLOR},${(alpSec * 1.3).toFixed(2)})`);
+    gradSec.addColorStop(0.7, `rgba(${VIZ_COLOR},${alpSec.toFixed(2)})`);
+    gradSec.addColorStop(1,   `rgba(${VIZ_COLOR},0)`);
+    ctx2d.fillStyle = gradSec;
+    ctx2d.fillRect(x, midY - barHSec, secBarW, barHSec * 2);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     CAPA 2 — Barras principales
+     ════════════════════════════════════════════════════════ */
   for (let i = 0; i < bars; i++) {
-    /* ── 1. Amplitud raw desde el espectro ── */
     let raw = 0.04;
 
     if (playing) {
       if (freqData) {
-        /* Escala logarítmica (como frequencyScale:"log" de AudioMotionAnalyzer):
-           reparte graves, medios y agudos en proporciones musicalmente correctas.
-           Usamos 78% del espectro; el resto son bins ultrasónicos vacíos. */
         const bins   = freqData.length;
         const usable = Math.floor(bins * 0.78);
         const logMin = Math.log2(1);
@@ -12105,18 +12166,12 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
         const end = Math.min(Math.max(b0 + 1, b1), bins);
         let   pk  = 0;
         for (let b = b0; b < end; b++) if (freqData[b] > pk) pk = freqData[b];
-
-        /* Curva de potencia 0.65: reactivo pero sin dispararse.
-           Suelo mínimo 8% para que las barras nunca queden planas. */
         raw = 0.08 + Math.pow(pk / 255, 0.65) * 0.88;
-
-        /* Atenuación progresiva de la mitad izquierda (graves siempre muy fuertes) */
         if (i < bars / 2) {
-          const pos = i / (bars / 2); /* 0=extremo izq → 1=centro */
+          const pos = i / (bars / 2);
           raw *= 0.45 + pos * 0.55;
         }
       } else {
-        /* Fallback senoidal */
         const s    = seeds[i];
         const wave = (Math.sin(t * s.speed  + s.phase)  * 0.5 + 0.5) * 0.7
                    + (Math.sin(t * s.speed2 + s.phase2) * 0.5 + 0.5) * 0.3;
@@ -12124,18 +12179,12 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
       }
     }
 
-    /* ── 2. Smoothing por barra (sube rápido, baja despacio) ──
-       Equivale al smoothingTimeConstant:0.7 de AudioMotionAnalyzer pero
-       con control asimétrico: los picos son rápidos, la caída es suave. */
     const prev = state.smooth[i];
     state.smooth[i] = raw > prev
-      ? prev + (raw  - prev) * SMOOTH_UP
-      : prev + (raw  - prev) * SMOOTH_DOWN;
+      ? prev + (raw - prev) * SMOOTH_UP
+      : prev + (raw - prev) * SMOOTH_DOWN;
     const amp = state.smooth[i];
 
-    /* ── 3. Peak marker con física de caída ──
-       El marcador sube instantáneamente con la barra y luego cae
-       acelerando (gravedad), igual que en AudioMotionAnalyzer. */
     if (amp >= state.peak[i]) {
       state.peak[i]    = amp;
       state.peakVel[i] = 0;
@@ -12146,12 +12195,10 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
     }
     const peakAmp = state.peak[i];
 
-    /* ── 4. Dibujo ── */
-    const x    = i * (barW + gap);
-    const barH = amp * maxH;
+    const x     = i * (barW + gap);
+    const barH  = amp * maxH;
     const alpha = playing ? (0.25 + amp * 0.55) : 0.15;
 
-    /* Gradiente vertical: brillante en el centro, desvanecido en los extremos */
     const grad = ctx2d.createLinearGradient(0, midY - barH, 0, midY + barH);
     grad.addColorStop(0,   `rgba(${VIZ_COLOR},${(alpha * 0.4).toFixed(2)})`);
     grad.addColorStop(0.4, `rgba(${VIZ_COLOR},${alpha.toFixed(2)})`);
@@ -12161,14 +12208,13 @@ function _drawVisualizerBars(canvas, seeds, isPlayingFn, t, analyser) {
     ctx2d.fillStyle = grad;
     ctx2d.fillRect(x, midY - barH, barW, barH * 2);
 
-    /* Peak marker: línea fina más brillante arriba y abajo (simétrico) */
     if (playing && peakAmp > 0.09) {
       const pH      = peakAmp * maxH;
       const pAlpha  = Math.min(0.95, 0.45 + peakAmp * 0.55);
       const markerH = Math.max(1.5, barW * 0.2);
       ctx2d.fillStyle = `rgba(255,215,80,${pAlpha.toFixed(2)})`;
-      ctx2d.fillRect(x, midY - pH - markerH, barW, markerH); /* arriba  */
-      ctx2d.fillRect(x, midY + pH,           barW, markerH); /* abajo   */
+      ctx2d.fillRect(x, midY - pH - markerH, barW, markerH);
+      ctx2d.fillRect(x, midY + pH,           barW, markerH);
     }
   }
 }
@@ -12181,6 +12227,7 @@ function musicStartVisualizer() {
     _drawVisualizerBars(
       document.getElementById('music-visualizer-canvas'),
       _musicVizSeeds,
+      _musicVizSeedsSec,
       () => musicIsPlaying,
       performance.now() / 1000,
       _musicAnalyser
@@ -12197,6 +12244,7 @@ function stStartVisualizer() {
     _drawVisualizerBars(
       document.getElementById('soundtrack-visualizer-canvas'),
       _stVizSeeds,
+      _stVizSeedsSec,
       () => stIsPlaying,
       performance.now() / 1000,
       _stAnalyser
