@@ -4348,6 +4348,305 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 
 /* ============================================================
+   ██████  ██████   █████  ██████  ██ ███    ██  ██████
+   ██   ██ ██   ██ ██   ██ ██   ██ ██ ████   ██ ██
+   ██████  ██   ██ ███████ ██████  ██ ██ ██  ██ ██   ███
+   ██   ██ ██   ██ ██   ██ ██   ██ ██ ██  ██ ██ ██    ██
+   ██   ██ ██████  ██   ██ ██   ██ ██ ██   ████  ██████
+   ─── ROARING GLOVE — DELTARUNE THEME ───────────────────
+   Applies ONLY when #glove-detail-view.roaring-active
+   ============================================================ */
+
+/* Load pixel font — fall back gracefully */
+@font-face {
+  font-family: '8bitoperatorplus2';
+  src: local('8bitoperatorplus2'), local('Press Start 2P'), local('Courier New');
+  font-display: swap;
+}
+
+/* ── FONT ── */
+.roaring-active,
+.roaring-active * {
+  font-family: '8bitoperatorplus2', 'Press Start 2P', 'Courier New', monospace !important;
+  letter-spacing: 0.5px;
+}
+
+/* ── BATTLE BACKGROUND (GIF animado) detrás del overlay ── */
+#glove-detail-overlay.roaring-bg {
+  background: url('175637.gif') center center / cover no-repeat !important;
+}
+
+/* ── Panel principal: negro puro, sin radius ── */
+#glove-detail-view.roaring-active {
+  background: #000000 !important;
+  border: 4px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* ── Header ── */
+#glove-detail-view.roaring-active #glove-detail-header {
+  background: #000000 !important;
+  border-bottom: 4px solid #ffffff !important;
+  border-radius: 0 !important;
+  position: relative;
+}
+
+/* Title */
+#glove-detail-view.roaring-active #glove-detail-title {
+  color: #ffffff !important;
+  text-shadow: none !important;
+  letter-spacing: 2px;
+}
+
+/* Corazón parpadeante estilo Deltarune */
+@keyframes drBlink {
+  0%,49% { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+#glove-detail-view.roaring-active #glove-detail-title::before {
+  content: '❤ ';
+  display: inline-block;
+  animation: drBlink 1s step-end infinite;
+  color: #ff2020;
+  text-shadow: none;
+  font-size: 0.8em;
+  vertical-align: middle;
+}
+
+/* Botón cerrar */
+#glove-detail-view.roaring-active #btn-close-glove-detail {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+#glove-detail-view.roaring-active #btn-close-glove-detail:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  filter: none !important;
+}
+
+/* ── Body & columnas ── */
+#glove-detail-view.roaring-active #glove-detail-body { background: #000000 !important; }
+
+#glove-detail-view.roaring-active #glove-detail-left {
+  background: #000000 !important;
+  border-right: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+}
+#glove-detail-view.roaring-active #glove-detail-right {
+  background: #000000 !important;
+  border-radius: 0 !important;
+}
+#glove-detail-view.roaring-active #glove-detail-left::-webkit-scrollbar-thumb,
+#glove-detail-view.roaring-active #glove-detail-right::-webkit-scrollbar-thumb {
+  background: #ffffff !important;
+  border-radius: 0 !important;
+}
+
+/* ── Banner ── */
+#glove-detail-view.roaring-active #glove-detail-banner-wrap {
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+  background: #000000 !important;
+}
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-slaps::after,
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-robux::after,
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-logro::after,
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-otro::after {
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+#glove-detail-view.roaring-active #glove-detail-banner-img { border-radius: 0 !important; }
+
+/* ── Botón tutorial ── */
+#glove-detail-view.roaring-active #glove-detail-tut-btn {
+  background: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+#glove-detail-view.roaring-active #glove-detail-tut-btn:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* ── Imagen del guante ── */
+#glove-detail-view.roaring-active #glove-detail-img-wrap {
+  background: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+}
+#glove-detail-view.roaring-active #glove-detail-img-wrap img,
+#glove-detail-view.roaring-active #glove-detail-glove-img {
+  border-radius: 0 !important;
+  image-rendering: pixelated;
+}
+
+/* ── Nombre y textos ── */
+#glove-detail-view.roaring-active #glove-detail-name {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+#glove-detail-view.roaring-active .detail-section-label {
+  color: #ffffff !important;
+  text-shadow: none !important;
+  display: block;
+  border-bottom: 2px solid #ffffff !important;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+}
+#glove-detail-view.roaring-active .glove-stat-key { color: #cccccc !important; text-shadow: none !important; }
+#glove-detail-view.roaring-active #glove-detail-obtain-text { color: #dddddd !important; text-shadow: none !important; }
+#glove-detail-view.roaring-active .glove-detail-release { color: #aaaaaa !important; text-shadow: none !important; }
+#glove-detail-view.roaring-active .glove-detail-release span:first-child { filter: grayscale(1); }
+
+/* ── Quote ── */
+#glove-detail-view.roaring-active .glove-detail-quote {
+  background: #111111 !important;
+  border-left: 4px solid #ffffff !important;
+  border-radius: 0 !important;
+  color: #dddddd !important;
+  text-shadow: none !important;
+}
+#glove-detail-view.roaring-active .glove-detail-quote::before { color: #ffffff !important; }
+
+/* ── Badges / pills ── */
+#glove-detail-view.roaring-active .glove-type-badge,
+#glove-detail-view.roaring-active .gtbadge-slaps,
+#glove-detail-view.roaring-active .gtbadge-robux,
+#glove-detail-view.roaring-active .gtbadge-logro,
+#glove-detail-view.roaring-active .gtbadge-otro,
+#glove-detail-view.roaring-active .glove-status-pill,
+#glove-detail-view.roaring-active [class^="gstatus-"],
+#glove-detail-view.roaring-active [class*=" gstatus-"] {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* ── Stats ── */
+#glove-detail-view.roaring-active .glove-stats-box,
+#glove-detail-view.roaring-active #glove-detail-stats-wrap { background: transparent !important; }
+#glove-detail-view.roaring-active .glove-stat-row {
+  background: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+#glove-detail-view.roaring-active .glove-stat-num,
+#glove-detail-view.roaring-active .glove-stat-num.sval-1,
+#glove-detail-view.roaring-active .glove-stat-num.sval-2,
+#glove-detail-view.roaring-active .glove-stat-num.sval-3,
+#glove-detail-view.roaring-active .glove-stat-num.sval-4,
+#glove-detail-view.roaring-active .glove-stat-num.sval-5 {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  border-radius: 0 !important;
+  text-shadow: none !important;
+}
+
+/* ── Badge / Gamepass block ── */
+#glove-detail-view.roaring-active #glove-detail-badge-wrap,
+#glove-detail-view.roaring-active #glove-detail-gamepass-wrap {
+  background: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+}
+#glove-detail-view.roaring-active #glove-detail-badge-img-wrap,
+#glove-detail-view.roaring-active #glove-detail-gamepass-img-wrap {
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #000000 !important;
+}
+#glove-detail-view.roaring-active #glove-detail-badge-img-wrap:hover,
+#glove-detail-view.roaring-active #glove-detail-gamepass-img-wrap:hover {
+  box-shadow: 3px 3px 0 #ffffff !important;
+  transform: none !important;
+}
+#glove-detail-view.roaring-active #glove-detail-badge-img,
+#glove-detail-view.roaring-active #glove-detail-gamepass-img { border-radius: 0 !important; }
+#glove-detail-view.roaring-active .glove-detail-badge-name,
+#glove-detail-view.roaring-active .glove-detail-gamepass-name {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+#glove-detail-view.roaring-active .btn-glove-badge-roblox,
+#glove-detail-view.roaring-active .btn-glove-gamepass-roblox {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 0 !important;
+  text-shadow: none !important;
+}
+#glove-detail-view.roaring-active .btn-glove-badge-roblox:hover,
+#glove-detail-view.roaring-active .btn-glove-gamepass-roblox:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+#glove-detail-view.roaring-active .glove-detail-badge-row,
+#glove-detail-view.roaring-active .glove-detail-gamepass-row {
+  border-top: 1px solid #444 !important;
+  padding-top: 4px;
+  color: #dddddd !important;
+}
+
+/* ── Items (mecánicas / habilidades) ── */
+#glove-detail-view.roaring-active .glove-detail-item {
+  background: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+  color: #dddddd !important;
+  text-shadow: none !important;
+  overflow: visible !important;
+}
+#glove-detail-view.roaring-active .glove-detail-item-bullet { filter: grayscale(1) brightness(5); }
+#glove-detail-view.roaring-active #glove-detail-mechanics-wrap .detail-section-label,
+#glove-detail-view.roaring-active #glove-detail-abilities-wrap .detail-section-label {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* ── Vinyl ── */
+#glove-detail-view.roaring-active #glove-vinyl-box {
+  background: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0 !important;
+}
+#glove-detail-view.roaring-active #glove-vinyl-disc { border: 2px solid #ffffff; }
+
+/* ── Scrollbar ── */
+#glove-detail-view.roaring-active ::-webkit-scrollbar { width: 6px; }
+#glove-detail-view.roaring-active ::-webkit-scrollbar-track { background: #000000; }
+#glove-detail-view.roaring-active ::-webkit-scrollbar-thumb { background: #ffffff !important; border-radius: 0 !important; }
+
+/* ── Inline icon ── */
+#glove-detail-view.roaring-active .slap-icon-inline { filter: grayscale(1) brightness(5); border-radius: 0 !important; }
+
+/* ── Mobile ── */
+@media (max-width: 860px) {
+  #glove-detail-view.roaring-active #glove-detail-left {
+    border-right: none !important;
+    border-bottom: 3px solid #ffffff !important;
+  }
+}
+
+/* END ROARING DELTARUNE THEME */
+
+
+/* ============================================================
    CAJA DE VINILO (debajo de las estadísticas del guante)
    ============================================================ */
 #glove-vinyl-wrap { margin-top: 6px; }
@@ -6137,6 +6436,16 @@ input[type="range"].slap-volume::-moz-range-track {
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
+  {
+    version: "1.2.21 - DELTARUNE TOMORROW",
+    date: "25/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Mas guantes!! (Default, Roaring, God's Hand, OVERKILL, Leash, Joust)"},
+      { emoji: "🎵", color: "#5e5e5e", text: "2 nuevas canciones (Roaring y OVERKILL)"},
+      { emoji: "⚔️", color: "#ffffff", text: "Diseño diferente para el guante Roaring inspirado en el UI de DELTARUNE (Por la salida del capitulo 5)"},
+    ]
+  },
+  
   {
     version: "1.2.2 - Mejoras musicales y informacion irrelevante.",
     date: "24/06/2026",
@@ -10629,6 +10938,26 @@ const GLOVES = [
   },
 
   {
+    id: 'default',
+    name: 'Default',
+    type: 'slaps',
+    cost: 0,              // en slaps
+    quote: 'El guante con el que naciste.',
+    releaseDate: '16/01/2021',
+    power: 30,                 // 1-5, opcional
+    speed: 10,                 // 1-5, opcional
+    mechanics: [
+      'Es el guante más simple, ya que a la vez es el primer guante con el que empiezas. Todas las mecánicas de los otros guantes nacen de aquí.',
+      "Tras lanzarte el pedo, duplica tu velocidad por 1 segundo."
+    ],
+    abilities: [
+      '[E] Fart Blast: Lanza un pedo que te impulsa brevemente. (3.5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+  },
+  
+  {
     id: 'stick',
     name: 'Stick',
     type: 'slaps',
@@ -10909,7 +11238,91 @@ const GLOVES = [
     songs: null,
   },
 
+  {
+    id: 'roaring',
+    name: 'Roaring',
+    type: 'slaps',
+    cost: 65000,              // en slaps
+    quote: 'Tu visión se estrecha... El mundo gira a tu alrededor.',
+    releaseDate: '03/01/2026',
+    power: 50,                 // 1-5, opcional
+    speed: 13,                 // 1-5, opcional
+    mechanics: [
+      'Este guante no se usa directamente; se queda detrás y atacas usando una espada.',
+      'Mientras las estrellas regresan, puedes seguir atacando. Aun así, no pasa lo mismo mientras las lanzas.',
+      "Las personas marcados con una X tendrán que saltar en el momento que la X deje de girar para evitar ser golpeados.",
+      "La X gira por unos 5 segundos antes de pararse.",
+      "A las personas que mueran tras haber sido golpeadas al menos una vez por tu guante, les aparecerá una imagen simulando el SWOON del Roaring Knight."
+    ],
+    abilities: [
+      '[Mantener clic] Carga un pequeño dash para hacer slaps a mayores distancias.',
+      '[E] Starshot: Lanza 3 estrellas blancas que aplican knockback al contacto. (17s cooldoon / 9s spawn)',
+      '[E 2º Vez] Atrae las estrellas lanzadas a tu ubicación con una velocidad más rápida.',
+      "[R] X Slash: Realiza un ataque con una espada que marca al enemigo con una X. Si se falla, la X se queda inmóvil donde realizaste el ataque. (12s cooldown)"
+    ],
+    tutorialUrl: null,
+    songs: {
+      "Black Knife (Remix)": {id:"blackknife", roblox:"104449595639237"}
+    },
+    misc: true
+  },
+
+  {
+    id: 'godhand',
+    name: "God's Hand",
+    type: 'slaps',
+    cost: 70000,              // en slaps
+    quote: '¿Cómo se supone que has conseguido al menos mantener esto?',
+    releaseDate: '16/02/2021',
+    power: 250,                 // 1-5, opcional
+    speed: 17,                 // 1-5, opcional
+    mechanics: [
+      'Este guante suele matar de un solo slap, aunque con la suficiente suerte (o lag) puedes salvarte (y así conseguir el guante Júpiter).',
+      "El ragdoll de este guante dura 10 segundos.",
+      'El timestop dura 8 segundos, empezando desde el momento que termina tu animación.',
+      "Mientras el timestop esté activo, todo el mundo (incluido el propio God's Hand) verá la pantalla con un filtro noir.",
+      "Mientras el tiempo está parado, tú tienes total libertad de movimiento.",
+      "El timestop no tiene rango infinito; por tanto, gente muy lejana, como en el obby de retro, no será afectada, pero sí recibirá el efecto en blanco y negro.",
+      "Hay algunas excepciones de gente u objetos que sí pueden moverse, como un Killstreak de más de 25 kills, un reaper en su 3.ª fase, el plato, clones o NPCs, spectator, proyectiles, personas dentro del lobby, gente que spawnea en la arena default tras haber activado la habilidad o Roguelikes con carta de inmunidad al timestop."
+    ],
+    abilities: [
+      '[E] Stop Time: Te levanta del suelo apuntando la mano al suelo y poco después para el tiempo a todo el mundo.',
+    ],
+    tutorialUrl: null,
+    songs: {
+    },
+  },
+
   /* ── EJEMPLO TIPO: ROBUX ── */
+  {
+    id: 'overkill',
+    name: 'OVERKILL',
+    type: 'robux',
+    cost: 450,            // en robux
+    quote: "Básicamente, estás manteniendo un trozo de lava.",
+    power: 700,
+    speed: 20,
+    mechanics: [
+      'El guante tiene velocidad de slap infinito.',
+      'Hot Touch también actúa sin golpear, matando al contacto, pero no otorga slaps si no golpeas.',
+      "Overkill puede ser apagado tras ser golpeado por cualquier habilidad relacionada con hielo o agua, usando como ejemplo Water, Snow, la habilidad de Shard, la torreta de Snowball, entre otros..",
+      "Un overkill apagado solo tiene 45 de poder y 17 de velocidad, aparte de que su habilidad Hot Touch se desactiva."
+    ],
+    abilities: [
+      '[Clic] Hot Touch: Reduce la vida de quien golpees a 0.',
+    ],
+    gamepasses: [
+      { name: 'OVERKILL', url: 'https://www.roblox.com/game-pass/16361133/OVERKILL' },
+      // Puedes añadir más gamepasses aquí, ej:
+      // { name: 'Otro Gamepass', url: 'https://www.roblox.com/game-pass/XXXX/Otro-Gamepass' },
+    ],
+    tutorialUrl: null,
+    songs:{
+      "BFG Division": {id:"division", roblox:"9126742272"}
+    },
+    misc: true
+  },
+  
   {
     id: 'ultrainstinct',
     name: 'Ultra Instinct',
@@ -11252,6 +11665,35 @@ const GLOVES = [
   },
 
   {
+    id: 'leash',
+    name: 'Leash',
+    type: 'logro',
+    obtainMethod: 'Haz que un servidor entero, equivalente a 16 personas, use el guante Cult, consiguiendo el máximo poder de ese guante.',
+    badges: [
+      { name: 'Demonic Ritual', url: 'https://www.roblox.com/badges/2136607413/Demonic-Ritual' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Eso es lo que los cowboys hacen a los bandidos.',
+    releaseDate: '03/02/2023',
+    power: 52,
+    speed: 16,
+    mechanics: [
+      "Las personas atadas se quedan ragdoleadas permanentemente hasta que son desatadas.",
+      'Las personas atadas pueden saltar para hacer una habilidad similar a Fish. Hacerlo 3 veces te desata.',
+      'También se pueden desatar si eres golpeado por alguien o mueres.',
+      'No hay límite de sogas.',
+      "Las cuerdas te mantienen conectado siempre con tus enemigos; esto puede servir para sobrevivir a golpes con mucho poder o mantenerte flotando en el vacío."
+
+    ],
+    abilities: [
+      '[Clic] Lasso Drag: Te conecta con tu enemigo con una soga.',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=an5iBkr26UY',
+    songs: null,
+  },
+
+  {
     id: 'rob',
     name: 'rob',
     type: 'logro',
@@ -11276,6 +11718,33 @@ const GLOVES = [
       '[E] rob (rob really dislikes bob): Te conviertes en rob, controlándolo a tu antojo. (20s cooldown / 9s spawn / 100s null portal)',
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=HaVQTYyMZEs',
+    songs: null,
+  },
+
+  {
+    id: 'joust',
+    name: 'Joust',
+    type: 'logro',
+    obtainMethod: 'Haz parry al caballo de un Joust usando el guante Parry.',
+    badges: [
+      { name: "Stand your ground", url: 'https://www.roblox.com/badges/1662954021427606/Stand-your-ground' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: 'Juan',
+    releaseDate: '02/02/2024',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'El poder de Juan escala dependiendo de cuánto lleva la habilidad activa, entre 10 y 40.',
+      "Al acabar la habilidad o ser cancelada de forma externa, Juan se levanta y te lanza volando hacia atrás.",
+      "Juan también termina su habilidad si sueltas E, chocas con una pared, pasan 16 segundos, te acercas mucho al vacío o si se cancela por Parry o Reverse.",
+      "Juan tiene el doble de tu velocidad base, aunque no puede parar de moverse si no es cancelando la habilidad.",
+    ],
+    abilities: [
+      '[E Mantener] Juan: Te monta encima de tu caballo (Juan) y te lleva hacia delante sin poder parar, golpeando a quien se cruce por el camino. (12s cooldown / 5s spawn)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=wlQ_XOxKlug',
     songs: null,
   },
 
@@ -11820,11 +12289,24 @@ function openGloveDetail(id, e) {
   document.getElementById('glove-detail-view').classList.add('open');
   document.body.style.overflow = 'hidden';
   if (glove.id === 'killstreak') triggerKillstreakFlash();
+
+  /* ── Roaring: apply Deltarune theme ── */
+  const gdv = document.getElementById('glove-detail-view');
+  if (glove.id === 'roaring') {
+    gdv.classList.add('roaring-active');
+    /* Replace emoji so the blinking ❤ ::before pseudo takes over cleanly */
+    const titleEl = document.getElementById('glove-detail-title');
+    titleEl.textContent = titleEl.textContent.replace(/^🥊\s*/, '');
+  } else {
+    gdv.classList.remove('roaring-active');
+  }
 }
 
 function closeGloveDetail() {
   stopKillstreakFlash();
-  document.getElementById('glove-detail-view').classList.remove('open');
+  const gdv = document.getElementById('glove-detail-view');
+  gdv.classList.remove('open');
+  gdv.classList.remove('roaring-active');
   document.body.style.overflow = '';
   gloveDetailOpen = null;
   closeMusicPlayer();
