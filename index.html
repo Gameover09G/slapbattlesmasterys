@@ -4643,6 +4643,211 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   }
 }
 
+/* ── INTERACCIÓN: filas de mecánicas/habilidades funcionan como
+   opciones de menú (estilo ACT/ITEM de Deltarune): al pasar el
+   cursor se invierten a blanco y aparece una flechita roja ── */
+#glove-detail-view.roaring-active .glove-detail-item {
+  position: relative;
+  cursor: pointer;
+  transition: background-color .05s steps(1), color .05s steps(1);
+}
+#glove-detail-view.roaring-active .glove-detail-item:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+#glove-detail-view.roaring-active .glove-detail-item:hover span {
+  color: #000000 !important;
+}
+#glove-detail-view.roaring-active .glove-detail-item:hover .glove-detail-item-bullet {
+  filter: grayscale(1) brightness(0) !important;
+}
+#glove-detail-view.roaring-active .glove-detail-item::before {
+  content: '';
+  position: absolute;
+  left: -11px;
+  top: 50%;
+  transform: translateY(-50%) scaleX(0);
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid #ff2020;
+  transition: transform .08s steps(1);
+}
+#glove-detail-view.roaring-active .glove-detail-item:hover::before {
+  transform: translateY(-50%) scaleX(1);
+}
+
+/* La caja de vinilo también se resalta como opción seleccionable */
+#glove-detail-view.roaring-active #glove-vinyl-box { transition: filter .05s steps(1); }
+#glove-detail-view.roaring-active #glove-vinyl-box:hover { filter: invert(1); }
+
+/* ============================================================
+   ROARING — TEMA DELTARUNE EXTENDIDO AL REPRODUCTOR DE MÚSICA
+   Se activa en #music-player-overlay SOLO cuando la canción que
+   se reproduce pertenece al guante Roaring
+   ============================================================ */
+#music-player-overlay.roaring-active,
+#music-player-overlay.roaring-active * {
+  font-family: '8bitoperatorplus2', 'Press Start 2P', 'Courier New', monospace !important;
+  letter-spacing: 0.5px;
+}
+#music-player-overlay.roaring-active #music-player-frame {
+  background: #000000 !important;
+  border: 4px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+#music-player-overlay.roaring-active #music-player-close {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active #music-player-close:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  filter: none !important;
+}
+#music-player-overlay.roaring-active #music-vinyl-disc-big {
+  background: repeating-radial-gradient(circle at center, #1a1a1a 0 3px, #000000 3px 6px) !important;
+  box-shadow: 0 0 0 3px #ffffff, inset 0 0 0 3px #000000 !important;
+}
+#music-player-overlay.roaring-active #music-vinyl-center {
+  border: 3px solid #ffffff !important;
+  box-shadow: 0 0 0 3px #000000 !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active #music-vinyl-center-img {
+  border-radius: 0 !important;
+  image-rendering: pixelated;
+}
+#music-player-overlay.roaring-active #music-track-name {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+#music-player-overlay.roaring-active .music-roblox-value { color: #cccccc !important; }
+#music-player-overlay.roaring-active .music-roblox-value:hover { color: #ffffff !important; }
+#music-player-overlay.roaring-active .music-roblox-toast {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active #music-time-current,
+#music-player-overlay.roaring-active #music-time-total { color: #aaaaaa !important; }
+
+#music-player-overlay.roaring-active input[type="range"].slap-range::-webkit-slider-runnable-track,
+#music-player-overlay.roaring-active input[type="range"].slap-volume::-webkit-slider-runnable-track {
+  background: #333333 !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active input[type="range"].slap-range::-moz-range-track,
+#music-player-overlay.roaring-active input[type="range"].slap-volume::-moz-range-track {
+  background: #333333 !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active input[type="range"].slap-range::-webkit-slider-thumb,
+#music-player-overlay.roaring-active input[type="range"].slap-volume::-webkit-slider-thumb {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active input[type="range"].slap-range::-moz-range-thumb,
+#music-player-overlay.roaring-active input[type="range"].slap-volume::-moz-range-thumb {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  border-radius: 0 !important;
+}
+
+#music-player-overlay.roaring-active #music-btn-prev,
+#music-player-overlay.roaring-active #music-btn-next,
+#music-player-overlay.roaring-active #music-btn-shuffle {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active #music-btn-prev:hover,
+#music-player-overlay.roaring-active #music-btn-next:hover,
+#music-player-overlay.roaring-active #music-btn-shuffle:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+#music-player-overlay.roaring-active #music-btn-playpause {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+#music-player-overlay.roaring-active #music-btn-playpause:hover { filter: none !important; }
+#music-player-overlay.roaring-active #music-btn-shuffle.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+}
+#music-player-overlay.roaring-active #music-volume-wrap { border-left-color: #444444 !important; }
+#music-player-overlay.roaring-active #music-volume-icon,
+#music-player-overlay.roaring-active #music-volume-pct { color: #ffffff !important; }
+
+/* ============================================================
+   ROARING — MINI-CINEMÁTICA DE SALIDA
+   Línea diagonal roja (arriba-izq → abajo-der) que "corta" la
+   pantalla en dos; ambas mitades se separan revelando la
+   selección de guantes que hay detrás.
+   ============================================================ */
+#roaring-exit-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 99000;            /* encima de absolutamente todo */
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;          /* evita que los paneles creen scrollbar al salir */
+}
+#roaring-exit-transition.active { opacity: 1; visibility: visible; }
+#rt-slash-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+#roaring-exit-transition.split #rt-slash-svg {
+  opacity: 0;
+}
+#rt-slash-line {
+  stroke: #ff2020;
+  stroke-width: 1.0;
+  filter: drop-shadow(0 0 5px #ff2020) drop-shadow(0 0 14px #ff0000);
+  stroke-dasharray: 142 142;
+  stroke-dashoffset: 142;
+  opacity: 0;
+}
+#roaring-exit-transition.slash #rt-slash-line {
+  animation: rtSlashDraw .26s cubic-bezier(.7,0,.3,1) forwards;
+}
+@keyframes rtSlashDraw {
+  0%   { stroke-dashoffset: 142; opacity: 1; }
+  100% { stroke-dashoffset: 0;   opacity: 1; }
+}
+.rt-panel {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  /* Las mitades se solapan ligeramente para evitar gaps sub-píxel
+     en resoluciones no cuadradas (ej. 1920x1080, 2560x1440…) */
+  transition: transform .52s cubic-bezier(.6,0,.2,1);
+  /* translateZ(0) fuerza capa GPU sin el bug de clip-path+will-change de Safari */
+  transform: translateZ(0);
+}
+/* +2% de margen en cada polígono → cero gap en cualquier aspect ratio */
+#rt-panel-a { clip-path: polygon(-2% -2%, 102% -2%, 102% 102%); }
+#rt-panel-b { clip-path: polygon(-2% -2%, -2% 102%, 102% 102%); }
+/* 110% garantiza que los paneles salen de pantalla en cualquier resolución */
+#roaring-exit-transition.split #rt-panel-a { transform: translate3d(110%, -110%, 0); }
+#roaring-exit-transition.split #rt-panel-b { transform: translate3d(-110%, 110%, 0); }
+
 /* END ROARING DELTARUNE THEME */
 
 
@@ -6377,6 +6582,15 @@ input[type="range"].slap-volume::-moz-range-track {
 </div>
 
 <div id="killstreak-flash-overlay" aria-hidden="true"></div>
+
+<!-- ── Roaring: mini-cinemática de salida estilo Deltarune ── -->
+<div id="roaring-exit-transition" aria-hidden="true">
+  <svg id="rt-slash-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+    <line id="rt-slash-line" x1="0" y1="0" x2="100" y2="100"></line>
+  </svg>
+  <div id="rt-panel-a" class="rt-panel"></div>
+  <div id="rt-panel-b" class="rt-panel"></div>
+</div>
 
 
 <!-- ========================================================
@@ -12302,7 +12516,51 @@ function openGloveDetail(id, e) {
   }
 }
 
+/* ============================================================
+   ROARING — MINI-CINEMÁTICA DE SALIDA
+   Al cerrar el detalle del guante Roaring: destello de línea
+   diagonal roja → la pantalla se parte en dos → se revela la
+   selección de guantes. Para el resto de guantes, el cierre es
+   instantáneo como siempre.
+   ============================================================ */
+let _roaringTransitionPlaying = false;
+
+function playRoaringExitCinematic(onMidpoint, onComplete) {
+  const overlay = document.getElementById('roaring-exit-transition');
+  if (!overlay || _roaringTransitionPlaying) { onMidpoint(); if (onComplete) onComplete(); return; }
+  _roaringTransitionPlaying = true;
+
+  overlay.classList.remove('slash', 'split');
+  overlay.classList.add('active');
+  void overlay.offsetWidth; // fuerza reflow para reiniciar la animación del trazo
+
+  // 1) la línea roja diagonal "corta" la pantalla (duración 0.26s)
+  overlay.classList.add('slash');
+
+  // 2) esperamos a que la línea esté completamente dibujada
+  //    y ENTONCES la pantalla se parte en dos
+  setTimeout(() => {
+    overlay.classList.add('split');          // paneles empiezan a abrirse
+    setTimeout(() => onMidpoint(), 100);     // cierra el detail 100ms después (mitad de la apertura)
+  }, 320);
+
+  // 3) termina la cinemática y resetea el overlay (320 + 520 duración split + margen)
+  setTimeout(() => {
+    overlay.classList.remove('active', 'slash', 'split');
+    _roaringTransitionPlaying = false;
+    if (onComplete) onComplete();
+  }, 320 + 570);
+}
+
 function closeGloveDetail() {
+  if (gloveDetailOpen && gloveDetailOpen.id === 'roaring') {
+    playRoaringExitCinematic(() => _finishCloseGloveDetail());
+  } else {
+    _finishCloseGloveDetail();
+  }
+}
+
+function _finishCloseGloveDetail() {
   stopKillstreakFlash();
   const gdv = document.getElementById('glove-detail-view');
   gdv.classList.remove('open');
@@ -12311,6 +12569,50 @@ function closeGloveDetail() {
   gloveDetailOpen = null;
   closeMusicPlayer();
 }
+
+/* ============================================================
+   ROARING — INTERACCIÓN: sonidos de menú estilo Deltarune
+   "Blip" al pasar el cursor por una opción y un acorde de
+   confirmación al seleccionarla (clic). Usa el AudioContext
+   compartido del sitio, sin necesidad de archivos de audio.
+   ============================================================ */
+const DR_SOUND_SELECTOR =
+  '.glove-detail-item, #glove-vinyl-box, #glove-detail-tut-btn, ' +
+  '#glove-detail-badge-img-wrap, #glove-detail-gamepass-img-wrap, ' +
+  '.btn-glove-badge-roblox, .btn-glove-gamepass-roblox, #btn-close-glove-detail, ' +
+  '#music-player-close, #music-btn-shuffle, #music-btn-prev, #music-btn-playpause, ' +
+  '#music-btn-next, .music-roblox-value';
+
+let _drLastHoverEl = null;
+
+function _drTone(freq, dur) {
+  const ctx = _getSharedCtx();
+  if (!ctx) return;
+  _resumeSharedCtx();
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = freq;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const t = ctx.currentTime;
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(0.16, t + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.start(t);
+  osc.stop(t + dur + 0.02);
+}
+
+document.addEventListener('mouseover', (e) => {
+  const el = e.target.closest(DR_SOUND_SELECTOR);
+  if (!el || el === _drLastHoverEl) return;
+  if (!el.closest('.roaring-active')) return;
+  _drLastHoverEl = el;
+});
+document.addEventListener('mouseout', (e) => {
+  const el = e.target.closest(DR_SOUND_SELECTOR);
+  if (el && el === _drLastHoverEl) _drLastHoverEl = null;
+});
 
 /* Botón maestría en la tarjeta → abre el detail de maestría */
 function openGloveGoMastery(id, e) {
@@ -12381,6 +12683,7 @@ let musicAudio       = null;
 let musicIsPlaying   = false;
 let musicVolume      = 0.7;
 let musicSeeking     = false;
+let musicCurrentGloveId = null; // id del guante dueño de la pista actual (p.ej. 'roaring')
 
 /* ── Control de volumen: 100% nativo (audio.volume) ─────────────────────────
    El volumen se aplica directamente sobre audio.volume (0–1).
@@ -12956,8 +13259,12 @@ function openMusicPlayer() {
   musicShuffleOn  = false;
   musicShuffleBag = [];
   musicShuffleHistory = [];
+  musicCurrentGloveId = glove.id;
   const shuffleBtn = document.getElementById('music-btn-shuffle');
   if (shuffleBtn) shuffleBtn.classList.remove('active');
+
+  /* ── Roaring: el reproductor grande también usa el tema Deltarune ── */
+  document.getElementById('music-player-overlay').classList.toggle('roaring-active', glove.id === 'roaring');
 
   // Animación: la caja de vinilo "vuela" fuera de la pantalla.
   // Para que no ensanche el contenedor con scroll que la rodea, primero la
@@ -13015,6 +13322,7 @@ function musicStopAndHideMini() {
   }
   musicIsPlaying = false;
   miniPlayerSource = null;
+  musicCurrentGloveId = null;
   document.getElementById('music-vinyl-disc-big').classList.remove('spinning');
   hideMiniPlayer();
 }
@@ -13317,6 +13625,9 @@ function reopenFullMusicPlayer() {
   document.getElementById('music-btn-shuffle').disabled = onlyOne;
   document.getElementById('music-btn-shuffle').classList.toggle('active', musicShuffleOn);
   musicUpdatePlayButton();
+
+  /* ── Roaring: mantener el tema Deltarune si la pista es suya ── */
+  document.getElementById('music-player-overlay').classList.toggle('roaring-active', musicCurrentGloveId === 'roaring');
 
   document.getElementById('music-player-overlay').classList.add('open');
 }
