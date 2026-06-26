@@ -15734,54 +15734,82 @@ function buildGloveBadgeIndex() {
   return index;
 }
 
-/* CORS-proxy fetch: try direct first, then proxies */
-const CORS_PROXIES = [
-  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://proxy.cors.sh/${url}`,
-];
+/* ---- fetch helpers with CORS proxy fallback ---- */
 
-async function fetchJSON(url) {
-  /* Try direct first */
+/* GET via proxies */
+async function fetchGET(url) {
+  const proxies = [
+    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  ];
+  /* direct first */
   try {
     const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
     if (r.ok) return await r.json();
   } catch(_) {}
-  /* Try each proxy */
-  for (const makeProxyUrl of CORS_PROXIES) {
+  /* proxies */
+  for (const purl of proxies) {
     try {
-      const r = await fetch(makeProxyUrl(url), { headers: { 'Accept': 'application/json' } });
-      if (r.ok) {
-        const text = await r.text();
-        return JSON.parse(text);
-      }
+      const r = await fetch(purl);
+      if (r.ok) { const t = await r.text(); return JSON.parse(t); }
     } catch(_) {}
   }
-  throw new Error(`No se pudo obtener: ${url}`);
+  throw new Error(`No se pudo obtener datos de:\n${url}`);
+}
+
+/* POST via proxies — corsproxy.io supports POST by forwarding to the target */
+async function fetchPOST(url, body) {
+  const jsonBody = JSON.stringify(body);
+  const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+
+  /* direct */
+  try {
+    const r = await fetch(url, { method: 'POST', headers, body: jsonBody });
+    if (r.ok) return await r.json();
+  } catch(_) {}
+
+  /* corsproxy.io — supports POST */
+  try {
+    const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`, {
+      method: 'POST', headers, body: jsonBody,
+    });
+    if (r.ok) { const t = await r.text(); return JSON.parse(t); }
+  } catch(_) {}
+
+  /* allorigins wraps POST as GET with the body in a query param (undocumented but works) */
+  try {
+    const r = await fetch(
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&body=${encodeURIComponent(jsonBody)}&method=POST`
+    );
+    if (r.ok) { const t = await r.text(); return JSON.parse(t); }
+  } catch(_) {}
+
+  throw new Error(`No se pudo contactar con la API de Roblox.\nVerifica tu conexión o inténtalo de nuevo.`);
 }
 
 async function getRobloxUserId(username) {
-  const data = await fetchJSON(
-    `https://users.roblox.com/v1/usernames/users?usernames[]=${encodeURIComponent(username)}&excludeBannedUsers=false`
+  /* La API de usuarios de Roblox requiere POST con JSON body */
+  const data = await fetchPOST(
+    'https://users.roblox.com/v1/usernames/users',
+    { usernames: [username], excludeBannedUsers: false }
   );
-  // allorigins/corsproxy may return the raw array or the {data:[]} wrapper
   const list = Array.isArray(data) ? data : (data.data || []);
-  if (!list.length) throw new Error(`Usuario "${username}" no encontrado en Roblox.`);
-  return { id: list[0].id, displayName: list[0].displayName || username, name: list[0].name || username };
+  if (!list.length) throw new Error(`Usuario "${username}" no encontrado en Roblox.\n¿El nombre está bien escrito?`);
+  return { id: list[0].id, name: list[0].name || username, displayName: list[0].displayName || username };
 }
 
 async function getAwardedBadges(userId, badgeIds) {
-  /* Roblox allows up to 100 badge IDs per request */
+  /* badges.roblox.com acepta GET con hasta 100 IDs por petición */
   const awarded = {};
   const chunks = [];
   for (let i = 0; i < badgeIds.length; i += 100) chunks.push(badgeIds.slice(i, i + 100));
   for (const chunk of chunks) {
     try {
-      const data = await fetchJSON(
+      const data = await fetchGET(
         `https://badges.roblox.com/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`
       );
       const list = Array.isArray(data) ? data : (data.data || []);
-      list.forEach(entry => { awarded[String(entry.badgeId)] = entry.awardedDate; });
+      list.forEach(e => { awarded[String(e.badgeId)] = e.awardedDate; });
     } catch(_) {}
   }
   return awarded;
