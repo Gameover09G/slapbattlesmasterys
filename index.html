@@ -15725,9 +15725,11 @@ document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
    Ejemplo: 'https://mi-proxy.miusuario.workers.dev'
    El Worker debe responder a:
      POST /users/v1/usernames/users
-     GET  /badges/v1/users/{id}/badges?limit=100&sortOrder=Desc&cursor=...
-   (El endpoint /awarded-dates ya no funciona sin login desde
-   marzo de 2026 — Roblox cerró el acceso público a ese endpoint.)
+     GET  /badges/v1/users/{id}/badges/awarded-dates?badgeIds=...
+   (Desde marzo 2026 este último endpoint exige autenticación.
+   El Worker la resuelve adjuntando la cookie de una cuenta "bot"
+   — ver ROBLOSECURITY en cloudflare-worker.js. Si esa cuenta se
+   bloquea o Roblox restringe más esto, volverá a fallar.)
    ============================================================ */
 const PROXY_BASE_URL = 'https://slap-proxy.gameover09g.workers.dev';
 
@@ -15790,53 +15792,35 @@ async function getRobloxUserId(username) {
 }
 
 /* ------------------------------------------------------------
-   NOTA (jun 2026): el endpoint /badges/awarded-dates que se usaba
-   antes ya NO funciona sin login — Roblox eliminó el acceso sin
-   autenticación a ese endpoint en marzo de 2026 (devolverá 401
-   siempre, venga de un Worker o de donde sea). Ahora usamos el
-   listado público de insignias del usuario (/v1/users/{id}/badges)
-   y comprobamos manualmente si los IDs que nos interesan están en
-   esa lista. Es más lento (hay que paginar) y no nos da la fecha
-   exacta en que se obtuvo cada insignia (ese dato solo lo daba el
-   endpoint bloqueado), pero el ✅/❌ de "tiene / no tiene" insignia
-   vuelve a funcionar sin necesitar que el visitante inicie sesión.
-
-   Si Roblox en el futuro también bloquea este listado público,
-   ya no habrá forma de comprobar insignias de otros usuarios sin
-   que cada visitante inicie sesión para consultar SOLO su propio
-   perfil (y aun así, dependerá de su configuración de privacidad).
+   NOTA (jun 2026): este endpoint dejó de funcionar SIN login en
+   marzo de 2026. Ahora el Worker adjunta la cookie de una cuenta
+   "bot" dedicada (ver cloudflare-worker.js) para que Roblox vuelva
+   a responder. Aun así, Roblox solo devuelve las insignias que esa
+   cuenta bot tiene permiso de ver según la configuración de
+   privacidad de inventario de CADA jugador — la mayoría las tiene
+   en público por defecto, pero si alguien la puso privada, saldrá
+   como "no obtenida" aunque sí la tenga (no es un fallo, es la
+   privacidad de esa persona). Esto puede volver a romperse si
+   Roblox decide banear/bloquear la cuenta bot o restringe más este
+   endpoint en el futuro.
    ------------------------------------------------------------ */
-async function getAwardedBadges(userId, badgeIds, maxPages = 60) {
-  const targets = new Set(badgeIds.map(String));
+async function getAwardedBadges(userId, badgeIds) {
   const awarded = {};
-  let cursor = '';
-  let pages  = 0;
-
-  while (pages < maxPages) {
-    const url = `${PROXY_BASE_URL}/badges/v1/users/${userId}/badges?limit=100&sortOrder=Desc`
-              + (cursor ? `&cursor=${encodeURIComponent(cursor)}` : '');
-    let json;
+  for (let i = 0; i < badgeIds.length; i += 100) {
+    const chunk = badgeIds.slice(i, i + 100);
+    const url = `${PROXY_BASE_URL}/badges/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`;
     try {
       const r = await fetch(url);
-      if (!r.ok) { console.warn('badges list HTTP', r.status); break; }
-      json = await r.json();
-    } catch (err) {
-      console.warn('badges list error:', err);
-      break;
+      if (!r.ok) { console.warn('badges chunk HTTP', r.status); continue; }
+      const json = await r.json();
+      const list = Array.isArray(json) ? json : (json.data || []);
+      list.forEach(e => {
+        if (e.badgeId != null) awarded[String(e.badgeId)] = e.awardedDate || true;
+      });
+    } catch(err) {
+      console.warn('badges chunk error:', err);
     }
-
-    const list = Array.isArray(json) ? json : (json.data || []);
-    list.forEach(b => {
-      const id = String(b.id ?? b.badgeId ?? '');
-      if (id && targets.has(id)) awarded[id] = true; // sin fecha exacta disponible
-    });
-
-    pages++;
-    cursor = json.nextPageCursor || '';
-    if (!cursor) break;                                  // no hay más páginas
-    if (Object.keys(awarded).length >= targets.size) break; // ya encontramos todo lo que buscábamos
   }
-
   return awarded;
 }
 
@@ -15941,10 +15925,9 @@ async function submitRobloxCheck() {
       const bl=document.createElement('div'); bl.className='rcr-badge-list';
       gd.badges.forEach(b=>{
         const item=document.createElement('div'); item.className='rcr-badge-item';
-        const dateText = (b.awardedDate && b.awardedDate !== true) ? formatDate(b.awardedDate) : '';
-        const dateStr = b.awardedDate
-          ? `<span class="rcr-badge-date">${dateText ? 'Obtenido el ' + dateText : 'Conseguido'}</span>`
-          : `<span class="rcr-badge-miss">Sin obtener</span>`;
+        const dateStr=b.awardedDate
+          ?`<span class="rcr-badge-date">Obtenido el ${formatDate(b.awardedDate)}</span>`
+          :`<span class="rcr-badge-miss">Sin obtener</span>`;
         item.innerHTML=`<span class="rcr-badge-icon">${b.awardedDate?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>${dateStr}`;
         bl.appendChild(item);
       });
