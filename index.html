@@ -15715,102 +15715,97 @@ function closeRobloxCheck() {
   document.getElementById('roblox-check-overlay').classList.remove('open');
 }
 
-/* Build index: badgeId -> [{gloveId, gloveName, badgeName, badgeUrl}] */
+/* ---- Build badge index from ALL gloves that have badges ---- */
 function buildGloveBadgeIndex() {
   const index = {};
   if (typeof GLOVES === 'undefined') return index;
   GLOVES.forEach(g => {
-    if (g.type === 'logro' && Array.isArray(g.badges)) {
+    if (Array.isArray(g.badges) && g.badges.length) {
       g.badges.forEach(b => {
         if (!b.url) return;
-        const m = b.url.match(/badges\/(\d+)/);
+        /* Match both /badges/XXXX and badges?id=XXXX URL formats */
+        const m = b.url.match(/[?&]?(?:badges\/|badgeId=)(\d+)/i) || b.url.match(/\/(\d{7,})/);
         if (!m) return;
         const id = m[1];
         if (!index[id]) index[id] = [];
-        index[id].push({ gloveId: g.id, gloveName: g.name, badgeName: b.name, badgeUrl: b.url });
+        index[id].push({ gloveId: g.id, gloveName: g.name, badgeName: b.name, badgeUrl: b.url, gloveType: g.type });
       });
     }
   });
   return index;
 }
 
-/* ---- fetch helpers with CORS proxy fallback ---- */
-
-/* GET via proxies */
-async function fetchGET(url) {
-  const proxies = [
-    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+/* ---- CORS proxy helper ---- */
+/* Returns parsed JSON or throws */
+async function proxyFetch(url, opts = {}) {
+  const PROXIES = [
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://thingproxy.freeboard.io/fetch/${u}`,
   ];
-  /* direct first */
+
+  /* Try direct (works in Electron / some browsers) */
   try {
-    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-    if (r.ok) return await r.json();
+    const r = await fetch(url, { ...opts, headers: { 'Accept': 'application/json', ...(opts.headers||{}) } });
+    if (r.ok) { const t = await r.text(); return JSON.parse(t); }
   } catch(_) {}
-  /* proxies */
-  for (const purl of proxies) {
+
+  /* Try each proxy */
+  for (const mkProxy of PROXIES) {
     try {
-      const r = await fetch(purl);
+      const proxyUrl = mkProxy(url);
+      const fetchOpts = opts.method === 'POST'
+        ? { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: opts.body }
+        : {};
+      const r = await fetch(proxyUrl, fetchOpts);
       if (r.ok) { const t = await r.text(); return JSON.parse(t); }
     } catch(_) {}
   }
-  throw new Error(`No se pudo obtener datos de:\n${url}`);
+  throw new Error(`No se pudo obtener datos de la API de Roblox.\nComprueba tu conexión e inténtalo de nuevo.`);
 }
 
-/* POST via proxies — corsproxy.io supports POST by forwarding to the target */
-async function fetchPOST(url, body) {
-  const jsonBody = JSON.stringify(body);
-  const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-
-  /* direct */
-  try {
-    const r = await fetch(url, { method: 'POST', headers, body: jsonBody });
-    if (r.ok) return await r.json();
-  } catch(_) {}
-
-  /* corsproxy.io — supports POST */
-  try {
-    const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`, {
-      method: 'POST', headers, body: jsonBody,
-    });
-    if (r.ok) { const t = await r.text(); return JSON.parse(t); }
-  } catch(_) {}
-
-  /* allorigins wraps POST as GET with the body in a query param (undocumented but works) */
-  try {
-    const r = await fetch(
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&body=${encodeURIComponent(jsonBody)}&method=POST`
-    );
-    if (r.ok) { const t = await r.text(); return JSON.parse(t); }
-  } catch(_) {}
-
-  throw new Error(`No se pudo contactar con la API de Roblox.\nVerifica tu conexión o inténtalo de nuevo.`);
-}
-
+/* ---- Resolve Roblox username → userId ---- */
 async function getRobloxUserId(username) {
-  /* La API de usuarios de Roblox requiere POST con JSON body */
-  const data = await fetchPOST(
+  /* Roblox Users API: POST /v1/usernames/users */
+  const data = await proxyFetch(
     'https://users.roblox.com/v1/usernames/users',
-    { usernames: [username], excludeBannedUsers: false }
+    {
+      method: 'POST',
+      body: JSON.stringify({ usernames: [username], excludeBannedUsers: false }),
+    }
   );
   const list = Array.isArray(data) ? data : (data.data || []);
   if (!list.length) throw new Error(`Usuario "${username}" no encontrado en Roblox.\n¿El nombre está bien escrito?`);
   return { id: list[0].id, name: list[0].name || username, displayName: list[0].displayName || username };
 }
 
+/* ---- Fetch awarded badge dates for a user ---- */
+/*
+  The Roblox Badges API endpoint is:
+    GET https://badges.roblox.com/v1/users/{userId}/badges/awarded-dates?badgeIds=ID1,ID2,...
+  Returns: { data: [ { badgeId: number, awardedDate: "ISO string" }, ... ] }
+  Only badges the user actually HAS are returned; absent = not awarded.
+  Max ~100 IDs per request.
+*/
 async function getAwardedBadges(userId, badgeIds) {
-  /* badges.roblox.com acepta GET con hasta 100 IDs por petición */
   const awarded = {};
-  const chunks = [];
-  for (let i = 0; i < badgeIds.length; i += 100) chunks.push(badgeIds.slice(i, i + 100));
-  for (const chunk of chunks) {
+  /* Chunk into groups of 100 */
+  for (let i = 0; i < badgeIds.length; i += 100) {
+    const chunk = badgeIds.slice(i, i + 100);
+    const url = `https://badges.roblox.com/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`;
     try {
-      const data = await fetchGET(
-        `https://badges.roblox.com/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`
-      );
+      const data = await proxyFetch(url);
+      /* Response shape: { data: [{badgeId, awardedDate}, ...] } */
       const list = Array.isArray(data) ? data : (data.data || []);
-      list.forEach(e => { awarded[String(e.badgeId)] = e.awardedDate; });
-    } catch(_) {}
+      list.forEach(e => {
+        /* badgeId may be a number; always store as string key */
+        if (e.badgeId != null && e.awardedDate) {
+          awarded[String(e.badgeId)] = e.awardedDate;
+        }
+      });
+    } catch(_) {
+      /* If one chunk fails, continue with remaining */
+    }
   }
   return awarded;
 }
@@ -15820,7 +15815,7 @@ function formatDate(iso) {
   try {
     const d = new Date(iso);
     return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' });
-  } catch(_) { return iso.slice(0,10); }
+  } catch(_) { return String(iso).slice(0,10); }
 }
 
 function setStatus(msg, cls) {
@@ -15839,43 +15834,51 @@ async function submitRobloxCheck() {
   setStatus('🔍 Buscando usuario…');
 
   try {
+    /* Step 1: resolve username → userId */
     const user = await getRobloxUserId(username);
-    setStatus(`✅ Usuario encontrado: ${user.name} (ID: ${user.id}) — cargando logros…`, 'ok');
+    setStatus(`✅ Usuario encontrado: ${user.name} (ID: ${user.id}) — cargando badges…`, 'ok');
 
+    /* Step 2: build badge index from ALL gloves with badges (not just type:'logro') */
     const index = buildGloveBadgeIndex();
     const allBadgeIds = Object.keys(index);
 
     if (!allBadgeIds.length) {
-      setStatus('No hay guantes de tipo logro con badges configurados.', 'error');
+      setStatus('No hay guantes con badges configurados en los datos.', 'error');
       submitBtn.disabled = false;
       return;
     }
 
+    setStatus(`✅ Usuario: ${user.name} — consultando ${allBadgeIds.length} badge(s)…`, 'ok');
+
+    /* Step 3: fetch awarded dates */
     const awarded = await getAwardedBadges(user.id, allBadgeIds);
 
-    /* Group by glove */
+    /* Step 4: group results by glove */
     const gloveMap = {};
     GLOVES.forEach(g => {
-      if (g.type === 'logro' && Array.isArray(g.badges) && g.badges.length) {
-        gloveMap[g.id] = { gloveName: g.name, badges: [] };
-        g.badges.forEach(b => {
-          if (!b.url) return;
-          const m = b.url.match(/badges\/(\d+)/);
-          if (!m) return;
-          const bid = m[1];
-          gloveMap[g.id].badges.push({
-            badgeId: bid,
-            badgeName: b.name,
-            badgeUrl: b.url,
-            awardedDate: awarded[bid] || null,
-          });
-        });
+      if (!Array.isArray(g.badges) || !g.badges.length) return;
+      /* Build the per-glove entry on first encounter */
+      if (!gloveMap[g.id]) {
+        gloveMap[g.id] = { gloveName: g.name, gloveType: g.type, badges: [] };
       }
+      g.badges.forEach(b => {
+        if (!b.url) return;
+        const m = b.url.match(/[?&]?(?:badges\/|badgeId=)(\d+)/i) || b.url.match(/\/(\d{7,})/);
+        if (!m) return;
+        const bid = String(m[1]);
+        gloveMap[g.id].badges.push({
+          badgeId: bid,
+          badgeName: b.name,
+          badgeUrl: b.url,
+          /* awarded[bid] is the ISO date string, or undefined if not awarded */
+          awardedDate: awarded[bid] || null,
+        });
+      });
     });
 
-    /* Stats */
+    /* Step 5: stats */
     let totalComplete = 0, totalPartial = 0, totalPending = 0;
-    const gloveEntries = Object.entries(gloveMap).filter(([,v]) => v.badges.length > 0);
+    const gloveEntries = Object.entries(gloveMap).filter(([, v]) => v.badges.length > 0);
     gloveEntries.forEach(([, v]) => {
       const got = v.badges.filter(b => b.awardedDate).length;
       if (got === v.badges.length) totalComplete++;
@@ -15883,7 +15886,7 @@ async function submitRobloxCheck() {
       else totalPending++;
     });
 
-    /* Render */
+    /* Step 6: render */
     const resultsEl = document.getElementById('roblox-check-results');
 
     const summaryEl = document.createElement('div');
@@ -15898,10 +15901,10 @@ async function submitRobloxCheck() {
     `;
     resultsEl.appendChild(summaryEl);
 
-    /* Sort: complete last, pending first */
-    const sorted = gloveEntries.slice().sort(([,a],[,b]) => {
+    /* Sort: pending first, complete last */
+    const sorted = gloveEntries.slice().sort(([, a], [, b]) => {
       const score = v => {
-        const got = v.badges.filter(x=>x.awardedDate).length;
+        const got = v.badges.filter(x => x.awardedDate).length;
         if (got === v.badges.length) return 2;
         if (got > 0) return 1;
         return 0;
@@ -15919,7 +15922,7 @@ async function submitRobloxCheck() {
 
       const row = document.createElement('div');
       row.className = 'rcr-glove-row';
-      if (got === total) row.classList.add('open'); // auto-expand complete ones
+      if (got === total) row.classList.add('open'); /* auto-expand completed gloves */
 
       const header = document.createElement('div');
       header.className = 'rcr-glove-header';
@@ -15952,7 +15955,12 @@ async function submitRobloxCheck() {
       resultsEl.appendChild(row);
     });
 
-    setStatus(`Mostrando ${gloveEntries.length} guantes de logro para ${user.name}.`, 'ok');
+    const awardedCount = Object.keys(awarded).length;
+    setStatus(
+      `Mostrando ${gloveEntries.length} guante(s) con badges para ${user.name}` +
+      ` — ${awardedCount} badge(s) obtenido(s) de ${allBadgeIds.length} total.`,
+      'ok'
+    );
   } catch(err) {
     setStatus('❌ ' + (err.message || 'Error desconocido.'), 'error');
   } finally {
