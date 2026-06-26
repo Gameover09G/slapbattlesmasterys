@@ -15712,11 +15712,26 @@ document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
 </script>
 
 
+
 <!-- ============================================================
-     ROBLOX BADGE CHECKER — via RoProxy (badges.roproxy.com)
+     ROBLOX BADGE CHECKER
+     Usa tu propio Cloudflare Worker como proxy.
+     Cambia PROXY_BASE_URL por la URL de tu Worker.
      ============================================================ -->
 <script>
 
+/* ============================================================
+   CONFIGURACIÓN — pon aquí la URL de tu Cloudflare Worker
+   Ejemplo: 'https://mi-proxy.miusuario.workers.dev'
+   El Worker debe responder a:
+     POST /users/v1/usernames/users
+     GET  /badges/v1/users/{id}/badges/awarded-dates?badgeIds=...
+   ============================================================ */
+const PROXY_BASE_URL = 'https://slap-proxy.YOUR_SUBDOMAIN.workers.dev';
+
+/* ============================================================
+   Helpers DOM — null-safe
+   ============================================================ */
 function openRobloxCheck() {
   const overlay = document.getElementById('roblox-check-overlay');
   const status  = document.getElementById('roblox-check-status');
@@ -15730,13 +15745,14 @@ function openRobloxCheck() {
   inp.value = '';
   setTimeout(() => inp.focus(), 80);
 }
-
 function closeRobloxCheck() {
   const el = document.getElementById('roblox-check-overlay');
   if (el) el.classList.remove('open');
 }
 
-/* ---- Build index: badgeId (string) → glove info ---- */
+/* ============================================================
+   Badge index
+   ============================================================ */
 function buildGloveBadgeIndex() {
   const index = {};
   if (typeof GLOVES === 'undefined') return index;
@@ -15754,20 +15770,17 @@ function buildGloveBadgeIndex() {
   return index;
 }
 
-/* ---------------------------------------------------------------
-   RoProxy mirrors Roblox subdomains with CORS headers.
-   users.roblox.com  → users.roproxy.com
-   badges.roblox.com → badges.roproxy.com
---------------------------------------------------------------- */
-
+/* ============================================================
+   API calls — a través del Worker propio
+   ============================================================ */
 async function getRobloxUserId(username) {
-  // RoProxy supports POST and adds CORS headers
-  const r = await fetch('https://users.roproxy.com/v1/usernames/users', {
+  const url = `${PROXY_BASE_URL}/users/v1/usernames/users`;
+  const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
   });
-  if (!r.ok) throw new Error(`Error buscando usuario (${r.status}). ¿El nombre está bien escrito?`);
+  if (!r.ok) throw new Error(`Error al buscar usuario (HTTP ${r.status}). ¿El nombre está bien escrito?`);
   const json = await r.json();
   const list = Array.isArray(json) ? json : (json.data || []);
   if (!list.length) throw new Error(`Usuario "${username}" no encontrado en Roblox.`);
@@ -15776,13 +15789,12 @@ async function getRobloxUserId(username) {
 
 async function getAwardedBadges(userId, badgeIds) {
   const awarded = {};
-  // Chunks of 100 — RoProxy supports the awarded-dates endpoint
   for (let i = 0; i < badgeIds.length; i += 100) {
     const chunk = badgeIds.slice(i, i + 100);
-    const url = `https://badges.roproxy.com/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`;
+    const url = `${PROXY_BASE_URL}/badges/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`;
     try {
       const r = await fetch(url);
-      if (!r.ok) { console.warn('badges chunk failed:', r.status); continue; }
+      if (!r.ok) { console.warn('badges chunk HTTP', r.status); continue; }
       const json = await r.json();
       const list = Array.isArray(json) ? json : (json.data || []);
       list.forEach(e => {
@@ -15795,13 +15807,14 @@ async function getAwardedBadges(userId, badgeIds) {
   return awarded;
 }
 
+/* ============================================================
+   Utilidades
+   ============================================================ */
 function formatDate(iso) {
   if (!iso || iso === true) return '';
-  try {
-    return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch(_) { return String(iso).slice(0, 10); }
+  try { return new Date(iso).toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' }); }
+  catch(_) { return String(iso).slice(0,10); }
 }
-
 function setStatus(msg, cls) {
   const el = document.getElementById('roblox-check-status');
   if (!el) return;
@@ -15809,6 +15822,9 @@ function setStatus(msg, cls) {
   el.className   = cls || '';
 }
 
+/* ============================================================
+   Submit
+   ============================================================ */
 async function submitRobloxCheck() {
   const usernameEl = document.getElementById('roblox-username-input');
   const submitBtn  = document.getElementById('roblox-check-submit');
@@ -15818,27 +15834,27 @@ async function submitRobloxCheck() {
   const username = usernameEl.value.trim();
   if (!username) { setStatus('Introduce un nombre de usuario.', 'error'); return; }
 
+  /* Advertir si el proxy no está configurado */
+  if (PROXY_BASE_URL.includes('YOUR_SUBDOMAIN')) {
+    setStatus('⚠️ Configura primero tu Cloudflare Worker (ver instrucciones en el README).', 'error');
+    return;
+  }
+
   submitBtn.disabled  = true;
   resultsEl.innerHTML = '';
   setStatus('🔍 Buscando usuario…');
 
   try {
-    /* 1 — resolver usuario */
     const user = await getRobloxUserId(username);
     setStatus(`✅ ${user.name} (ID: ${user.id}) — consultando badges…`, 'ok');
 
-    /* 2 — índice de badges */
-    const index      = buildGloveBadgeIndex();
+    const index       = buildGloveBadgeIndex();
     const allBadgeIds = Object.keys(index);
-    if (!allBadgeIds.length) {
-      setStatus('No hay guantes con badges configurados.', 'error');
-      return;
-    }
+    if (!allBadgeIds.length) { setStatus('No hay guantes con badges configurados.', 'error'); return; }
 
-    /* 3 — badges obtenidos */
     const awarded = await getAwardedBadges(user.id, allBadgeIds);
 
-    /* 4 — agrupar por guante */
+    /* Agrupar por guante */
     const gloveMap = {};
     GLOVES.forEach(g => {
       if (!Array.isArray(g.badges) || !g.badges.length) return;
@@ -15847,99 +15863,68 @@ async function submitRobloxCheck() {
         if (!b.url) return;
         const m = b.url.match(/\/badges\/(\d+)/i) || b.url.match(/badgeId=(\d+)/i);
         if (!m) return;
-        const bid = String(m[1]);
         gloveMap[g.id].badges.push({
-          badgeId: bid,
-          badgeName: b.name,
-          badgeUrl: b.url,
-          awardedDate: awarded[bid] || null,
+          badgeId: String(m[1]), badgeName: b.name, badgeUrl: b.url,
+          awardedDate: awarded[m[1]] || null
         });
       });
     });
 
-    /* 5 — estadísticas */
-    let totalComplete = 0, totalPartial = 0, totalPending = 0;
-    const gloveEntries = Object.entries(gloveMap).filter(([, v]) => v.badges.length > 0);
-    gloveEntries.forEach(([, v]) => {
-      const got = v.badges.filter(b => b.awardedDate).length;
-      if (got === v.badges.length) totalComplete++;
-      else if (got > 0) totalPartial++;
+    let totalComplete=0, totalPartial=0, totalPending=0;
+    const gloveEntries = Object.entries(gloveMap).filter(([,v]) => v.badges.length);
+    gloveEntries.forEach(([,v]) => {
+      const got = v.badges.filter(b=>b.awardedDate).length;
+      if (got===v.badges.length) totalComplete++;
+      else if (got>0) totalPartial++;
       else totalPending++;
     });
 
-    /* 6 — render */
     const summaryEl = document.createElement('div');
     summaryEl.className = 'rcr-summary-bar';
     summaryEl.innerHTML = `
-      <span class="rcr-sum-num">${totalComplete}</span>
-      <span class="rcr-sum-label">guantes completos</span>
+      <span class="rcr-sum-num">${totalComplete}</span><span class="rcr-sum-label"> guantes completos</span>
       &nbsp;·&nbsp;
-      <span class="rcr-sum-miss">${totalPending + totalPartial}</span>
-      <span class="rcr-sum-label">pendientes / parciales</span>
-      <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>
-    `;
+      <span class="rcr-sum-miss">${totalPending+totalPartial}</span><span class="rcr-sum-label"> pendientes / parciales</span>
+      <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>`;
     resultsEl.appendChild(summaryEl);
 
-    /* Ordenar: pendientes primero, completos al final */
-    const sorted = gloveEntries.slice().sort(([, a], [, b]) => {
-      const score = v => { const g = v.badges.filter(x => x.awardedDate).length; return g === v.badges.length ? 2 : g > 0 ? 1 : 0; };
-      return score(a) - score(b);
+    const sorted = gloveEntries.slice().sort(([,a],[,b]) => {
+      const s = v => { const g=v.badges.filter(x=>x.awardedDate).length; return g===v.badges.length?2:g>0?1:0; };
+      return s(a)-s(b);
     });
 
-    sorted.forEach(([, gloveData]) => {
-      const got   = gloveData.badges.filter(b => b.awardedDate).length;
-      const total = gloveData.badges.length;
-      let pillClass, pillText;
-      if (got === total) { pillClass = 'complete'; pillText = '✅ Completo'; }
-      else if (got > 0)  { pillClass = 'partial';  pillText = `⚠️ Parcial (${got}/${total})`; }
-      else               { pillClass = 'pending';  pillText = '❌ Pendiente'; }
+    sorted.forEach(([, gd]) => {
+      const got=gd.badges.filter(b=>b.awardedDate).length, total=gd.badges.length;
+      const [pillClass,pillText] = got===total ? ['complete','✅ Completo']
+                                 : got>0       ? ['partial', `⚠️ Parcial (${got}/${total})`]
+                                               : ['pending', '❌ Pendiente'];
+      const row=document.createElement('div'); row.className='rcr-glove-row';
+      if(got===total) row.classList.add('open');
 
-      const row = document.createElement('div');
-      row.className = 'rcr-glove-row';
-      if (got === total) row.classList.add('open');
+      const header=document.createElement('div'); header.className='rcr-glove-header';
+      header.innerHTML=`<span class="rcr-glove-name">🥊 ${gd.gloveName}</span><span class="rcr-status-pill ${pillClass}">${pillText}</span><span class="rcr-chevron">▶</span>`;
+      header.addEventListener('click',()=>row.classList.toggle('open'));
 
-      const header = document.createElement('div');
-      header.className = 'rcr-glove-header';
-      header.innerHTML = `
-        <span class="rcr-glove-name">🥊 ${gloveData.gloveName}</span>
-        <span class="rcr-status-pill ${pillClass}">${pillText}</span>
-        <span class="rcr-chevron">▶</span>
-      `;
-      header.addEventListener('click', () => row.classList.toggle('open'));
-
-      const badgeList = document.createElement('div');
-      badgeList.className = 'rcr-badge-list';
-      gloveData.badges.forEach(b => {
-        const item    = document.createElement('div');
-        item.className = 'rcr-badge-item';
-        const icon    = b.awardedDate ? '✅' : '❌';
-        const dateStr = b.awardedDate
-          ? `<span class="rcr-badge-date">Obtenido el ${formatDate(b.awardedDate)}</span>`
-          : `<span class="rcr-badge-miss">Sin obtener</span>`;
-        item.innerHTML = `
-          <span class="rcr-badge-icon">${icon}</span>
-          <span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>
-          ${dateStr}
-        `;
-        badgeList.appendChild(item);
+      const bl=document.createElement('div'); bl.className='rcr-badge-list';
+      gd.badges.forEach(b=>{
+        const item=document.createElement('div'); item.className='rcr-badge-item';
+        const dateStr=b.awardedDate
+          ?`<span class="rcr-badge-date">Obtenido el ${formatDate(b.awardedDate)}</span>`
+          :`<span class="rcr-badge-miss">Sin obtener</span>`;
+        item.innerHTML=`<span class="rcr-badge-icon">${b.awardedDate?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>${dateStr}`;
+        bl.appendChild(item);
       });
 
-      row.appendChild(header);
-      row.appendChild(badgeList);
-      resultsEl.appendChild(row);
+      row.appendChild(header); row.appendChild(bl); resultsEl.appendChild(row);
     });
 
-    const awardedCount = Object.keys(awarded).length;
-    setStatus(
-      `${user.name}: ${awardedCount}/${allBadgeIds.length} badges obtenidos · ${totalComplete} guante(s) completo(s)`,
-      'ok'
-    );
+    setStatus(`${user.name}: ${Object.keys(awarded).length}/${allBadgeIds.length} badges · ${totalComplete} guante(s) completo(s)`,'ok');
 
   } catch(err) {
-    setStatus('❌ ' + (err.message || 'Error desconocido.'), 'error');
+    setStatus('❌ '+(err.message||'Error desconocido.'),'error');
     console.error(err);
   } finally {
-    submitBtn.disabled = false;
+    submitBtn.disabled=false;
   }
 }
 </script>
