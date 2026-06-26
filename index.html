@@ -15408,7 +15408,7 @@ document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
 
   /* ── Estado de la cinemática ── */
   let _rafId        = null;   // requestAnimationFrame handle
-  let _trailTimer   = null;   // setInterval para generar ghostos
+  let _trailTimer   = null;   // setInterval para generar
   let _phase        = 'idle'; // 'idle' | 'flash' | 'pulse' | 'fly' | 'return'
   let _flyStartTime = 0;      // timestamp cuando empieza la fase ∞
   let _origRect     = null;   // posición original del frame (para fase return)
@@ -15806,21 +15806,46 @@ async function getRobloxUserId(username) {
    ------------------------------------------------------------ */
 async function getAwardedBadges(userId, badgeIds) {
   const awarded = {};
+  let failedChunks = 0;
+  let lastBadStatus = null;
+
   for (let i = 0; i < badgeIds.length; i += 100) {
     const chunk = badgeIds.slice(i, i + 100);
     const url = `${PROXY_BASE_URL}/badges/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`;
     try {
       const r = await fetch(url);
-      if (!r.ok) { console.warn('badges chunk HTTP', r.status); continue; }
+      if (!r.ok) {
+        lastBadStatus = r.status;
+        failedChunks++;
+        console.warn('badges chunk HTTP', r.status);
+        continue;
+      }
       const json = await r.json();
       const list = Array.isArray(json) ? json : (json.data || []);
       list.forEach(e => {
         if (e.badgeId != null) awarded[String(e.badgeId)] = e.awardedDate || true;
       });
-    } catch(err) {
+    } catch (err) {
+      failedChunks++;
       console.warn('badges chunk error:', err);
     }
   }
+
+  // Si TODOS los chunks fallaron, lanzar error descriptivo
+  const totalChunks = Math.ceil(badgeIds.length / 100);
+  if (failedChunks > 0 && failedChunks === totalChunks) {
+    if (lastBadStatus === 401) {
+      throw new Error(
+        'El Worker devuelve 401 al consultar badges. Roblox exige autenticación desde marzo de 2026. ' +
+        'Configura el secreto ROBLOSECURITY en tu Cloudflare Worker (ver instrucciones abajo).'
+      );
+    }
+    throw new Error(
+      `El proxy falló en todos los chunks de badges (HTTP ${lastBadStatus ?? 'error de red'}). ` +
+      'Revisa la consola del navegador y los logs del Worker.'
+    );
+  }
+
   return awarded;
 }
 
