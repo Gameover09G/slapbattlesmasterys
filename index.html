@@ -2389,6 +2389,203 @@ body {
 #share-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
 
 /* ============================================================
+   ROBLOX CHECK FAB (fixed above share-fab)
+   ============================================================ */
+#roblox-check-fab {
+  position: fixed;
+  bottom: 190px;
+  right: 18px;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, opacity .2s, border-color .2s;
+  font-family: 'Fredoka One', cursive;
+  animation: fabAppear .35s cubic-bezier(.34,1.56,.64,1) both;
+  opacity: 0.45;
+  font-size: 15px;
+}
+#roblox-check-fab:hover {
+  opacity: 1;
+  transform: scale(1.12);
+  border-color: #fbbf24;
+  box-shadow: 0 0 14px rgba(251,191,36,0.35), 0 4px 12px rgba(0,0,0,0.6);
+}
+#roblox-check-fab:active { transform: scale(0.93); }
+#roblox-check-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+
+/* ============================================================
+   ROBLOX CHECK MODAL
+   ============================================================ */
+#roblox-check-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 9200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s;
+}
+#roblox-check-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+#roblox-check-modal {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 28px 28px 22px;
+  width: min(92vw, 560px);
+  max-height: 82vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#roblox-check-modal h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #fbbf24;
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: .5px;
+}
+#roblox-check-input-row {
+  display: flex;
+  gap: 8px;
+}
+#roblox-username-input {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #eee;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color .18s;
+}
+#roblox-username-input:focus { border-color: #fbbf24; }
+#roblox-check-submit {
+  background: #fbbf24;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background .15s, transform .12s;
+}
+#roblox-check-submit:hover { background: #f59e0b; transform: scale(1.04); }
+#roblox-check-submit:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; }
+#roblox-check-cancel {
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+#roblox-check-cancel:hover { color: #ccc; border-color: #555; }
+#roblox-check-status {
+  font-size: 0.85rem;
+  color: #aaa;
+  min-height: 18px;
+}
+#roblox-check-status.error { color: #f87171; }
+#roblox-check-status.ok { color: #4ade80; }
+#roblox-check-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rcr-summary-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  background: #161616;
+  border-radius: 10px;
+  border: 1px solid #222;
+  font-size: 0.85rem;
+}
+.rcr-summary-bar .rcr-sum-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: #fbbf24;
+}
+.rcr-summary-bar .rcr-sum-label { color: #aaa; }
+.rcr-summary-bar .rcr-sum-miss { color: #f87171; font-size: 1.4rem; font-family: 'Fredoka One', cursive; }
+.rcr-glove-row {
+  background: #161616;
+  border: 1px solid #252525;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.rcr-glove-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.rcr-glove-header:hover { background: #1e1e1e; }
+.rcr-glove-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: #fde68a;
+  flex: 1;
+}
+.rcr-status-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 2px 9px;
+  letter-spacing: .4px;
+}
+.rcr-status-pill.complete { background: #14532d; color: #4ade80; border: 1px solid #166534; }
+.rcr-status-pill.partial  { background: #431407; color: #fb923c; border: 1px solid #7c2d12; }
+.rcr-status-pill.pending  { background: #1c1917; color: #888; border: 1px solid #292524; }
+.rcr-chevron { color: #555; font-size: 0.8rem; transition: transform .2s; }
+.rcr-glove-row.open .rcr-chevron { transform: rotate(90deg); }
+.rcr-badge-list {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid #222;
+}
+.rcr-glove-row.open .rcr-badge-list { display: flex; }
+.rcr-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border-bottom: 1px solid #1e1e1e;
+  font-size: 0.82rem;
+}
+.rcr-badge-item:last-child { border-bottom: none; }
+.rcr-badge-icon { font-size: 1rem; flex-shrink: 0; }
+.rcr-badge-name { flex: 1; color: #ccc; }
+.rcr-badge-name a { color: #93c5fd; text-decoration: none; }
+.rcr-badge-name a:hover { text-decoration: underline; }
+.rcr-badge-date { font-size: 0.75rem; color: #4ade80; }
+.rcr-badge-miss { font-size: 0.75rem; color: #6b7280; }
+
+/* ============================================================
    SHARE COLLAGE MODAL
    ============================================================ */
 #share-collage-overlay {
@@ -6422,6 +6619,31 @@ input[type="range"].slap-volume::-moz-range-track {
     </div>
   </div>
 
+</div>
+
+<!-- ========================================================
+     ROBLOX CHECK FAB (fixed above share-fab)
+     ======================================================== -->
+<button id="roblox-check-fab" onclick="openRobloxCheck()" title="Comprobar logros de un jugador de Roblox">
+  <span class="fab-icon">🏅</span>
+</button>
+
+<!-- ========================================================
+     ROBLOX CHECK MODAL
+     ======================================================== -->
+<div id="roblox-check-overlay" onclick="if(event.target===this)closeRobloxCheck()">
+  <div id="roblox-check-modal">
+    <h2>🏅 Comprobar logros en Roblox</h2>
+    <div id="roblox-check-input-row">
+      <input id="roblox-username-input" type="text" placeholder="Nombre de usuario de Roblox…"
+             onkeydown="if(event.key==='Enter')submitRobloxCheck()"
+             autocomplete="off" spellcheck="false" />
+      <button id="roblox-check-submit" onclick="submitRobloxCheck()">Buscar</button>
+      <button id="roblox-check-cancel" onclick="closeRobloxCheck()">✕ Cerrar</button>
+    </div>
+    <div id="roblox-check-status"></div>
+    <div id="roblox-check-results"></div>
+  </div>
 </div>
 
 <!-- ========================================================
@@ -15473,6 +15695,242 @@ document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
   }
 
 })();
+</script>
+
+<!-- ============================================================
+     ROBLOX BADGE CHECKER
+     ============================================================ -->
+<script>
+/* ---- helpers ---- */
+function openRobloxCheck() {
+  document.getElementById('roblox-check-overlay').classList.add('open');
+  document.getElementById('roblox-check-status').textContent = '';
+  document.getElementById('roblox-check-status').className = '';
+  document.getElementById('roblox-check-results').innerHTML = '';
+  const inp = document.getElementById('roblox-username-input');
+  inp.value = '';
+  setTimeout(() => inp.focus(), 80);
+}
+function closeRobloxCheck() {
+  document.getElementById('roblox-check-overlay').classList.remove('open');
+}
+
+/* Build index: badgeId -> [{gloveId, gloveName, badgeName, badgeUrl}] */
+function buildGloveBadgeIndex() {
+  const index = {};
+  if (typeof GLOVES === 'undefined') return index;
+  GLOVES.forEach(g => {
+    if (g.type === 'logro' && Array.isArray(g.badges)) {
+      g.badges.forEach(b => {
+        if (!b.url) return;
+        const m = b.url.match(/badges\/(\d+)/);
+        if (!m) return;
+        const id = m[1];
+        if (!index[id]) index[id] = [];
+        index[id].push({ gloveId: g.id, gloveName: g.name, badgeName: b.name, badgeUrl: b.url });
+      });
+    }
+  });
+  return index;
+}
+
+/* CORS-proxy fetch: try direct first, then proxies */
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://proxy.cors.sh/${url}`,
+];
+
+async function fetchJSON(url) {
+  /* Try direct first */
+  try {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (r.ok) return await r.json();
+  } catch(_) {}
+  /* Try each proxy */
+  for (const makeProxyUrl of CORS_PROXIES) {
+    try {
+      const r = await fetch(makeProxyUrl(url), { headers: { 'Accept': 'application/json' } });
+      if (r.ok) {
+        const text = await r.text();
+        return JSON.parse(text);
+      }
+    } catch(_) {}
+  }
+  throw new Error(`No se pudo obtener: ${url}`);
+}
+
+async function getRobloxUserId(username) {
+  const data = await fetchJSON(
+    `https://users.roblox.com/v1/usernames/users?usernames[]=${encodeURIComponent(username)}&excludeBannedUsers=false`
+  );
+  // allorigins/corsproxy may return the raw array or the {data:[]} wrapper
+  const list = Array.isArray(data) ? data : (data.data || []);
+  if (!list.length) throw new Error(`Usuario "${username}" no encontrado en Roblox.`);
+  return { id: list[0].id, displayName: list[0].displayName || username, name: list[0].name || username };
+}
+
+async function getAwardedBadges(userId, badgeIds) {
+  /* Roblox allows up to 100 badge IDs per request */
+  const awarded = {};
+  const chunks = [];
+  for (let i = 0; i < badgeIds.length; i += 100) chunks.push(badgeIds.slice(i, i + 100));
+  for (const chunk of chunks) {
+    try {
+      const data = await fetchJSON(
+        `https://badges.roblox.com/v1/users/${userId}/badges/awarded-dates?badgeIds=${chunk.join(',')}`
+      );
+      const list = Array.isArray(data) ? data : (data.data || []);
+      list.forEach(entry => { awarded[String(entry.badgeId)] = entry.awardedDate; });
+    } catch(_) {}
+  }
+  return awarded;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' });
+  } catch(_) { return iso.slice(0,10); }
+}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('roblox-check-status');
+  el.textContent = msg;
+  el.className = cls || '';
+}
+
+async function submitRobloxCheck() {
+  const username = document.getElementById('roblox-username-input').value.trim();
+  if (!username) { setStatus('Introduce un nombre de usuario.', 'error'); return; }
+
+  const submitBtn = document.getElementById('roblox-check-submit');
+  submitBtn.disabled = true;
+  document.getElementById('roblox-check-results').innerHTML = '';
+  setStatus('🔍 Buscando usuario…');
+
+  try {
+    const user = await getRobloxUserId(username);
+    setStatus(`✅ Usuario encontrado: ${user.name} (ID: ${user.id}) — cargando logros…`, 'ok');
+
+    const index = buildGloveBadgeIndex();
+    const allBadgeIds = Object.keys(index);
+
+    if (!allBadgeIds.length) {
+      setStatus('No hay guantes de tipo logro con badges configurados.', 'error');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    const awarded = await getAwardedBadges(user.id, allBadgeIds);
+
+    /* Group by glove */
+    const gloveMap = {};
+    GLOVES.forEach(g => {
+      if (g.type === 'logro' && Array.isArray(g.badges) && g.badges.length) {
+        gloveMap[g.id] = { gloveName: g.name, badges: [] };
+        g.badges.forEach(b => {
+          if (!b.url) return;
+          const m = b.url.match(/badges\/(\d+)/);
+          if (!m) return;
+          const bid = m[1];
+          gloveMap[g.id].badges.push({
+            badgeId: bid,
+            badgeName: b.name,
+            badgeUrl: b.url,
+            awardedDate: awarded[bid] || null,
+          });
+        });
+      }
+    });
+
+    /* Stats */
+    let totalComplete = 0, totalPartial = 0, totalPending = 0;
+    const gloveEntries = Object.entries(gloveMap).filter(([,v]) => v.badges.length > 0);
+    gloveEntries.forEach(([, v]) => {
+      const got = v.badges.filter(b => b.awardedDate).length;
+      if (got === v.badges.length) totalComplete++;
+      else if (got > 0) totalPartial++;
+      else totalPending++;
+    });
+
+    /* Render */
+    const resultsEl = document.getElementById('roblox-check-results');
+
+    const summaryEl = document.createElement('div');
+    summaryEl.className = 'rcr-summary-bar';
+    summaryEl.innerHTML = `
+      <span class="rcr-sum-num">${totalComplete}</span>
+      <span class="rcr-sum-label">guantes completos</span>
+      &nbsp;·&nbsp;
+      <span class="rcr-sum-miss">${totalPending + totalPartial}</span>
+      <span class="rcr-sum-label">pendientes / parciales</span>
+      <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>
+    `;
+    resultsEl.appendChild(summaryEl);
+
+    /* Sort: complete last, pending first */
+    const sorted = gloveEntries.slice().sort(([,a],[,b]) => {
+      const score = v => {
+        const got = v.badges.filter(x=>x.awardedDate).length;
+        if (got === v.badges.length) return 2;
+        if (got > 0) return 1;
+        return 0;
+      };
+      return score(a) - score(b);
+    });
+
+    sorted.forEach(([gloveId, gloveData]) => {
+      const got = gloveData.badges.filter(b => b.awardedDate).length;
+      const total = gloveData.badges.length;
+      let pillClass, pillText;
+      if (got === total) { pillClass = 'complete'; pillText = '✅ Completo'; }
+      else if (got > 0)  { pillClass = 'partial';  pillText = `⚠️ Parcial (${got}/${total})`; }
+      else               { pillClass = 'pending';  pillText = '❌ Pendiente'; }
+
+      const row = document.createElement('div');
+      row.className = 'rcr-glove-row';
+      if (got === total) row.classList.add('open'); // auto-expand complete ones
+
+      const header = document.createElement('div');
+      header.className = 'rcr-glove-header';
+      header.innerHTML = `
+        <span class="rcr-glove-name">🥊 ${gloveData.gloveName}</span>
+        <span class="rcr-status-pill ${pillClass}">${pillText}</span>
+        <span class="rcr-chevron">▶</span>
+      `;
+      header.addEventListener('click', () => row.classList.toggle('open'));
+
+      const badgeList = document.createElement('div');
+      badgeList.className = 'rcr-badge-list';
+      gloveData.badges.forEach(b => {
+        const item = document.createElement('div');
+        item.className = 'rcr-badge-item';
+        const icon = b.awardedDate ? '✅' : '❌';
+        const dateStr = b.awardedDate
+          ? `<span class="rcr-badge-date">Obtenido el ${formatDate(b.awardedDate)}</span>`
+          : `<span class="rcr-badge-miss">Sin obtener</span>`;
+        item.innerHTML = `
+          <span class="rcr-badge-icon">${icon}</span>
+          <span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>
+          ${dateStr}
+        `;
+        badgeList.appendChild(item);
+      });
+
+      row.appendChild(header);
+      row.appendChild(badgeList);
+      resultsEl.appendChild(row);
+    });
+
+    setStatus(`Mostrando ${gloveEntries.length} guantes de logro para ${user.name}.`, 'ok');
+  } catch(err) {
+    setStatus('❌ ' + (err.message || 'Error desconocido.'), 'error');
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
 </script>
 
 </body>
