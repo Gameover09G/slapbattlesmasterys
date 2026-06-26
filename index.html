@@ -7092,6 +7092,15 @@ input[type="range"].slap-volume::-moz-range-track {
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
+    version: "1.2.3 - CÁMARA",
+    date: "25/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Guante Cámara."},
+      { emoji: "🎖️", color: "#FFD700", text: "Puedes ver que logros te faltan en slap batles con un solo boton. Ni lo intentes, no esta completamente configurado el api de roblox y te saldra todo como no completado."},
+    ]
+  },
+  
+  {
     version: "1.2.21 - DELTARUNE TOMORROW",
     date: "25/06/2026",
     entries: [
@@ -12513,25 +12522,30 @@ const GLOVES = [
     id: 'camera',
     name: 'Camera',
     type: 'logro',
-    obtainMethod: 'Usa el guante Adiós mientras estás sentado encima de un Car Keys en forma de coche. Tras ser teletransportado a otra dimensión, gana en una carrera al otro coche.',
+    obtainMethod: 'Usando el guante Ghost, recoge la cámara situada en la isla de Slapple encima de una mesa de madera. Se te colocará un ítem en la hotbar y podrás activar una cámara que te coloca en primera persona y hacer flash con E. Mientras tienes la cámara activa, aparecerán 7 fotos con las que podrás hacer flash. Las ubicaciones son: Parte baja del árbol del Golden Slapple, la cadena del cubo de la muerte, estructuras de madera en la isla cañón, la cadena de la isla principal, fuerte de almhuadas (nube), isla de cerezo derecha (teniendo como punto de referencia que miras a la isla Slapple) e isla moai. La cámara no aparece en servidores privados.',
     badges: [
-      { name: "???", url: 'https://www.roblox.com/badges/1294103285471925/Slappy-Wheels' },
+      { name: "Fatal Frame", url: 'https://www.roblox.com/badges/3607811029078582/Fatal-Frame' },
       // Puedes añadir más logros aquí, ej:
       // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
     ],
-    quote: '¿Atropello a este tío o paso por su lado? ¿Qué opináis, chat?',
+    quote: '¿Por qué la gente no simplemente coloca láseres en sus cámaras para atrapar gente más fácilmente? ¿Son tontos?',
     releaseDate: '26/06/2026',
     power: 50,
-    speed: 17,
+    speed: 14,
     mechanics: [
-      "El coche se controla como un coche clásico de Roblox: W para acelerar, S para frenar, y luego A y D para girar.",
+      "Las cámaras se pueden romper de 5 golpes.",
+      "Puedes girar las cámaras moviendo el ratón o la pantalla en el móvil. Puedes girar tan solo 180º.",
+      "Mientras miras las cámaras, te quedas inmóvil y vulnerable."
+
     ],
     abilities: [
-      '[E] DA WHIP: Te transforma en un coche, conservando ítems y ropa de tu skip para customizarlo. (14s cooldown / 4s spawn)',
+      '[E] Place Camera: Abre una vista previa para decidir dónde colocar la cámara. Vuelve a pulsar E para colocarla. (1s cooldown)',
+      "[R] Camera Shot: Abre una tablet y te deja cambiar entre cámaras. Pulsa otra vez para salir. (1s cooldown)",
+      "[Clic mientras miras las cámaras] Lanza un rayo láser que aplica knockback en contacto."
     ],
     tutorialUrl: null,
     songs: null,
-    locked: true
+    locked: false
   },
 
   /* ── EJEMPLO TIPO: OTRO ── */
