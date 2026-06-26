@@ -3847,6 +3847,54 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   display: block;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   GLOVE CARD — LOCK SYSTEM
+   (reutiliza .card-lock-overlay, .card-lock-icon y las
+   keyframes lockShake / lockBorderFlash definidas en maestrías)
+   ══════════════════════════════════════════════════════════════ */
+.glove-card.locked {
+  cursor: default;
+}
+/* Bloquea el hover lift/glow */
+.glove-card.locked:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-card) !important;
+  border-color: #111 !important;
+}
+/* Banner en escala de grises + oscuro; al hover se revela */
+.glove-card.locked .glove-card-banner {
+  filter: brightness(0.2) saturate(0.92);
+  transform: none !important;
+}
+.glove-card.locked:hover .glove-card-banner {
+  filter: brightness(1) saturate(1);
+  transform: none !important;
+}
+/* Overlay oscuro (usa la clase compartida .card-lock-overlay) */
+.glove-card.locked:hover .card-lock-overlay {
+  background: rgba(0, 0, 0, 0.0);
+}
+/* Icono 🔒 centrado → esquina al hover (usa .card-lock-icon compartida) */
+.glove-card.locked:hover .card-lock-icon {
+  transform: translate(0, 0);
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+/* Botones del footer — desactivados visualmente */
+.glove-card.locked .glove-card-footer .btn {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+  filter: grayscale(0.25);
+}
+/* Animación de rechazo */
+.glove-card.lock-denied {
+  animation: lockBorderFlash 0.7s ease forwards !important;
+}
+.glove-card.lock-denied .card-lock-icon {
+  animation: lockShake 0.45s ease !important;
+}
+
 /* ── Type badge in detail ── */
 .glove-type-badge {
   display: inline-flex;
@@ -8822,6 +8870,15 @@ function triggerLockDeny(card) {
   setTimeout(() => card.classList.remove('lock-denied'), 750);
 }
 
+/* Misma lógica para tarjetas de guante bloqueadas */
+function triggerGloveLockDeny(card) {
+  if (!card) return;
+  card.classList.remove('lock-denied');
+  void card.offsetWidth;
+  card.classList.add('lock-denied');
+  setTimeout(() => card.classList.remove('lock-denied'), 750);
+}
+
 /* ============================================================
    TOGGLE HIDDEN
    ============================================================ */
@@ -11123,6 +11180,11 @@ let gloveDetailOpen = null;
                    álbumes (después de los álbumes normales y de los álbumes custom de
                    EXTRA_ALBUMS). Dentro de ese álbum, cada canción muestra su nombre y, debajo,
                    el nombre del guante del que proviene (igual que en "Todo el Soundtrack").
+     locked      : boolean (opcional) — true si el guante está bloqueado. La tarjeta
+                   aparece al final de la cuadrícula: el banner se pone en B&N, se muestra
+                   un 🔒 centrado (que se mueve a la esquina al pasar el ratón), el botón
+                   "VER MÁS" queda desactivado y al pulsarlo dispara la animación de rechazo
+                   (shake + destello rojo). El panel de detalle no se puede abrir.
    ────────────────────────────────────────────────────────────── */
 const GLOVES = [
 
@@ -12054,6 +12116,31 @@ const GLOVES = [
     songs: null,
   },
 
+  {
+    id: 'camera',
+    name: 'Camera',
+    type: 'logro',
+    obtainMethod: 'Usa el guante Adiós mientras estás sentado encima de un Car Keys en forma de coche. Tras ser teletransportado a otra dimensión, gana en una carrera al otro coche.',
+    badges: [
+      { name: "???", url: 'https://www.roblox.com/badges/1294103285471925/Slappy-Wheels' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Atropello a este tío o paso por su lado? ¿Qué opináis, chat?',
+    releaseDate: '26/06/2026',
+    power: 50,
+    speed: 17,
+    mechanics: [
+      "El coche se controla como un coche clásico de Roblox: W para acelerar, S para frenar, y luego A y D para girar.",
+    ],
+    abilities: [
+      '[E] DA WHIP: Te transforma en un coche, conservando ítems y ropa de tu skip para customizarlo. (14s cooldown / 4s spawn)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
   /* ── EJEMPLO TIPO: OTRO ── */
   {
     id: 'acrobat',
@@ -12216,6 +12303,11 @@ function renderGlovesGrid() {
   const list  = GLOVES.filter(g => {
     if (glovesTypeFilter !== 'all' && g.type !== glovesTypeFilter) return false;
     return g.name.toLowerCase().includes(query);
+  }).sort((a, b) => {
+    // Los guantes bloqueados siempre van al final
+    if (a.locked && !b.locked) return 1;
+    if (!a.locked && b.locked) return -1;
+    return 0;
   });
 
   if (list.length === 0) {
@@ -12250,6 +12342,7 @@ function createGloveCard(glove) {
   // ¿Tiene maestría asociada?
   const linkedMastery = MASTERIES.find(m => m.id === glove.id);
   const statusMeta = GLOVE_STATUS_META[glove.status];
+  const isLocked = !!glove.locked;
 
   // Precio (slaps / robux) o logro(s) necesario(s) para guantes de tipo "logro"
   let priceHtml = '';
@@ -12267,7 +12360,7 @@ function createGloveCard(glove) {
     : '';
 
   const card = document.createElement('div');
-  card.className = 'glove-card';
+  card.className = isLocked ? 'glove-card locked' : 'glove-card';
   card.dataset.type = glove.type;
   card.dataset.id   = glove.id;
 
@@ -12276,6 +12369,7 @@ function createGloveCard(glove) {
       <img class="glove-card-banner" src="default_${glove.id}.png" alt="${glove.name}"
         onerror="this.onerror=null;this.src='preview_placeholder.png'">
       <div class="glove-type-ribbon ${meta.ribbonClass}">${meta.label}</div>
+      ${isLocked ? '<div class="card-lock-overlay"></div><div class="card-lock-icon">🔒</div>' : ''}
     </div>
     <div class="glove-card-body">
       <div class="glove-card-name">${glove.name}</div>
@@ -12283,8 +12377,11 @@ function createGloveCard(glove) {
       ${(priceHtml || statusHtml) ? `<div class="glove-card-meta-row">${priceHtml}${statusHtml}</div>` : ''}
     </div>
     <div class="glove-card-footer">
-      <button class="btn btn-primary" style="flex:1" onclick="openGloveDetail('${glove.id}',event)">📖 VER MÁS</button>
-      ${linkedMastery ? `<button class="btn btn-glove-mastery" onclick="openGloveGoMastery('${glove.id}',event)" title="Ver maestría"><img class="btn-glove-mastery-icon" src="masteryicon.png" alt="Maestría" width="20" height="20" style="width:20px;height:20px;max-width:20px;max-height:20px;object-fit:contain;flex-shrink:0;display:block;" onerror="this.style.display='none';this.insertAdjacentText('afterend','⚔️')"></button>` : ''}
+      <button class="btn btn-primary" style="flex:1"
+        onclick="${isLocked
+          ? `triggerGloveLockDeny(this.closest('.glove-card'))`
+          : `openGloveDetail('${glove.id}',event)`}">📖 VER MÁS</button>
+      ${linkedMastery && !isLocked ? `<button class="btn btn-glove-mastery" onclick="openGloveGoMastery('${glove.id}',event)" title="Ver maestría"><img class="btn-glove-mastery-icon" src="masteryicon.png" alt="Maestría" width="20" height="20" style="width:20px;height:20px;max-width:20px;max-height:20px;object-fit:contain;flex-shrink:0;display:block;" onerror="this.style.display='none';this.insertAdjacentText('afterend','⚔️')"></button>` : ''}
     </div>
   `;
 
@@ -12315,6 +12412,12 @@ function openGloveDetail(id, e) {
   if (e) e.stopPropagation();
   const glove = GLOVES.find(g => g.id === id);
   if (!glove) return;
+  // Guante bloqueado: feedback de rechazo y salir
+  if (glove.locked) {
+    const card = document.querySelector(`.glove-card[data-id="${id}"]`);
+    triggerGloveLockDeny(card);
+    return;
+  }
   gloveDetailOpen = glove;
   const meta = GLOVE_TYPE_META[glove.type] || GLOVE_TYPE_META.otro;
 
@@ -12538,7 +12641,7 @@ function playRoaringExitCinematic(onMidpoint, onComplete) {
   overlay.classList.add('slash');
 
   // 2) esperamos a que la línea esté completamente dibujada
-  //    y ENTONCES la pantalla se parte en dos
+  //    y ENTONCES la pantalla se parte en dosa
   setTimeout(() => {
     overlay.classList.add('split');          // paneles empiezan a abrirse
     setTimeout(() => onMidpoint(), 100);     // cierra el detail 100ms después (mitad de la apertura)
