@@ -4074,15 +4074,25 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 
 /* RIGHT */
 #glove-detail-right {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+#glove-detail-right-bgvideo { display: none; }
+
+#glove-detail-right-scroll {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   padding: 14px;
   gap: 14px;
   overflow-y: auto;
+  height: 100%;
   min-height: 0;
 }
-#glove-detail-right::-webkit-scrollbar { width: 5px; }
-#glove-detail-right::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
+#glove-detail-right-scroll::-webkit-scrollbar { width: 5px; }
+#glove-detail-right-scroll::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
 
 .glove-detail-item {
   display: flex;
@@ -4419,10 +4429,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   letter-spacing: 0.5px;
 }
 
-/* ── BATTLE BACKGROUND (GIF animado) detrás del overlay ── */
-#glove-detail-overlay.roaring-bg {
-  background: url('175637.gif') center center / cover no-repeat !important;
-}
+/* (Fondo de batalla eliminado) */
 
 /* ── Panel principal: negro puro, sin radius ── */
 #glove-detail-view.roaring-active {
@@ -4490,8 +4497,18 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   background: #000000 !important;
   border-radius: 0 !important;
 }
+#glove-detail-view.roaring-active #glove-detail-right-bgvideo {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
 #glove-detail-view.roaring-active #glove-detail-left::-webkit-scrollbar-thumb,
-#glove-detail-view.roaring-active #glove-detail-right::-webkit-scrollbar-thumb {
+#glove-detail-view.roaring-active #glove-detail-right-scroll::-webkit-scrollbar-thumb {
   background: #ffffff !important;
   border-radius: 0 !important;
 }
@@ -4763,10 +4780,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #music-player-overlay.roaring-active #music-vinyl-center {
   border: 3px solid #ffffff !important;
   box-shadow: 0 0 0 3px #000000 !important;
-  border-radius: 0 !important;
 }
 #music-player-overlay.roaring-active #music-vinyl-center-img {
-  border-radius: 0 !important;
   image-rendering: pixelated;
 }
 #music-player-overlay.roaring-active #music-track-name {
@@ -4795,14 +4810,18 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 }
 #music-player-overlay.roaring-active input[type="range"].slap-range::-webkit-slider-thumb,
 #music-player-overlay.roaring-active input[type="range"].slap-volume::-webkit-slider-thumb {
-  background-image: none !important;
-  background-color: #ffffff !important;
+  background-image: url('soul.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: transparent !important;
   border-radius: 0 !important;
 }
 #music-player-overlay.roaring-active input[type="range"].slap-range::-moz-range-thumb,
 #music-player-overlay.roaring-active input[type="range"].slap-volume::-moz-range-thumb {
-  background-image: none !important;
-  background-color: #ffffff !important;
+  background-image: url('soul.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: transparent !important;
   border-radius: 0 !important;
 }
 
@@ -4836,6 +4855,117 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #music-player-overlay.roaring-active #music-volume-pct { color: #ffffff !important; }
 
 /* ============================================================
+   ROARING — CINEMÁTICA DURANTE LA REPRODUCCIÓN
+   Fases:
+     0:00–0:11      Normal
+     0:11–0:12.5    Flash blanco progresivo sobre TODO excepto el reproductor
+     0:12.5–0:39    Beat Pulse: la pantalla late con la música
+     0:39–2:30      Reproductor vuela en forma de ∞ dejando rastro
+     2:30–2:37      Reproductor vuelve al centro, fin
+   ============================================================ */
+
+/* ── Capa de flash blanco (cubre toda la pantalla excepto #music-player-frame) ── */
+#roaring-white-flash {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 901;          /* encima del overlay bg (900) pero el frame lo ponemos en z-index 910 cuando está en modo flying */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+#roaring-white-flash.active { opacity: 1; }
+
+/* Durante el flash el frame necesita estar encima de la capa blanca */
+#music-player-overlay.roaring-flash-active #music-player-frame {
+  position: relative;
+  z-index: 10 !important;
+}
+
+/* ── Beat Pulse: el reproductor late al ritmo (en body causaba descuadre con position:fixed) ── */
+@keyframes roaringBeatPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+#music-player-frame.roaring-beat-pulse {
+  animation: roaringBeatPulse 0.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+/* ── Rastro del reproductor: cuadrado que aparece tenue y sube a opacidad 1 ── */
+.roaring-trail-ghost {
+  position: fixed;
+  z-index: 898;
+  pointer-events: none;
+  border-radius: 0;
+  border: 3px solid rgba(255,255,255,0.6);
+  background: rgba(0,0,0,0.5);
+  opacity: 0.2;
+  animation: roaringTrailFadeIn 2s ease-out forwards;
+  overflow: hidden;
+}
+@keyframes roaringTrailFadeIn {
+  0%   { opacity: 0.2; }
+  30%  { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+/* ── El reproductor se mueve libremente durante la fase ∞ ── */
+#music-player-frame.roaring-flying {
+  position: fixed !important;
+  /* left/top se controlan desde JS con requestAnimationFrame */
+  z-index: 910;
+  transition: none !important;
+  /* pequeño glow blanco para reforzar el efecto Roaring Knight */
+  box-shadow: 0 0 0 4px #ffffff, 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(180,80,255,0.4) !important;
+}
+
+/* ── Botón de toggle de efectos cinemáticos ── */
+#roaring-fx-toggle {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  padding: 4px 9px;
+  background: rgba(30,30,30,0.85);
+  color: rgba(255,255,255,0.5);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 20;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+#roaring-fx-toggle:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(50,50,50,0.95);
+}
+#roaring-fx-toggle.fx-off {
+  color: rgba(255,80,80,0.65);
+  border-color: rgba(255,80,80,0.3);
+}
+#roaring-fx-toggle.fx-off:hover {
+  color: #ff6060;
+  border-color: rgba(255,80,80,0.6);
+}
+/* Cuando el reproductor está en modo Roaring, adaptar el botón al estilo B&W */
+#music-player-overlay.roaring-active #roaring-fx-toggle {
+  font-family: '8bitoperatorplus2', 'Press Start 2P', 'Courier New', monospace !important;
+  background: #000 !important;
+  color: rgba(255,255,255,0.4) !important;
+  border: 1.5px solid rgba(255,255,255,0.25) !important;
+  border-radius: 0 !important;
+}
+#music-player-overlay.roaring-active #roaring-fx-toggle.fx-off {
+  color: rgba(255,80,80,0.55) !important;
+  border-color: rgba(255,80,80,0.3) !important;
+}
+
+/* ============================================================
    ROARING — MINI-CINEMÁTICA DE SALIDA
    Línea diagonal roja (arriba-izq → abajo-der) que "corta" la
    pantalla en dos; ambas mitades se separan revelando la
@@ -4844,34 +4974,48 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #roaring-exit-transition {
   position: fixed;
   inset: 0;
-  z-index: 99000;            /* encima de absolutamente todo */
+  z-index: 99000;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  overflow: hidden;          /* evita que los paneles creen scrollbar al salir */
+  overflow: hidden;
+  /* Aísla repintados: el navegador no recalcula el resto de la página
+     mientras se anima la cinemática (clave para Opera/Firefox) */
+  contain: layout paint;
 }
 #roaring-exit-transition.active { opacity: 1; visibility: visible; }
+
 #rt-slash-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  /* overflow:hidden → viewport exacto de repintado sin expansión extra */
+  overflow: hidden;
   z-index: 2;
   pointer-events: none;
   transition: opacity 0.18s ease;
 }
-#roaring-exit-transition.split #rt-slash-svg {
-  opacity: 0;
-}
-#rt-slash-line {
-  stroke: #ff2020;
-  stroke-width: 1.0;
-  filter: drop-shadow(0 0 5px #ff2020) drop-shadow(0 0 14px #ff0000);
+#roaring-exit-transition.split #rt-slash-svg { opacity: 0; }
+
+/* Glow SIN filter CSS → evita la rasterización en CPU que laggea Opera.
+   Segunda línea más gruesa y semitransparente simula el efecto luminoso. */
+#rt-slash-glow {
+  stroke: rgba(255, 30, 30, 0.4);
+  stroke-width: 6;
+  stroke-linecap: round;
   stroke-dasharray: 142 142;
   stroke-dashoffset: 142;
   opacity: 0;
 }
+#rt-slash-line {
+  stroke: #ff3030;
+  stroke-width: 1.4;
+  stroke-dasharray: 142 142;
+  stroke-dashoffset: 142;
+  opacity: 0;
+}
+#roaring-exit-transition.slash #rt-slash-glow,
 #roaring-exit-transition.slash #rt-slash-line {
   animation: rtSlashDraw .26s cubic-bezier(.7,0,.3,1) forwards;
 }
@@ -4879,22 +5023,39 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   0%   { stroke-dashoffset: 142; opacity: 1; }
   100% { stroke-dashoffset: 0;   opacity: 1; }
 }
+
 .rt-panel {
   position: absolute;
   inset: 0;
   background: #000000;
-  /* Las mitades se solapan ligeramente para evitar gaps sub-píxel
-     en resoluciones no cuadradas (ej. 1920x1080, 2560x1440…) */
-  transition: transform .52s cubic-bezier(.6,0,.2,1);
-  /* translateZ(0) fuerza capa GPU sin el bug de clip-path+will-change de Safari */
-  transform: translateZ(0);
+  /* translate3d: promueve a capa GPU desde el inicio */
+  transform: translate3d(0, 0, 0);
+  /* backface-visibility: evita re-rasterizaciones en motores Blink/WebKit */
+  backface-visibility: hidden;
 }
-/* +2% de margen en cada polígono → cero gap en cualquier aspect ratio */
+/* will-change SOLO cuando la cinemática está activa → no malgasta VRAM en reposo */
+#roaring-exit-transition.active .rt-panel { will-change: transform; }
+
+/* +2 % de margen: cero gap sub-píxel en cualquier aspecto de pantalla */
 #rt-panel-a { clip-path: polygon(-2% -2%, 102% -2%, 102% 102%); }
 #rt-panel-b { clip-path: polygon(-2% -2%, -2% 102%, 102% 102%); }
-/* 110% garantiza que los paneles salen de pantalla en cualquier resolución */
-#roaring-exit-transition.split #rt-panel-a { transform: translate3d(110%, -110%, 0); }
-#roaring-exit-transition.split #rt-panel-b { transform: translate3d(-110%, 110%, 0); }
+
+/* @keyframes en lugar de CSS transition: se ejecuta garantizadamente en el
+   compositor-thread → sin jank en Opera, Firefox ni Safari */
+@keyframes rtPanelAOut {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(110%, -110%, 0); }
+}
+@keyframes rtPanelBOut {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-110%, 110%, 0); }
+}
+#roaring-exit-transition.split #rt-panel-a {
+  animation: rtPanelAOut .52s cubic-bezier(.6,0,.2,1) forwards;
+}
+#roaring-exit-transition.split #rt-panel-b {
+  animation: rtPanelBOut .52s cubic-bezier(.6,0,.2,1) forwards;
+}
 
 /* END ROARING DELTARUNE THEME */
 
@@ -6130,13 +6291,16 @@ input[type="range"].slap-volume::-moz-range-track {
 
     <!-- RIGHT -->
     <div id="glove-detail-right">
-      <div id="glove-detail-mechanics-wrap">
-        <div class="detail-section-label">⚙️ MECÁNICAS Y PASIVAS</div>
-        <div id="glove-detail-mechanics-list"></div>
-      </div>
-      <div id="glove-detail-abilities-wrap">
-        <div class="detail-section-label">⚡ HABILIDADES ACTIVAS</div>
-        <div id="glove-detail-abilities-list"></div>
+      <video id="glove-detail-right-bgvideo" src="roaringbackground.mp4" autoplay loop muted playsinline></video>
+      <div id="glove-detail-right-scroll">
+        <div id="glove-detail-mechanics-wrap">
+          <div class="detail-section-label">⚙️ MECÁNICAS Y PASIVAS</div>
+          <div id="glove-detail-mechanics-list"></div>
+        </div>
+        <div id="glove-detail-abilities-wrap">
+          <div class="detail-section-label">⚡ HABILIDADES ACTIVAS</div>
+          <div id="glove-detail-abilities-list"></div>
+        </div>
       </div>
     </div>
 
@@ -6617,8 +6781,12 @@ input[type="range"].slap-volume::-moz-range-track {
         <span class="music-volume-pct" id="music-volume-pct">70%</span>
       </div>
     </div>
+    <button id="roaring-fx-toggle" title="Activar/desactivar efectos cinemáticos" onclick="roaringToggleFx()">✦ FX</button>
   </div>
 </div>
+
+<!-- ── Roaring: capa de flash blanco para cinemática ── -->
+<div id="roaring-white-flash" aria-hidden="true"></div>
 
 <div id="stick-jumpscare-overlay" aria-hidden="true">
   <img id="stick-jumpscare-image" src="banner_stick.png" alt="Stick jumpscare">
@@ -6634,6 +6802,9 @@ input[type="range"].slap-volume::-moz-range-track {
 <!-- ── Roaring: mini-cinemática de salida estilo Deltarune ── -->
 <div id="roaring-exit-transition" aria-hidden="true">
   <svg id="rt-slash-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+    <!-- Línea de glow: trazo semitransparente grueso SIN filter CSS (más rápido en GPU) -->
+    <line id="rt-slash-glow" x1="0" y1="0" x2="100" y2="100"></line>
+    <!-- Línea roja visible encima -->
     <line id="rt-slash-line" x1="0" y1="0" x2="100" y2="100"></line>
   </svg>
   <div id="rt-panel-a" class="rt-panel"></div>
@@ -12614,6 +12785,8 @@ function openGloveDetail(id, e) {
     /* Replace emoji so the blinking ❤ ::before pseudo takes over cleanly */
     const titleEl = document.getElementById('glove-detail-title');
     titleEl.textContent = titleEl.textContent.replace(/^🥊\s*/, '');
+    const bgv = document.getElementById('glove-detail-right-bgvideo');
+    if (bgv) { bgv.currentTime = 0; bgv.play().catch(() => {}); }
   } else {
     gdv.classList.remove('roaring-active');
   }
@@ -12633,26 +12806,48 @@ function playRoaringExitCinematic(onMidpoint, onComplete) {
   if (!overlay || _roaringTransitionPlaying) { onMidpoint(); if (onComplete) onComplete(); return; }
   _roaringTransitionPlaying = true;
 
+  // Reset de estado anterior y muestra el overlay (paneles cubren la pantalla)
   overlay.classList.remove('slash', 'split');
   overlay.classList.add('active');
-  void overlay.offsetWidth; // fuerza reflow para reiniciar la animación del trazo
 
-  // 1) la línea roja diagonal "corta" la pantalla (duración 0.26s)
-  overlay.classList.add('slash');
+  // Doble requestAnimationFrame: garantiza que el compositor ya ha promovido
+  // los paneles a capas GPU antes de arrancar las animaciones.
+  // Sin esto, el primer frame se rasteriza en CPU y se nota el jank en Opera.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
 
-  // 2) esperamos a que la línea esté completamente dibujada
-  //    y ENTONCES la pantalla se parte en dosa
-  setTimeout(() => {
-    overlay.classList.add('split');          // paneles empiezan a abrirse
-    setTimeout(() => onMidpoint(), 100);     // cierra el detail 100ms después (mitad de la apertura)
-  }, 320);
+      // 1) línea roja + sonido del tajo simultáneos
+      overlay.classList.add('slash');
+      _playRoaringSlashSound();
 
-  // 3) termina la cinemática y resetea el overlay (320 + 520 duración split + margen)
-  setTimeout(() => {
-    overlay.classList.remove('active', 'slash', 'split');
-    _roaringTransitionPlaying = false;
-    if (onComplete) onComplete();
-  }, 320 + 570);
+      // 2) esperamos a que la línea esté dibujada (0.26s + margen)
+      //    y ENTONCES los paneles se parten en dos
+      setTimeout(() => {
+        overlay.classList.add('split');
+        setTimeout(() => onMidpoint(), 100);
+      }, 320);
+
+      // 3) limpieza: elimina las clases y libera will-change
+      setTimeout(() => {
+        overlay.classList.remove('active', 'slash', 'split');
+        _roaringTransitionPlaying = false;
+        if (onComplete) onComplete();
+      }, 320 + 570);
+
+    });
+  });
+}
+
+/* ── Sonido del tajo diagonal ─────────────────────────────────────
+   Reproduce roaringslash.mp3 en el momento exacto en que la línea
+   empieza a dibujarse. Usa new Audio() (sin AudioContext) para que
+   funcione sin interacción previa del usuario en todos los navegadores. */
+function _playRoaringSlashSound() {
+  try {
+    const a = new Audio('roaringslash.mp3');
+    a.volume = 0.85;
+    a.play().catch(() => {}); // silencia el rechazo de autoplay
+  } catch (_) {}
 }
 
 function closeGloveDetail() {
@@ -12668,6 +12863,8 @@ function _finishCloseGloveDetail() {
   const gdv = document.getElementById('glove-detail-view');
   gdv.classList.remove('open');
   gdv.classList.remove('roaring-active');
+  const bgv = document.getElementById('glove-detail-right-bgvideo');
+  if (bgv) bgv.pause();
   document.body.style.overflow = '';
   gloveDetailOpen = null;
   closeMusicPlayer();
@@ -14956,6 +15153,326 @@ document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
     }
   });
 });
+</script>
+
+<script>
+/* ============================================================
+   ROARING KNIGHT — CINEMÁTICA DEL REPRODUCTOR DE MÚSICA
+   ============================================================
+   Fases (en segundos):
+     0       → 11      Normal
+     11      → 12.5    Flash blanco progresivo sobre toda la pantalla (excepto el reproductor)
+     12.5    → 39      Beat Pulse: pantalla late al ritmo de la música
+     39      → 150     Reproductor vuela en trayectoria de ∞, dejando rastro
+     150     → 157     Reproductor vuelve al centro original y para
+*/
+
+(function () {
+  'use strict';
+
+  /* ── Estado de la cinemática ── */
+  let _rafId        = null;   // requestAnimationFrame handle
+  let _trailTimer   = null;   // setInterval para generar ghostos
+  let _phase        = 'idle'; // 'idle' | 'flash' | 'pulse' | 'fly' | 'return'
+  let _flyStartTime = 0;      // timestamp cuando empieza la fase ∞
+  let _origRect     = null;   // posición original del frame (para fase return)
+  let _beatTimer    = null;   // setInterval del beat pulse
+
+  /* ── Refs cacheadas ── */
+  function getOverlay()   { return document.getElementById('music-player-overlay'); }
+  function getFrame()     { return document.getElementById('music-player-frame'); }
+  function getFlash()     { return document.getElementById('roaring-white-flash'); }
+  function getMusicAudio(){ return typeof musicAudio !== 'undefined' ? musicAudio : null; }
+
+  /* ── ¿Está activo el modo roaring en el reproductor? ── */
+  function isRoaringActive() {
+    const ov = getOverlay();
+    return ov && ov.classList.contains('roaring-active') && ov.classList.contains('open');
+  }
+
+  /* ── Reset completo: deja todo como estaba ── */
+  function resetAll() {
+    if (_rafId)      { cancelAnimationFrame(_rafId); _rafId = null; }
+    if (_trailTimer) { clearInterval(_trailTimer);   _trailTimer = null; }
+    if (_beatTimer)  { clearInterval(_beatTimer);    _beatTimer = null; }
+
+    _phase = 'idle';
+
+    /* Flash */
+    const flash = getFlash();
+    if (flash) { flash.style.transition = 'none'; flash.style.opacity = '0'; flash.classList.remove('active'); }
+    const ov = getOverlay();
+    if (ov) ov.classList.remove('roaring-flash-active');
+
+    /* Beat pulse */
+    document.body.classList.remove('roaring-beat-pulse'); /* legacy, por si acaso */
+    document.body.style.animation = '';
+    const framePulse = getFrame();
+    if (framePulse) {
+      framePulse.classList.remove('roaring-beat-pulse');
+      framePulse.style.animationDuration = '';
+    }
+
+    /* Frame: quita position:fixed y clases de vuelo */
+    const frame = getFrame();
+    if (frame) {
+      frame.classList.remove('roaring-flying');
+      frame.style.left   = '';
+      frame.style.top    = '';
+      frame.style.width  = '';
+      frame.style.transform = '';
+    }
+
+    /* Limpia ghostos sobrantes */
+    document.querySelectorAll('.roaring-trail-ghost').forEach(g => g.remove());
+  }
+
+  /* ── Genera un cuadrado fantasma del reproductor en su posición actual ── */
+  function spawnTrailGhost(frame) {
+    const ghost = document.createElement('div');
+    ghost.className = 'roaring-trail-ghost';
+    ghost.style.left   = frame.style.left;
+    ghost.style.top    = frame.style.top;
+    ghost.style.width  = frame.offsetWidth  + 'px';
+    ghost.style.height = frame.offsetHeight + 'px';
+
+    document.body.appendChild(ghost);
+    /* Autoeliminación al terminar la animación */
+    ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
+  }
+
+  /* ── Trayectoria de Lemniscata (∞) centrada en pantalla ── */
+  function lemniscatePos(t) {
+    /* Parámetro de Bernoulli: x=a·cos(t)/(1+sin²(t)), y=a·sin(t)cos(t)/(1+sin²(t)) */
+    const W  = window.innerWidth;
+    const H  = window.innerHeight;
+    const aX = W * 0.38;
+    const aY = H * 0.30;
+    const s  = Math.sin(t);
+    const c  = Math.cos(t);
+    const d  = 1 + s * s;
+    return {
+      x: W / 2 + aX * c / d,
+      y: H / 2 + aY * s * c / d
+    };
+  }
+
+  /* ── Fase 3: vuelo en ∞ ── */
+  function startFlyPhase() {
+    _phase = 'fly';
+    const frame = getFrame();
+    if (!frame) return;
+
+    /* Captura rect ANTES de poner position:fixed */
+    _origRect = frame.getBoundingClientRect();
+
+    /* Ancla en posición fija en el sitio actual */
+    frame.style.left      = _origRect.left + 'px';
+    frame.style.top       = _origRect.top  + 'px';
+    frame.style.width     = _origRect.width + 'px';
+    frame.style.transform = 'none';
+    frame.classList.add('roaring-flying');
+
+    /* Mueve el reproductor al centro de la pantalla (punto de inicio de la lemniscata, t=π/2) */
+    const centerX = window.innerWidth  / 2 - _origRect.width  / 2;
+    const centerY = window.innerHeight / 2 - _origRect.height / 2;
+    frame.style.left = centerX + 'px';
+    frame.style.top  = centerY + 'px';
+
+    _flyStartTime = performance.now();
+
+    /* Rastro: spawn ghost cada 50 ms */
+    _trailTimer = setInterval(() => {
+      if (_phase === 'fly') spawnTrailGhost(frame);
+      else { clearInterval(_trailTimer); _trailTimer = null; }
+    }, 50);
+
+    function flyLoop(now) {
+      if (!isRoaringActive()) { resetAll(); return; }
+      if (_phase !== 'fly' && _phase !== 'return') return;
+      if (_phase !== 'fly') return;
+
+      const elapsed = (now - _flyStartTime) / 1000; /* segundos */
+      const duration = 150 - 39;                      /* 111 s de vuelo */
+
+      if (elapsed >= duration) {
+        startReturnPhase(frame);
+        return;
+      }
+
+      /* Ease-in suave los primeros 3 s para arrancar desde el centro sin brusquedad */
+      const easeInDur = 3.0;
+      const speedScale = elapsed < easeInDur
+        ? Math.pow(elapsed / easeInDur, 2)   /* 0→1 cuadrático */
+        : 1;
+
+      /* Velocidad alta: ~10 vueltas completas (20π) en 111 s.
+         t=π/2 en la lemniscata → x=0,y=0 → empieza exactamente en el centro */
+      const baseT  = Math.PI / 2;
+      const speed  = (20 * Math.PI) / duration;        /* rad/s rápido */
+      const t = baseT + elapsed * speed * speedScale;
+      const pos = lemniscatePos(t);
+
+      frame.style.left = (pos.x - frame.offsetWidth  / 2) + 'px';
+      frame.style.top  = (pos.y - frame.offsetHeight / 2) + 'px';
+
+      _rafId = requestAnimationFrame(flyLoop);
+    }
+    _rafId = requestAnimationFrame(flyLoop);
+  }
+
+  /* ── Fase 4: regreso al origen ── */
+  function startReturnPhase(frame) {
+    _phase = 'return';
+    if (_trailTimer) { clearInterval(_trailTimer); _trailTimer = null; }
+
+    const startLeft = parseFloat(frame.style.left);
+    const startTop  = parseFloat(frame.style.top);
+    const endLeft   = _origRect.left;
+    const endTop    = _origRect.top;
+    const dur       = 7; /* segundos (2:30 → 2:37) */
+    const t0        = performance.now();
+
+    function returnLoop(now) {
+      const p = Math.min((now - t0) / (dur * 1000), 1);
+      /* Ease-out cubic */
+      const ease = 1 - Math.pow(1 - p, 3);
+      frame.style.left = (startLeft + (endLeft - startLeft) * ease) + 'px';
+      frame.style.top  = (startTop  + (endTop  - startTop)  * ease) + 'px';
+
+      if (p < 1) {
+        _rafId = requestAnimationFrame(returnLoop);
+      } else {
+        /* Cinemática terminada — limpia todo */
+        resetAll();
+      }
+    }
+    _rafId = requestAnimationFrame(returnLoop);
+  }
+
+  /* ── Beat Pulse usando timeupdate ── */
+  function startBeatPulse() {
+    _phase = 'pulse';
+    /* Aplicamos la animación al frame (no al body, para no romper position:fixed) */
+    const frame = getFrame();
+    if (frame) {
+      frame.classList.add('roaring-beat-pulse');
+      frame.style.animationDuration = '0.5s';
+    }
+  }
+
+  /* ── Hook en el timeupdate del audio ── */
+  function roaringCinematicTimeUpdate() {
+    const audio = getMusicAudio();
+    if (!audio) return;
+
+    const t = audio.currentTime;
+    const overlay = getOverlay();
+    if (!overlay || !overlay.classList.contains('roaring-active') || !overlay.classList.contains('open')) {
+      if (_phase !== 'idle') resetAll();
+      return;
+    }
+
+    /* Fase 1 → 2: flash blanco 0:11 → 0:12.5 */
+    if (_phase === 'idle' && t >= 11) {
+      _phase = 'flash';
+      const flash = getFlash();
+      const ov = getOverlay();
+      if (flash) {
+        flash.style.transition = 'opacity 1.5s ease';
+        flash.style.opacity = '1';
+        flash.classList.add('active');
+      }
+      if (ov) ov.classList.add('roaring-flash-active');
+    }
+
+    /* Fase 2 → 3: beat pulse a los 12.5 s */
+    if (_phase === 'flash' && t >= 12.5) {
+      /* Fade out del flash */
+      const flash = getFlash();
+      const ov = getOverlay();
+      if (flash) {
+        flash.style.transition = 'opacity 1s ease';
+        flash.style.opacity = '0';
+      }
+      if (ov) ov.classList.remove('roaring-flash-active');
+      startBeatPulse();
+    }
+
+    /* Fase 3 → 4: vuelo ∞ a los 39 s */
+    if (_phase === 'pulse' && t >= 39) {
+      const framePulse = getFrame();
+      if (framePulse) {
+        framePulse.classList.remove('roaring-beat-pulse');
+        framePulse.style.animationDuration = '';
+      }
+      startFlyPhase();
+    }
+
+    /* Watchdog: si el usuario salta a un tiempo fuera de rango, resetea */
+    if ((t < 11) && _phase !== 'idle') {
+      resetAll();
+    }
+  }
+
+  /* ── Observador principal: se engancha al audio cuando se abre el reproductor ── */
+  /* Parchamos openMusicPlayer / closeMusicPlayer para detectar el momento */
+  function hookRoaringCinematic() {
+    /* Esperamos a que el DOM y funciones del juego estén listas */
+    const checkInterval = setInterval(() => {
+      if (typeof musicAudio !== 'undefined') {
+        clearInterval(checkInterval);
+        attachAudioListeners();
+      }
+    }, 200);
+  }
+
+  let _lastHookedAudio = null;
+
+  function attachAudioListeners() {
+    /* Pollea el audio activo y engancha timeupdate */
+    setInterval(() => {
+      const audio = getMusicAudio();
+      const ov    = getOverlay();
+
+      /* Si cambió el objeto Audio (nueva pista), limpia la cinemática */
+      if (audio !== _lastHookedAudio) {
+        if (_lastHookedAudio) _lastHookedAudio.removeEventListener('timeupdate', roaringCinematicTimeUpdate);
+        _lastHookedAudio = audio;
+        if (_phase !== 'idle') resetAll();
+
+        if (audio && ov && ov.classList.contains('roaring-active') && ov.classList.contains('open')) {
+          audio.addEventListener('timeupdate', roaringCinematicTimeUpdate);
+        }
+      }
+
+      /* Si el overlay se cerró mientras la cinemática estaba activa, resetea */
+      if (_phase !== 'idle' && (!ov || !ov.classList.contains('open'))) {
+        resetAll();
+        if (_lastHookedAudio) {
+          _lastHookedAudio.removeEventListener('timeupdate', roaringCinematicTimeUpdate);
+        }
+      }
+
+      /* Re-engancha si el overlay se abrió y es roaring y hay audio */
+      if (_phase === 'idle' && audio && ov &&
+          ov.classList.contains('roaring-active') &&
+          ov.classList.contains('open') &&
+          !audio._roaringHooked) {
+        audio._roaringHooked = true;
+        audio.addEventListener('timeupdate', roaringCinematicTimeUpdate);
+      }
+    }, 300);
+  }
+
+  /* Lanzar cuando el DOM esté listo */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hookRoaringCinematic);
+  } else {
+    hookRoaringCinematic();
+  }
+
+})();
 </script>
 
 </body>
