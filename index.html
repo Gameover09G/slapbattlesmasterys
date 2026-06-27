@@ -2500,6 +2500,16 @@ body {
   transition: color .15s, border-color .15s;
 }
 #roblox-check-cancel:hover { color: #ccc; border-color: #555; }
+#roblox-check-disclaimer {
+  font-size: 0.78rem;
+  color: #8a6f3a;
+  background: #1a1200;
+  border: 1.5px solid #3a2a00;
+  border-radius: 8px;
+  padding: 8px 12px;
+  line-height: 1.55;
+}
+#roblox-check-disclaimer strong { color: #fbbf24; }
 #roblox-check-status {
   font-size: 0.85rem;
   color: #aaa;
@@ -6650,6 +6660,7 @@ input[type="range"].slap-volume::-moz-range-track {
       <button id="roblox-check-submit" onclick="submitRobloxCheck()">Buscar</button>
       <button id="roblox-check-cancel" onclick="closeRobloxCheck()">✕ Cerrar</button>
     </div>
+    <div id="roblox-check-disclaimer">⚠️ <em>Esta función actualmente está en desarrollo y usa un sistema experimental. El sistema actual requiere actualizarse manualmente de forma semanal, haciendo que, cuando expire, deje de funcionar completamente. Por favor, si te sucede esto, contacta con <strong>@gameover09_g</strong> por Discord.</em></div>
     <div id="roblox-check-status"></div>
     <div id="roblox-check-results"></div>
   </div>
@@ -7100,6 +7111,15 @@ input[type="range"].slap-volume::-moz-range-track {
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
+  {
+    version: "1.2.3 - (Casi) TODOS LOS GUANTES DE LOGRO Y PROGRESO",
+    date: "27/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Todos los guantes de logro desde MEGAROCK hasta Jerry ya tienen nombre, nombre de logo y banner, para asi mejorar la seleccion de guantes que aparecen en el siguiente apartado:"},
+      { emoji: "🎖️", color: "#FFD700", text: "Ya puedes ver los guantes de logro que tienes y los que te faltan, aun asi, tiene muchos errores y es escencial que reviseis el aviso que hay."},
+    ]
+  },
+  
   {
     version: "1.2.22 - CÁMARA",
     date: "26/06/2026",
@@ -12333,6 +12353,32 @@ const GLOVES = [
   },
 
   {
+    id: 'jet',
+    name: 'Jet',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Orb of Flight', url: 'https://www.roblox.com/badges/2124930374/Orb-of-flight' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
     id: 'shard',
     name: 'Shard',
     type: 'logro',
@@ -12357,6 +12403,500 @@ const GLOVES = [
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=ybkhfXgloW8',
     songs: null,
+  },
+
+  {
+    id: 'potato',
+    name: 'Potato',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Sorry to burst your bubble', url: 'https://www.roblox.com/badges/2124989121/Sorry-to-burst-your-bubble' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'cult',
+    name: 'Cult',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'good job', url: 'https://www.roblox.com/badges/2125850245/good-job' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'bob',
+    name: 'bob',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'bob', url: 'https://www.roblox.com/badges/2125950512/bob' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'buddies',
+    name: 'Buddies',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'the touch of midas', url: 'https://www.roblox.com/badges/2124760928/the-touch-of-midas' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'moon',
+    name: 'Moon',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'ez', url: 'https://www.roblox.com/badges/2124760895/ez' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'jupiter',
+    name: 'Jupiter',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Death Dodger', url: 'https://www.roblox.com/badges/2126334003/Death-Dodger' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'spy',
+    name: 'Spy',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Predator', url: 'https://www.roblox.com/badges/2126450753/Predator' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'detonator',
+    name: 'Detonator',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Head Hunter', url: 'https://www.roblox.com/badges/2126589561/Head-Hunter' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'rage',
+    name: 'Rage',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Anticlimatic End', url: 'https://www.roblox.com/badges/2127132894/Anticlimactic-End' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'trap',
+    name: 'Trap',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Brick Master', url: 'https://www.roblox.com/badges/2127567042/Brick-Master' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'orbit',
+    name: 'Orbit',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'YOU MONSTER', url: 'https://www.roblox.com/badges/2127703232/YOU-MONSTER' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'hybrid',
+    name: 'Hybrid',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Prolonged Anger', url: 'https://www.roblox.com/badges/2127861437/Prolonged-Anger' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'slapple',
+    name: 'Slapple',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'The Golden Slapple', url: 'https://www.roblox.com/badges/2128012376/The-Golden-Slapple' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'disarm',
+    name: 'Disarm',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Momento Mori', url: 'https://www.roblox.com/badges/2128233612/Memento-Mori' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'dominance',
+    name: 'Dominance',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Island Conqueror', url: 'https://www.roblox.com/badges/2127816588/Island-Conqueror' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'link',
+    name: 'Link',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Error glove', url: 'https://www.roblox.com/badges/2124760254/Error-glove' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'chain',
+    name: 'Chain',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'THE ACCIDENT', url: 'https://www.roblox.com/badges/2128557186/THE-ACCIDENT' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'rattlebones',
+    name: 'Rattlebones',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Candy King', url: 'https://www.roblox.com/badges/2128772719/Candy-King' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'charge',
+    name: 'Charge',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'Killer', url: 'https://www.roblox.com/badges/2129104684/Killer' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
   },
 
   {
@@ -12398,6 +12938,162 @@ const GLOVES = [
       "Zenith Tycoon Music": {id: "zenith", roblox: "132220049431002", info:"Boombox de GOD MODE (Maestria)"}
     },
     misc: true
+  },
+
+  {
+    id: 'confusion',
+    name: 'Confusion',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: 'what', url: 'https://www.roblox.com/badges/2129474790/what' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'glitch',
+    name: 'Glitch',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: '01010010 01010101 01001110', url: 'https://www.roblox.com/badges/2129568267/01010010-01010101-01001110' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'snowball',
+    name: 'Snowball',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Engineer's Gift", url: 'https://www.roblox.com/badges/2129648848/Engineers-Gift' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'elude',
+    name: 'Elude',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "EXPOSED", url: 'https://www.roblox.com/badges/2129871858/EXPOSED' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'rng',
+    name: 'Rng',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "RNGod", url: 'https://www.roblox.com/badges/2130031244/RNGod' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'fish',
+    name: 'fish',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "DEEP SLUMBER", url: 'https://www.roblox.com/badges/2130032297/DEEP-SLUMBER' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
   },
 
   {
@@ -12487,6 +13183,32 @@ const GLOVES = [
   },
 
   {
+    id: 'goofy',
+    name: 'Goofy',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "CHAOS", url: 'https://www.roblox.com/badges/2133016756/CHAOS' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
     id: 'leash',
     name: 'Leash',
     type: 'logro',
@@ -12513,6 +13235,292 @@ const GLOVES = [
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=an5iBkr26UY',
     songs: null,
+  },
+
+  {
+    id: 'flamarang',
+    name: 'Flamarang',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Underkill", url: 'https://www.roblox.com/badges/2140855364/Underkill' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'kinetic',
+    name: 'Kinetic',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Kinetically Charged", url: 'https://www.roblox.com/badges/2141386326/Kinetically-Charged' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'berserk',
+    name: 'Berserk',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "GO BERSERK", url: 'https://www.roblox.com/badges/2141784233/GO-BERSERK' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'sparky',
+    name: 'Sparky',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Incredible Running Man", url: 'https://www.roblox.com/badges/2142826462/Incredible-Running-Man' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'boogie',
+    name: 'Boogie',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Boogie With It", url: 'https://www.roblox.com/badges/2143034526/Boogie-With-It' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'recall',
+    name: 'Recall',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Repressed Memories", url: 'https://www.roblox.com/badges/2143973603/Repressed-Memories' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'quake',
+    name: 'Quake',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Blasting Off Again", url: 'https://www.roblox.com/badges/2144766764/Blasting-Off-Again' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'psycho',
+    name: 'Psycho',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Ultimate Control", url: 'https://www.roblox.com/badges/2145165421/Ultimate-Control' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'kraken',
+    name: 'Kraken',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Escape the Abyss", url: 'https://www.roblox.com/badges/2145381761/Escape-the-Abyss' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'counter',
+    name: 'Counter',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Da Maze Runner", url: 'https://www.roblox.com/badges/2146130728/Da-Maze-Runner' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'hammer',
+    name: 'Hammer',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Toolbox", url: 'https://www.roblox.com/badges/2146540403/Toolbox' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
   },
 
   {
@@ -12544,6 +13552,449 @@ const GLOVES = [
   },
 
   {
+    id: 'rhythm',
+    name: 'Rhythm',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Total Rhythm", url: 'https://www.roblox.com/badges/2148234934/Total-Rhythm' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'rojo',
+    name: 'Rojo',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "See in the dark", url: 'https://www.roblox.com/badges/2148480065/See-in-the-dark' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'hitman',
+    name: 'Hitman',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Sharp Shooter", url: 'https://www.roblox.com/badges/2148934270/Sharp-Shooter' },
+      { name: "court evidence", url: 'https://www.roblox.com/badges/2124760907/court-evidence' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'retro',
+    name: 'Retro',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Parkour Pwner", url: 'https://www.roblox.com/badges/2149637240/Parkour-Pwner' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'null',
+    name: 'Null',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "The Relic", url: 'https://www.roblox.com/badges/2150485950/The-Relic' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'lure',
+    name: 'Lure',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Catch Emm All", url: 'https://www.roblox.com/badges/2151266964/Catch-Emm-All' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'tinkerer',
+    name: 'Tinkerer',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Great Escape", url: 'https://www.roblox.com/badges/2152295593/Great-Escape' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'necromancer',
+    name: 'Necromancer',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Sweet-Tooth Sovereign", url: 'https://www.roblox.com/badges/2152906832/Sweet-Tooth-Sovereign' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'alchemist',
+    name: 'Alchemist',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Containment Breach", url: 'https://www.roblox.com/badges/2153473254/Containment-Breach' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'druid',
+    name: 'Druid',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Gardens and Ghouls", url: 'https://www.roblox.com/badges/2153911928/Gardens-And-Ghouls' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'jester',
+    name: 'Jester',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Now You See Me", url: 'https://www.roblox.com/badges/2500227230783997/Now-You-See-Me' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'scythe',
+    name: 'Scythe',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Farmland Fray", url: 'https://www.roblox.com/badges/3318257806017965/Farmland-Fray' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'santa',
+    name: 'Santa',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Yuletime Might", url: 'https://www.roblox.com/badges/2895206704788569/Yuletime-Might' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'iceskate',
+    name: 'Iceskate',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Slap Battles: On Ice", url: 'https://www.roblox.com/badges/2906002612987222/Slap-Battles-On-Ice' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'blasphemy',
+    name: 'Blasphemy',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "G-Grandson...?", url: 'https://www.roblox.com/badges/3335299217032061/G-Grandson' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'pan',
+    name: 'Pan',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Into the Crypt", url: 'https://www.roblox.com/badges/4404799574333856/Into-the-Crypt' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'admin',
+    name: 'Admin',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "CERTIFIED ADMIN", url: 'https://www.roblox.com/badges/1840188608156642/CERTIFIED-ADMIN' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
     id: 'joust',
     name: 'Joust',
     type: 'logro',
@@ -12568,6 +14019,32 @@ const GLOVES = [
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=wlQ_XOxKlug',
     songs: null,
+  },
+
+  {
+    id: 'firework',
+    name: 'Firework',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Easy As Pie", url: 'https://www.roblox.com/badges/2628581469266954/Easy-As-Pie' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
   },
 
   {
@@ -12624,6 +14101,604 @@ const GLOVES = [
     ],
     tutorialUrl: 'https://www.youtube.com/watch?v=yxgfXUrZH4I',
     songs: null,
+  },
+
+  {
+    id: 'divebomb',
+    name: 'Divebomb',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Null Piercer", url: 'https://www.roblox.com/badges/342573645147372/Null-Piercer' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'lamp',
+    name: 'Lamp',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Friend of the Dark", url: 'https://www.roblox.com/badges/490455814138437/Friend-of-the-Dark' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'knockoff',
+    name: 'Knockoff',
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Code Breaker", url: 'https://www.roblox.com/badges/1962623816699442/Code-Breaker' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'frostbite',
+    name: "Frostbite",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Ice Essence", url: 'https://www.roblox.com/badges/1286358044443937/Ice-Essence' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'plank',
+    name: "Plank",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Cranking 90's", url: 'https://www.roblox.com/badges/4031317971987872/Cranking-90-s' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'spoonful',
+    name: "Spoonful",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "SLAP BATTLES SWEEP", url: 'https://www.roblox.com/badges/2236076719770808/SLAP-BATTLES-SWEEP' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'schlob',
+    name: "the schlob",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Leap of Faith", url: 'https://www.roblox.com/badges/1354956782555226/Leap-of-Faith' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'siphon',
+    name: "Siphon",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Caution: High Voltage", url: 'https://www.roblox.com/badges/187186758930457/Caution-High-Voltage' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'wrench',
+    name: "Wrench",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "ÜberCharged", url: 'https://www.roblox.com/badges/2240434593038483/berCharged' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'hunter',
+    name: "Hunter",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Bounty Claimed", url: 'https://www.roblox.com/badges/3483144763925839/Bounty-Claimed' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'relude',
+    name: "Relude",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "A Guiding Hand", url: 'https://www.roblox.com/badges/154204790800271/A-Guiding-Hand' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'avatar',
+    name: "Avatar",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Nah, I'd win", url: 'https://www.roblox.com/badges/154204790800271/A-Guiding-Hand' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'water',
+    name: "Water",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "How did we get here?", url: 'https://www.roblox.com/badges/2193861648156971/How-did-we-get-here' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'fan',
+    name: "Fan",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "FREE OOG!", url: 'https://www.roblox.com/badges/2657379023348335/FREE-OOG' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'boxer',
+    name: "Boxer",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "The Glove", url: 'https://www.roblox.com/badges/1223765330375569/The-Glove' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'materialize',
+    name: "MATERIALIZE",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Orb of Honor", url: 'https://www.roblox.com/badges/4256352459948010/Orb-of-Honor' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'bind',
+    name: "Bind",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Garden of Erasure", url: 'https://www.roblox.com/badges/3199562682373814/Garden-of-Erasure' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'poltergeist',
+    name: "Poltergeist",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Fetch me their Souls", url: 'https://www.roblox.com/badges/868768988664040/Fetch-me-their-Souls' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'clock',
+    name: "Clock",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Shattered Memories", url: 'https://www.roblox.com/badges/2035627575374951/Shattered-Memories' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'utg',
+    name: "Untitled Tag Glove",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Hurt me plenty", url: 'https://www.roblox.com/badges/2223110832777636/Hurt-me-plenty' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'pillow',
+    name: "Pillow",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Fortress of Dreams", url: 'https://www.roblox.com/badges/4390302507334168/Fortress-of-Dreams' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'angler',
+    name: "Angler",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "You're gonna need a bigger glove", url: 'https://www.roblox.com/badges/2117833544213343/You-re-gonna-need-a-bigger-glove' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'jerry',
+    name: "Jerry",
+    type: 'logro',
+    obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
+    badges: [
+      { name: "Snow man left behind", url: 'https://www.roblox.com/badges/182408299845710/Snow-man-left-behind' },
+      // Puedes añadir más logros aquí, ej:
+      // { name: 'Otro Logro', url: 'https://www.roblox.com/badges/XXXX/Otro-Logro' },
+    ],
+    quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
+    releaseDate: '29/01/2022',
+    power: 50,
+    speed: 16,
+    mechanics: [
+      'Puede hacer explotar la bomba antes de tiempo pulsando la habilidad cuando quieras.',
+      'Tras explotar manualmente, la bomba sigue marcando el recorrido usando estrellas.',
+    ],
+    abilities: [
+      '[E] Detonation: Lanza una bomba en la dirección que estás mirando que explota y aplica knockback a los enemigos cercanos. (10s cooldown)',
+    ],
+    tutorialUrl: 'https://www.youtube.com/watch?v=GIBc0OSF7BE',
+    songs: null,
+    locked: true
   },
 
   {
