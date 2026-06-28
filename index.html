@@ -615,6 +615,8 @@ body {
   cursor: not-allowed;
   filter: grayscale(0.35);
 }
+
+/* ── (acrobat manual check handled via glove-owned-tick.acrobat-manual-tick) ── */
 .btn-hide.active {
   background: #0e2230;
   color: #8ad6ff;
@@ -1475,6 +1477,192 @@ body {
   border-color: var(--red-close);
   color: var(--red-close);
 }
+
+/* ============================================================
+   RESET NUKE OVERLAY
+   ============================================================ */
+#reset-nuke-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: rgba(0,0,0,0.92);
+  align-items: center;
+  justify-content: center;
+  animation: fadeInDetail .2s ease;
+}
+#reset-nuke-overlay.open { display: flex; }
+
+#reset-nuke-modal {
+  position: relative;
+  background: #0d0505;
+  border: 2px solid #3d0a0a;
+  border-top: 3px solid var(--red-close);
+  border-radius: 16px;
+  box-shadow: 0 0 50px rgba(255,51,51,0.18), 0 16px 50px rgba(0,0,0,0.9);
+  max-width: 460px;
+  width: 92%;
+  overflow: hidden;
+  animation: cardIn .28s ease both;
+}
+
+#reset-nuke-header {
+  background: linear-gradient(90deg, #1a0404 0%, #110202 100%);
+  border-bottom: 1px solid #3d0a0a;
+  padding: 18px 56px 18px 20px;
+  position: relative;
+}
+#reset-nuke-header h2 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  color: var(--red-close);
+  text-shadow: 0 0 20px rgba(255,51,51,0.5);
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+#btn-close-reset-nuke {
+  position: absolute;
+  top: 50%; right: 14px;
+  transform: translateY(-50%);
+  background: #1a0404;
+  color: var(--red-close);
+  border: 2px solid #3d0a0a;
+  border-radius: 10px;
+  width: 34px; height: 34px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: filter .15s;
+}
+#btn-close-reset-nuke:hover { filter: brightness(1.3); }
+
+#reset-nuke-body {
+  padding: 22px 22px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reset-nuke-warning-icon {
+  font-size: 2.8rem;
+  text-align: center;
+  line-height: 1;
+  filter: drop-shadow(0 0 12px rgba(255,51,51,0.6));
+}
+
+.reset-nuke-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  color: #ccc;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.reset-nuke-list {
+  background: #110000;
+  border: 1.5px solid #2a0505;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.reset-nuke-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.88rem;
+  color: #bbb;
+}
+.reset-nuke-list-item span.rni-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+#reset-nuke-footer {
+  padding: 14px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Hold-to-confirm button */
+#btn-nuke-confirm {
+  position: relative;
+  width: 100%;
+  padding: 13px 16px;
+  background: #1a0404;
+  border: 2px solid var(--red-close);
+  border-radius: 10px;
+  color: var(--red-close);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  box-shadow: 0 0 0 rgba(255,51,51,0);
+}
+#btn-nuke-confirm:hover {
+  box-shadow: 0 0 18px rgba(255,51,51,0.25);
+}
+#btn-nuke-confirm-fill {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,51,51,0.18);
+  width: 0%;
+  transition: none;
+  pointer-events: none;
+  border-radius: 8px;
+}
+#btn-nuke-confirm-fill.filling {
+  transition: width linear;
+}
+#btn-nuke-confirm-label {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+#btn-nuke-confirm.done {
+  background: #2a0505;
+  border-color: #ff6666;
+  color: #fff;
+  box-shadow: 0 0 28px rgba(255,51,51,0.45);
+}
+
+#btn-nuke-cancel {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  color: #666;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+#btn-nuke-cancel:hover {
+  border-color: #555;
+  color: #aaa;
+}
+
+#reset-nuke-countdown {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  color: #555;
+  text-align: center;
+  min-height: 1.2em;
+  letter-spacing: 0.5px;
+  transition: color .2s;
+}
+#reset-nuke-countdown.active { color: var(--red-close); }
 
 /* ── Indicador de guardado automático ── */
 #autosave-badge {
@@ -2609,6 +2797,35 @@ body {
   transition: color .15s, border-color .15s;
 }
 #roblox-check-cancel:hover { color: #ccc; border-color: #555; }
+
+/* ── Selector de modo: Guantes de Badge / Badges sin Guante / Gamepasses ── */
+#rcr-mode-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.rcr-mode-btn {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  color: #888;
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  padding: 8px 6px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.25;
+  transition: background .15s, color .15s, border-color .15s, transform .12s;
+}
+.rcr-mode-btn:hover { border-color: #555; color: #ccc; }
+.rcr-mode-btn.active {
+  background: #1a1000;
+  border-color: #fbbf24;
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(251,191,36,0.25);
+}
+.rcr-mode-btn:active { transform: scale(0.96); }
 #roblox-check-disclaimer {
   font-size: 0.78rem;
   color: #8a6f3a;
@@ -2653,6 +2870,10 @@ body {
   border: 1px solid #252525;
   border-radius: 10px;
   overflow: hidden;
+}
+.rcr-glove-row.rcr-flat-row .rcr-badge-item {
+  border-bottom: none;
+  padding: 11px 14px;
 }
 .rcr-glove-header {
   display: flex;
@@ -2763,6 +2984,28 @@ body {
 }
 .glove-card.owned .glove-owned-tick { display: flex; }
 
+/* ── Acrobat: tick siempre visible (vacío = outline, relleno = obtenido) ── */
+.glove-owned-tick.acrobat-manual-tick {
+  display: flex;
+  background: transparent;
+  border: 1.5px solid #444;
+  color: transparent;
+  box-shadow: none;
+  pointer-events: all;
+  cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s, box-shadow .18s;
+}
+.glove-owned-tick.acrobat-manual-tick:hover {
+  border-color: #4ade80;
+  color: rgba(74,222,128,0.5);
+}
+.glove-card.owned .glove-owned-tick.acrobat-manual-tick {
+  background: rgba(20,83,45,0.92);
+  border-color: #4ade80;
+  color: #4ade80;
+  box-shadow: 0 0 8px rgba(74,222,128,0.5);
+}
+
 /* ── Buscador del checker ── */
 #rcr-search-wrap {
   display: flex;
@@ -2804,10 +3047,6 @@ body {
 .rcr-filter-btn.active.complete { background: #0e2210; border-color: #4ade80; color: #4ade80; }
 .rcr-filter-btn.active.partial  { background: #1c1000; border-color: #fb923c; color: #fb923c; }
 .rcr-filter-btn.active.pending  { background: #111; border-color: #6b7280; color: #9ca3af; }
-
-/* ── Filtros completado/pendiente en el grid principal ── */
-.gtype-filter[data-type="owned"].active    { background:#0e2210; border-color:#4ade80; color:#4ade80; box-shadow:0 0 10px rgba(74,222,128,0.2); }
-.gtype-filter[data-type="notowned"].active { background:#200a0a; border-color:#f87171; color:#f87171; box-shadow:0 0 10px rgba(248,113,113,0.2); }
 
 /* ============================================================
    SHARE COLLAGE MODAL
@@ -4032,38 +4271,185 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   box-shadow: 0 0 12px rgba(255,215,0,0.3);
 }
 
-/* ── Type filter bar ── */
-#gloves-filter-bar {
+/* ── Filtros: botón + menú desplegable multi-selección ── */
+#gloves-filter-wrap {
+  position: relative;
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 18px;
 }
-.gtype-filter {
+#gloves-filter-toggle-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Fredoka One', cursive;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   letter-spacing: 0.4px;
   background: #222;
   border: 2px solid #383838;
   border-radius: 20px;
-  color: #777;
-  padding: 6px 16px;
+  color: #ddd;
+  padding: 8px 18px;
   cursor: pointer;
   transition: border-color .18s, color .18s, background .18s, transform .1s;
 }
-.gtype-filter:hover { border-color: #555; color: #aaa; }
-.gtype-filter:active { transform: scale(0.94); }
-.gtype-filter.active {
+#gloves-filter-toggle-btn:hover { border-color: var(--yellow-bright); color: var(--yellow-bright); }
+#gloves-filter-toggle-btn:active { transform: scale(0.96); }
+#gloves-filter-wrap:has(#gloves-filter-menu.open) #gloves-filter-toggle-btn {
+  border-color: var(--yellow-bright);
+  color: var(--yellow-bright);
+  background: #1a1500;
+  box-shadow: 0 0 10px rgba(255,215,0,0.2);
+}
+.gloves-filter-chevron { font-size: 0.7rem; transition: transform .18s ease; }
+#gloves-filter-wrap:has(#gloves-filter-menu.open) .gloves-filter-chevron { transform: rotate(180deg); }
+
+.gloves-filter-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--red-close);
+  color: #fff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#gloves-filter-summary {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* ── Panel desplegable de filtros ── */
+#gloves-filter-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: min(560px, 92vw);
+  max-height: 0;
+  overflow: hidden;
+  background: #1c1c1c;
+  border: 3px solid #333;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -6px);
+  transition: opacity .18s ease, transform .18s ease, max-height .25s ease;
+}
+#gloves-filter-menu.open {
+  max-height: 72vh;
+  opacity: 1;
+  pointer-events: all;
+  transform: translate(-50%, 0);
+  overflow-y: auto;
+}
+#gloves-filter-menu::-webkit-scrollbar { width: 6px; }
+#gloves-filter-menu::-webkit-scrollbar-thumb { background: var(--yellow-dark); border-radius: 4px; }
+
+.gfm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  font-family: 'Fredoka One', cursive;
+  color: var(--yellow-bright);
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #2a2a2a;
+}
+.gfm-reset {
+  background: none;
+  border: 1.5px solid #444;
+  border-radius: 8px;
+  color: #999;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, transform .1s;
+}
+.gfm-reset:hover { border-color: var(--yellow-bright); color: var(--yellow-bright); }
+.gfm-reset:active { transform: scale(0.94); }
+
+.gfm-section { padding: 12px 16px; border-bottom: 1px solid #262626; }
+.gfm-section:last-of-type { border-bottom: none; }
+.gfm-section-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 8px;
+}
+.gfm-chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.gfm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  background: #262626;
+  border: 2px solid #3a3a3a;
+  border-radius: 18px;
+  color: #999;
+  padding: 6px 12px 6px 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .15s, color .15s, background .15s, transform .1s;
+}
+.gfm-chip:hover { border-color: #555; color: #ccc; }
+.gfm-chip:active { transform: scale(0.96); }
+.gfm-chip input { display: none; }
+.gfm-chip .gfm-count { opacity: 0.65; font-size: 0.74rem; }
+
+/* Tinte genérico cuando está marcado (fallback) */
+.gfm-chip:has(input:checked) {
   background: #1a1500;
   border-color: var(--yellow-bright);
   color: var(--yellow-bright);
-  box-shadow: 0 0 10px rgba(255,215,0,0.2);
 }
-.gtype-filter[data-type="slaps"].active  { background:#0e1800; border-color:#4ade80; color:#4ade80; box-shadow:0 0 10px rgba(74,222,128,0.2); }
-.gtype-filter[data-type="robux"].active  { background:#0a1228; border-color:#60a5fa; color:#60a5fa; box-shadow:0 0 10px rgba(96,165,250,0.2); }
-.gtype-filter[data-type="logro"].active  { background:#1a1000; border-color:#fbbf24; color:#fbbf24; box-shadow:0 0 10px rgba(251,191,36,0.2); }
-.gtype-filter[data-type="otro"].active   { background:#160a22; border-color:#c084fc; color:#c084fc; box-shadow:0 0 10px rgba(192,132,252,0.2); }
+/* Tinte específico por valor cuando está marcado */
+.gfm-chip[data-val="slaps"]:has(input:checked)        { background:#0e1800; border-color:#4ade80; color:#4ade80; }
+.gfm-chip[data-val="robux"]:has(input:checked)        { background:#0a1228; border-color:#60a5fa; color:#60a5fa; }
+.gfm-chip[data-val="logro"]:has(input:checked)        { background:#1a1000; border-color:#fbbf24; color:#fbbf24; }
+.gfm-chip[data-val="otro"]:has(input:checked)         { background:#160a22; border-color:#c084fc; color:#c084fc; }
+.gfm-chip[data-val="staff"]:has(input:checked)        { background:#240a38; border-color:#FFD700; color:#FFD700; box-shadow:0 0 10px rgba(255,215,0,0.25); }
+.gfm-chip[data-val="owned"]:has(input:checked)        { background:#0e2210; border-color:#4ade80; color:#4ade80; }
+.gfm-chip[data-val="notowned"]:has(input:checked)     { background:#200a0a; border-color:#f87171; color:#f87171; }
+.gfm-chip[data-val="unobtainable"]:has(input:checked) { background:#1a0a0a; border-color:#ff6b6b; color:#ff6b6b; }
+.gfm-chip[data-val="scavenger"]:has(input:checked)    { background:#100319; border-color:#B66FED; color:#B66FED; }
+.gfm-chip[data-val="halloween"]:has(input:checked)    { background:#1a0d00; border-color:var(--text-orange); color:var(--text-orange); }
+.gfm-chip[data-val="christmas"]:has(input:checked)    { background:#1a0404; border-color:var(--red-close); color:var(--red-close); }
+
+.gfm-footer { padding: 10px 16px 14px; }
+.gfm-close-btn {
+  width: 100%;
+  background: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  border-radius: 10px;
+  color: #ccc;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  padding: 9px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.gfm-close-btn:hover { border-color: var(--yellow-bright); color: var(--yellow-bright); }
 
 /* ── Grid ── */
 #gloves-grid-wrap { max-width: 1600px; margin: 0 auto; }
@@ -4105,6 +4491,13 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .glove-card[data-type="robux"]:hover  { border-color: #60a5fa; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(96,165,250,0.35); }
 .glove-card[data-type="logro"]:hover  { border-color: #fbbf24; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(251,191,36,0.35); }
 .glove-card[data-type="otro"]:hover   { border-color: #c084fc; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(192,132,252,0.35); }
+.glove-card[data-type="staff"]:hover  { border-color: #FFD700; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(255,215,0,0.4), 0 0 32px rgba(168,85,247,0.3); }
+
+/* ── Tarjeta morada para guantes de Staff-only ── */
+.glove-card[data-type="staff"] {
+  background: linear-gradient(160deg, #2c1248 0%, #190a2c 100%);
+  border-color: #4c1d8a;
+}
 
 .glove-card-top {
   position: relative;
@@ -4133,6 +4526,27 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   font-size: 3rem;
 }
 
+/* ── Banner en blanco y negro con toques dorados (duotono) para Staff-only ──
+   El banner es el mismo archivo que la contraparte normal (default_(baseId).png):
+   se pasa a B&N con "filter" y se tiñe de dorado con un overlay en
+   mix-blend-mode:color (técnica de duotono — sustituye el negro casi
+   absoluto por dorado en vez de dejarlo en gris/negro puro).
+   Nota: se usa !important + prefijo #slap-view porque hay una regla más
+   arriba (#slap-view .glove-card-banner { filter:none !important; }) que
+   si no, ganaría por especificidad y anularía este efecto. */
+#slap-view .glove-card[data-type="staff"] .glove-card-banner {
+  filter: grayscale(1) contrast(1.05) brightness(1.08) !important;
+}
+.glove-card[data-type="staff"] .glove-card-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #FFD700;
+  mix-blend-mode: color;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* Type ribbon top-left */
 .glove-type-ribbon {
   position: absolute;
@@ -4149,12 +4563,14 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .gribbon-robux { background: #60a5fa; color: #030d1a; }
 .gribbon-logro { background: #fbbf24; color: #1a0e00; }
 .gribbon-otro  { background: #c084fc; color: #0e0618; }
+.gribbon-staff { background: linear-gradient(135deg, #FFD700, #a855f7); color: #1f0a33; }
 
 /* Type accent bar at bottom of banner */
 .glove-card[data-type="slaps"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#4ade80; box-shadow:0 0 8px rgba(74,222,128,0.6); z-index:3; }
 .glove-card[data-type="robux"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#60a5fa; box-shadow:0 0 8px rgba(96,165,250,0.6); z-index:3; }
 .glove-card[data-type="logro"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#fbbf24; box-shadow:0 0 8px rgba(251,191,36,0.6); z-index:3; }
 .glove-card[data-type="otro"]  .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#c084fc; box-shadow:0 0 8px rgba(192,132,252,0.6); z-index:3; }
+.glove-card[data-type="staff"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#FFD700,#a855f7); box-shadow:0 0 8px rgba(255,215,0,0.5); z-index:3; }
 
 .glove-card-body {
   padding: 13px 15px 10px;
@@ -4180,6 +4596,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .glove-tl-robux { color: #60a5fa; }
 .glove-tl-logro { color: #fbbf24; }
 .glove-tl-otro  { color: #c084fc; }
+.glove-tl-staff { color: #FFD700; }
 
 /* ── Fila de meta-datos en la tarjeta: precio + estado ── */
 .glove-card-meta-row {
@@ -4228,14 +4645,6 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .gstatus-scavenger     { color: #B66FED; border-color: #6000B0; background: #100319; }
 .gstatus-halloween    { color: var(--text-orange); border-color: #5c3a00; background: #1a0d00; }
 .gstatus-christmas    { color: var(--red-close);   border-color: #5c1f1f; background: #1a0404; }
-
-/* ── Contador en los botones de filtro ── */
-.gtype-count {
-  display: inline-block;
-  margin-left: 5px;
-  font-size: 0.72rem;
-  opacity: 0.6;
-}
 
 .glove-card-footer {
   display: flex;
@@ -4333,6 +4742,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .gtbadge-robux { color: #60a5fa; background: #030d1a; border-color: #60a5fa; }
 .gtbadge-logro { color: #fbbf24; background: #1a0e00; border-color: #fbbf24; }
 .gtbadge-otro  { color: #c084fc; background: #0e0618; border-color: #c084fc; }
+.gtbadge-staff { color: #FFD700; background: #1f0a33; border-color: #a855f7; }
 
 /* ============================================================
    GLOVE DETAIL VIEW
@@ -4482,6 +4892,26 @@ body.todo-selecting #grid-view { padding-top: 72px; }
   font-size: 0.88rem;
   color: var(--text-light);
   line-height: 1.5;
+}
+/* Palabras del método de obtención que coinciden con un ID de guante */
+.obtain-glove-link {
+  color: var(--yellow-bright);
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 1px dashed var(--yellow-dark);
+  transition: color .15s, border-color .15s;
+}
+.obtain-glove-link:hover {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+.obtain-glove-link.locked-link {
+  color: #ff6b6b;
+  border-bottom-color: #5c1f1f;
+}
+.obtain-glove-link.locked-link:hover {
+  color: #ffaaaa;
+  border-bottom-color: #ff6b6b;
 }
 .slap-icon-inline {
   width: 1.05em;
@@ -4718,7 +5148,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #glove-detail-banner-wrap.gbtype-slaps::after,
 #glove-detail-banner-wrap.gbtype-robux::after,
 #glove-detail-banner-wrap.gbtype-logro::after,
-#glove-detail-banner-wrap.gbtype-otro::after {
+#glove-detail-banner-wrap.gbtype-otro::after,
+#glove-detail-banner-wrap.gbtype-staff::after {
   content: '';
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -4729,6 +5160,22 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #glove-detail-banner-wrap.gbtype-robux::after { background: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.65); }
 #glove-detail-banner-wrap.gbtype-logro::after { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.65); }
 #glove-detail-banner-wrap.gbtype-otro::after  { background: #c084fc; box-shadow: 0 0 10px rgba(192,132,252,0.65); }
+#glove-detail-banner-wrap.gbtype-staff::after { background: linear-gradient(90deg,#FFD700,#a855f7); box-shadow: 0 0 10px rgba(255,215,0,0.6); }
+
+/* ── Banner duotono B&N + dorado para Staff-only (igual técnica que en la tarjeta) ── */
+#glove-detail-banner-wrap.gbtype-staff { border-color: #4c1d8a; }
+#glove-detail-banner-wrap.gbtype-staff #glove-detail-banner-img {
+  filter: grayscale(1) contrast(1.05) brightness(1.08);
+}
+#glove-detail-banner-wrap.gbtype-staff::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #FFD700;
+  mix-blend-mode: color;
+  z-index: 1;
+  pointer-events: none;
+}
 
 /* ── Fila de meta (badge tipo + estado) en el detalle ── */
 .glove-detail-meta-row {
@@ -4943,11 +5390,14 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-slaps::after,
 #glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-robux::after,
 #glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-logro::after,
-#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-otro::after {
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-otro::after,
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-staff::after {
   background: #ffffff !important;
   box-shadow: none !important;
 }
 #glove-detail-view.roaring-active #glove-detail-banner-img { border-radius: 0 !important; }
+/* En modo roaring, el banner de Staff vuelve a B&N puro (sin el tinte dorado) */
+#glove-detail-view.roaring-active #glove-detail-banner-wrap.gbtype-staff::before { display: none !important; }
 
 /* ── Botón tutorial ── */
 #glove-detail-view.roaring-active #glove-detail-tut-btn {
@@ -5010,6 +5460,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #glove-detail-view.roaring-active .gtbadge-robux,
 #glove-detail-view.roaring-active .gtbadge-logro,
 #glove-detail-view.roaring-active .gtbadge-otro,
+#glove-detail-view.roaring-active .gtbadge-staff,
 #glove-detail-view.roaring-active .glove-status-pill,
 #glove-detail-view.roaring-active [class^="gstatus-"],
 #glove-detail-view.roaring-active [class*=" gstatus-"] {
@@ -6574,11 +7025,54 @@ input[type="range"].slap-volume::-moz-range-track {
   </button>
 </div>
 <div style="text-align:center;padding:4px 0 0;">
-  <button id="btn-reset" onclick="resetAllProgress()">🗑️ Resetear todo el progreso</button>
+  <button id="btn-reset" onclick="openResetNuke()">🗑️ Resetear todo el progreso</button>
 </div>
 
 <!-- Toast de guardado -->
 <div id="save-toast">💾 Guardado</div>
+
+<!-- ========================================================
+     RESET NUKE OVERLAY — confirmación de borrado total
+     ======================================================== -->
+<div id="reset-nuke-overlay">
+  <div id="reset-nuke-modal">
+    <div id="reset-nuke-header">
+      <h2>🗑️ RESETEAR PROGRESO</h2>
+      <button id="btn-close-reset-nuke" onclick="closeResetNuke()" title="Cancelar">✕</button>
+    </div>
+    <div id="reset-nuke-body">
+      <div class="reset-nuke-warning-icon">⚠️</div>
+      <div class="reset-nuke-text">
+        Esta acción es <strong style="color:var(--red-close)">permanente e irreversible</strong>.<br>
+        Se borrará todo lo siguiente:
+      </div>
+      <div class="reset-nuke-list">
+        <div class="reset-nuke-list-item">
+          <span class="rni-icon">⚔️</span>
+          <span>Maestrías completadas, misiones y contadores</span>
+        </div>
+        <div class="reset-nuke-list-item">
+          <span class="rni-icon">🥊</span>
+          <span>Guantes marcados como obtenidos</span>
+        </div>
+        <div class="reset-nuke-list-item">
+          <span class="rni-icon">📆</span>
+          <span>Historial completo del diario</span>
+        </div>
+      </div>
+    </div>
+    <div id="reset-nuke-footer">
+      <div id="reset-nuke-countdown">Mantén el botón para confirmar</div>
+      <button id="btn-nuke-confirm"
+        onmousedown="nukeHoldStart()" onmouseup="nukeHoldEnd()" onmouseleave="nukeHoldEnd()"
+        ontouchstart="nukeHoldStart();event.preventDefault()" ontouchend="nukeHoldEnd()" ontouchcancel="nukeHoldEnd()">
+        <div id="btn-nuke-confirm-fill"></div>
+        <span id="btn-nuke-confirm-label">🗑️ Mantén para borrar todo (5s)</span>
+      </button>
+      <button id="btn-nuke-cancel" onclick="closeResetNuke()">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ========================================================
      GRID VIEW
@@ -6607,18 +7101,64 @@ input[type="range"].slap-volume::-moz-range-track {
 
   <!-- ── Página real de guantes ── -->
   <div id="gloves-page" style="display:block">
-    <!-- Buscador + filtros de tipo -->
+    <!-- Buscador + filtros -->
     <div id="gloves-search-bar-wrap">
       <input type="text" id="gloves-search-input" placeholder="🔍  Buscar guante..." oninput="renderGlovesGrid()" autocomplete="off">
     </div>
-    <div id="gloves-filter-bar">
-      <button class="gtype-filter active" data-type="all"      onclick="setGlovesFilter('all')">✨ Todos<span class="gtype-count" id="gtcount-all"></span></button>
-      <button class="gtype-filter"        data-type="slaps"    onclick="setGlovesFilter('slaps')">👋 Slaps<span class="gtype-count" id="gtcount-slaps"></span></button>
-      <button class="gtype-filter"        data-type="robux"    onclick="setGlovesFilter('robux')">💎 Robux<span class="gtype-count" id="gtcount-robux"></span></button>
-      <button class="gtype-filter"        data-type="logro"    onclick="setGlovesFilter('logro')">🏅 Logro<span class="gtype-count" id="gtcount-logro"></span></button>
-      <button class="gtype-filter"        data-type="otro"     onclick="setGlovesFilter('otro')">🔮 Otro<span class="gtype-count" id="gtcount-otro"></span></button>
-      <button class="gtype-filter"        data-type="owned"    onclick="setGlovesFilter('owned')">✅ Obtenidos<span class="gtype-count" id="gtcount-owned"></span></button>
-      <button class="gtype-filter"        data-type="notowned" onclick="setGlovesFilter('notowned')">❌ Pendientes<span class="gtype-count" id="gtcount-notowned"></span></button>
+    <div id="gloves-filter-wrap">
+      <button id="gloves-filter-toggle-btn" onclick="toggleGlovesFilterMenu(event)">
+        🧰 Filtros
+        <span class="gloves-filter-chevron">▾</span>
+      </button>
+      <span id="gloves-filter-summary"></span>
+
+      <div id="gloves-filter-menu">
+        <div class="gfm-header">
+          <span>🧰 Filtros</span>
+          <button class="gfm-reset" onclick="resetGlovesFilters()">↺ Restablecer</button>
+        </div>
+
+        <div class="gfm-section">
+          <div class="gfm-section-title">Tipo de guante</div>
+          <div class="gfm-chip-row">
+            <label class="gfm-chip" data-val="slaps"><input type="checkbox" data-cat="type" data-val="slaps" checked onchange="toggleGloveFilterValue(this)">👋 Slaps<span class="gfm-count" id="gfcount-type-slaps"></span></label>
+            <label class="gfm-chip" data-val="robux"><input type="checkbox" data-cat="type" data-val="robux" checked onchange="toggleGloveFilterValue(this)">💎 Robux<span class="gfm-count" id="gfcount-type-robux"></span></label>
+            <label class="gfm-chip" data-val="logro"><input type="checkbox" data-cat="type" data-val="logro" checked onchange="toggleGloveFilterValue(this)">🏅 Logro<span class="gfm-count" id="gfcount-type-logro"></span></label>
+            <label class="gfm-chip" data-val="otro"><input type="checkbox" data-cat="type" data-val="otro" checked onchange="toggleGloveFilterValue(this)">🔮 Otro<span class="gfm-count" id="gfcount-type-otro"></span></label>
+            <label class="gfm-chip" data-val="staff"><input type="checkbox" data-cat="type" data-val="staff" onchange="toggleGloveFilterValue(this)">🟣 Staff-only<span class="gfm-count" id="gfcount-type-staff"></span></label>
+          </div>
+        </div>
+
+        <div class="gfm-section">
+          <div class="gfm-section-title">Disponibilidad</div>
+          <div class="gfm-chip-row">
+            <label class="gfm-chip" data-val="normal"><input type="checkbox" data-cat="status" data-val="normal" checked onchange="toggleGloveFilterValue(this)">⚪ Normal<span class="gfm-count" id="gfcount-status-normal"></span></label>
+            <label class="gfm-chip" data-val="scavenger"><input type="checkbox" data-cat="status" data-val="scavenger" checked onchange="toggleGloveFilterValue(this)">🔎 Escondido<span class="gfm-count" id="gfcount-status-scavenger"></span></label>
+            <label class="gfm-chip" data-val="unobtainable"><input type="checkbox" data-cat="status" data-val="unobtainable" checked onchange="toggleGloveFilterValue(this)">🔴 No disponible<span class="gfm-count" id="gfcount-status-unobtainable"></span></label>
+            <label class="gfm-chip" data-val="halloween"><input type="checkbox" data-cat="status" data-val="halloween" checked onchange="toggleGloveFilterValue(this)">🎃 Halloween<span class="gfm-count" id="gfcount-status-halloween"></span></label>
+            <label class="gfm-chip" data-val="christmas"><input type="checkbox" data-cat="status" data-val="christmas" checked onchange="toggleGloveFilterValue(this)">🎄 Navidad<span class="gfm-count" id="gfcount-status-christmas"></span></label>
+          </div>
+        </div>
+
+        <div class="gfm-section">
+          <div class="gfm-section-title">Propiedad</div>
+          <div class="gfm-chip-row">
+            <label class="gfm-chip" data-val="owned"><input type="checkbox" data-cat="owner" data-val="owned" checked onchange="toggleGloveFilterValue(this)">✅ Obtenidos<span class="gfm-count" id="gfcount-owner-owned"></span></label>
+            <label class="gfm-chip" data-val="notowned"><input type="checkbox" data-cat="owner" data-val="notowned" checked onchange="toggleGloveFilterValue(this)">❌ Pendientes<span class="gfm-count" id="gfcount-owner-notowned"></span></label>
+          </div>
+        </div>
+
+        <div class="gfm-section">
+          <div class="gfm-section-title">Extra</div>
+          <div class="gfm-chip-row">
+            <label class="gfm-chip"><input type="checkbox" id="gfm-show-locked" checked onchange="toggleGlovesShowLocked(this)">🔒 Incluir bloqueados<span class="gfm-count" id="gfcount-locked"></span></label>
+          </div>
+        </div>
+
+        <div class="gfm-footer">
+          <button class="gfm-close-btn" onclick="toggleGlovesFilterMenu(event)">Cerrar</button>
+        </div>
+      </div>
     </div>
 
     <!-- Grid de tarjetas -->
@@ -6710,6 +7250,10 @@ input[type="range"].slap-volume::-moz-range-track {
           </div>
         </div>
       </div>
+      <!-- Botón ir al guante normal (solo visible en guantes staff con baseId válido) -->
+      <button id="btn-glove-detail-go-base" style="display:none;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:9px 14px;background:#1f0a33;border:1.5px solid #a855f7;border-radius:10px;color:#d8b4fe;font-family:'Fredoka',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,color .15s;" onmouseenter="this.style.background='#2d0f4a';this.style.borderColor='#FFD700';this.style.color='#FFD700';" onmouseleave="this.style.background='#1f0a33';this.style.borderColor='#a855f7';this.style.color='#d8b4fe';">
+        🥊 Ver guante normal
+      </button>
     </div>
 
     <!-- RIGHT -->
@@ -6876,6 +7420,11 @@ input[type="range"].slap-volume::-moz-range-track {
 <div id="roblox-check-overlay" onclick="if(event.target===this)closeRobloxCheck()">
   <div id="roblox-check-modal">
     <h2>🏅 Comprobar logros en Roblox</h2>
+    <div id="rcr-mode-bar">
+      <button class="rcr-mode-btn active" data-mode="gloves"     onclick="setRcrMode('gloves')">🧤 Guantes de Badge</button>
+      <button class="rcr-mode-btn"        data-mode="badges"     onclick="setRcrMode('badges')">🏷️ Badges sin Guante</button>
+      <button class="rcr-mode-btn"        data-mode="gamepasses" onclick="setRcrMode('gamepasses')">💎 Gamepasses</button>
+    </div>
     <div id="roblox-check-input-row">
       <input id="roblox-username-input" type="text" placeholder="Nombre de usuario de Roblox…"
              onkeydown="if(event.key==='Enter')submitRobloxCheck()"
@@ -6892,9 +7441,9 @@ input[type="range"].slap-volume::-moz-range-track {
       </div>
       <div id="rcr-filter-bar">
         <button class="rcr-filter-btn active" data-filter="all"      onclick="setRcrFilter('all')">✨ Todos</button>
-        <button class="rcr-filter-btn complete" data-filter="complete" onclick="setRcrFilter('complete')">✅ Completos</button>
-        <button class="rcr-filter-btn partial"  data-filter="partial"  onclick="setRcrFilter('partial')">⚠️ Parciales</button>
-        <button class="rcr-filter-btn pending"  data-filter="pending"  onclick="setRcrFilter('pending')">❌ Pendientes</button>
+        <button id="rcr-filter-complete-btn" class="rcr-filter-btn complete" data-filter="complete" onclick="setRcrFilter('complete')">✅ Completos</button>
+        <button id="rcr-filter-partial-btn"  class="rcr-filter-btn partial"  data-filter="partial"  onclick="setRcrFilter('partial')">⚠️ Parciales</button>
+        <button id="rcr-filter-pending-btn"  class="rcr-filter-btn pending"  data-filter="pending"  onclick="setRcrFilter('pending')">❌ Pendientes</button>
       </div>
     </div>
     <div id="rcr-rows-container" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -7346,6 +7895,19 @@ input[type="range"].slap-volume::-moz-range-track {
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
+  {
+    version: "1.2.4 - DETECCIÓN DE GAMEPASSES Y MAS LOGROS",
+    date: "27/06/2026",
+    entries: [
+      { emoji: "🥊", color: "#11ffff", text: "Mas guantes de slaps hasta Shuckuchi"},
+      { emoji: "🎖️", color: "#FFD700", text: "Ahora puedes ver los logros que no otorgan guantes y gamepasses"},
+      { emoji: "✅", color: "#39ff14", text: "Puedes marcar Acrobat como completado de forma manual."},
+      { emoji: "🔎", color: "#a78bfa", text: "Filtros mejorados"},
+      { emoji: "🗑️", color: "#FF0000", text: "Ahora resetear todo el progreso tiene un mejor estilo visual y resetea TODO"},
+      { emoji: "💬", color: "#917A7A", text: "Si una persona no tiene ni un logro, te aparece un mensaje explicandote como ponerte el inventario en publico por si ese es el problema"},
+    ]
+  },
+  
   {
     version: "1.2.31 - MINI UPDATE TRAS LOS LOGROS",
     date: "27/06/2026",
@@ -9044,8 +9606,107 @@ function saveHiddenMasteries() {
   } catch(e) { console.warn('No se pudo guardar maestrías ocultas:', e); }
 }
 
+/* ============================================================
+   RESET NUKE MODAL — lógica de apertura, cierre y hold-confirm
+   ============================================================ */
+let _nukeHoldTimer    = null;
+let _nukeHoldInterval = null;
+let _nukeHolding      = false;
+
+function openResetNuke() {
+  const overlay = document.getElementById('reset-nuke-overlay');
+  if (!overlay) return;
+  overlay.classList.add('open');
+  _resetNukeBtn();
+  updateFabVisibility();
+  // Close on backdrop click
+  overlay.addEventListener('mousedown', _nukeBackdropClose);
+}
+
+function closeResetNuke() {
+  const overlay = document.getElementById('reset-nuke-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  overlay.removeEventListener('mousedown', _nukeBackdropClose);
+  _cancelNukeHold();
+  _resetNukeBtn();
+  updateFabVisibility();
+}
+
+function _nukeBackdropClose(e) {
+  if (e.target === document.getElementById('reset-nuke-overlay')) closeResetNuke();
+}
+
+function _resetNukeBtn() {
+  const fill  = document.getElementById('btn-nuke-confirm-fill');
+  const label = document.getElementById('btn-nuke-confirm-label');
+  const count = document.getElementById('reset-nuke-countdown');
+  const btn   = document.getElementById('btn-nuke-confirm');
+  if (fill)  { fill.style.transition = 'none'; fill.style.width = '0%'; fill.classList.remove('filling'); }
+  if (label) label.textContent = '🗑️ Mantén para borrar todo (5s)';
+  if (count) { count.textContent = 'Mantén el botón para confirmar'; count.classList.remove('active'); }
+  if (btn)   btn.classList.remove('done');
+}
+
+function _cancelNukeHold() {
+  clearTimeout(_nukeHoldTimer);
+  clearInterval(_nukeHoldInterval);
+  _nukeHoldTimer = null;
+  _nukeHoldInterval = null;
+  _nukeHolding = false;
+}
+
+function nukeHoldStart() {
+  if (_nukeHolding) return;
+  _nukeHolding = true;
+  const DURATION = 5000; // ms
+  const fill  = document.getElementById('btn-nuke-confirm-fill');
+  const label = document.getElementById('btn-nuke-confirm-label');
+  const count = document.getElementById('reset-nuke-countdown');
+  const btn   = document.getElementById('btn-nuke-confirm');
+  const start = Date.now();
+
+  if (fill) {
+    fill.style.transition = 'none';
+    fill.style.width = '0%';
+    // force reflow so transition kicks in fresh
+    void fill.offsetWidth;
+    fill.classList.add('filling');
+    fill.style.transition = `width ${DURATION}ms linear`;
+    fill.style.width = '100%';
+  }
+
+  _nukeHoldInterval = setInterval(() => {
+    const elapsed = Date.now() - start;
+    const remaining = Math.max(0, Math.ceil((DURATION - elapsed) / 1000));
+    if (count) {
+      count.classList.add('active');
+      count.textContent = remaining > 0 ? `Suelta para cancelar · ${remaining}s` : '¡Soltando ahora!';
+    }
+    if (label) label.textContent = `⏳ Borrando en ${Math.max(0, remaining)}s…`;
+  }, 100);
+
+  _nukeHoldTimer = setTimeout(() => {
+    clearInterval(_nukeHoldInterval);
+    if (!_nukeHolding) return;
+    if (btn)   btn.classList.add('done');
+    if (label) label.textContent = '✅ ¡Borrando todo!';
+    if (count) { count.textContent = ''; count.classList.remove('active'); }
+    setTimeout(() => {
+      closeResetNuke();
+      resetAllProgress();
+    }, 350);
+  }, DURATION);
+}
+
+function nukeHoldEnd() {
+  if (!_nukeHolding) return;
+  _cancelNukeHold();
+  _resetNukeBtn();
+}
+
 function resetAllProgress() {
-  if (!confirm('¿Seguro que quieres borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
+  // ── Maestrías ──
   progressData = {};
   completedSet.clear();
   completedAtMap = {};
@@ -9057,7 +9718,23 @@ function resetAllProgress() {
   saveProgress();
   saveHiddenMasteries();
   renderGrid(document.getElementById('search-input').value);
-  showToast('🗑️ Progreso reseteado');
+
+  // ── Guantes ──
+  ownedGlovesSet.clear();
+  saveOwnedGloves();
+  document.querySelectorAll('.glove-card.owned').forEach(card => card.classList.remove('owned'));
+  updateGloveFilterCounts();
+  if (glovesOwnerFilterRestrictive()) renderGlovesGrid();
+
+  // ── Diario ──
+  diaryData = {};
+  saveDiary();
+  if (document.getElementById('calendar-view')?.style.display !== 'none') {
+    renderCalendar();
+    calCloseDetail();
+  }
+
+  showToast('🗑️ Todo el progreso reseteado');
 }
 
 /* ============================================================
@@ -11873,10 +12550,42 @@ function calGoToday() {
 /* Contraseña de acceso */
 const GLOVES_PASSWORD = 'andynicoemilio';
 let glovesUnlocked = false;
-let glovesTypeFilter = 'all';
 let gloveDetailOpen = null;
 
-/* ── Tipos:  slaps | robux | logro | otro ── */
+/* ── Tipos:  slaps | robux | logro | otro | staff ── */
+/* ── Tipo especial "staff" ──────────────────────────────────────
+   type: 'staff'  →  Guante exclusivo del equipo de Staff. Es una variante
+   "secreta" de un guante normal (de tipo slaps, robux, logro u otro) que
+   reutiliza sus imágenes. Funciona distinto al resto de tipos:
+
+     baseId   : string (OBLIGATORIO en type:'staff') — el id del guante
+                normal cuyas imágenes se van a reutilizar. El banner de la
+                tarjeta/detalle usa default_(baseId).png — EXACTAMENTE el
+                mismo archivo que el guante normal. Sin embargo, la imagen
+                del guante en el detalle usa defglove_(id).png, es decir,
+                el ID PROPIO del guante staff (no baseId), por lo que sí
+                puede tener su propio archivo de guante diferenciado.
+     id       : sigue siendo obligatorio y debe ser ÚNICO (no reutilizar el
+                id del guante normal). Convención recomendada: id del
+                original + "_staff" (ej: 'spin_staff').
+     baseType : 'slaps' | 'robux' | 'logro' | 'otro'  (opcional, solo
+                informativo/documentación) — de qué tipo era el guante
+                original del que deriva este Staff-only.
+     obtainMethod : string — al igual que en type:'otro', es el único campo
+                que se usa para describir cómo se obtiene (normalmente algo
+                como "Exclusivo del equipo de Staff, no obtenible por
+                jugadores."). No se muestran precios/badges/gamepasses para
+                este tipo, ya que conceptualmente no se "compran" ni se
+                "ganan" de forma normal.
+     mastery vinculada: si quieres que el botón "⚔️ Ver maestría" de la
+                tarjeta lleve a la MISMA maestría que el guante normal, no
+                tienes que hacer nada extra: ya se busca automáticamente
+                usando baseId en vez de id.
+
+   FILTROS: por defecto, el tipo "staff" empieza DESMARCADO en el menú de
+   filtros (todos los demás tipos empiezan marcados). Esto hace que los
+   guantes de Staff-only estén "ocultos" / sean secretos hasta que alguien
+   activa manualmente esa casilla en el menú de filtros. ── */
 /* ── Campos NUEVOS y OPCIONALES (déjalos fuera si no los usas, no rompen nada):
      quote       : string   — frase corta a modo de cita (se ve como bocadillo)
      releaseDate : string   — fecha de lanzamiento, ej: '11/08/2023'
@@ -11954,6 +12663,29 @@ const GLOVES = [
     tutorialUrl: null,
     songs: null,
   },
+
+  {
+    id: 'defaultbad',
+    name: 'Default but Bad',
+    type: 'slaps',
+    cost: 0,              // en slaps
+    quote: 'El guante que has elegido a voluntad propia por algún motivo.',
+    releaseDate: '03/04/2026',
+    power: 1,                 // 1-5, opcional
+    speed: 2,                 // 1-5, opcional
+    mechanics: [
+      'El guante no otorga slaps.',
+      "No hay ningún motivo en absoluto para usar esto si no es para molestar."
+    ],
+    abilities: [
+      '[E] lol: Lanza un pedo que te ralentiza considerablemente. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: {
+      "Meatball parade": {id: "meatballparade", roblox: "131533591074605"}
+    },
+    misc: true
+  },
   
   {
     id: 'stick',
@@ -11974,6 +12706,94 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: null,
+  },
+
+  {
+    id: 'diamond',
+    name: 'Diamond',
+    type: 'slaps',
+    cost: 15,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'zzz',
+    name: 'ZZZZZZZ',
+    type: 'slaps',
+    cost: 25,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'extended',
+    name: 'Extended',
+    type: 'slaps',
+    cost: 30,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'dual',
+    name: 'Dual',
+    type: 'slaps',
+    cost: 40,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
   },
 
   {
@@ -11998,6 +12818,50 @@ const GLOVES = [
   },
 
   {
+    id: 'snow',
+    name: 'Snow',
+    type: 'slaps',
+    cost: 85,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'pull',
+    name: 'Pull',
+    type: 'slaps',
+    cost: 125,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
     id: 'flash',
     name: 'Flash',
     type: 'slaps',
@@ -12014,6 +12878,270 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: null,
+  },
+
+  {
+    id: 'stilts',
+    name: 'Stilts',
+    type: 'slaps',
+    cost: 200,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'spring',
+    name: 'Spring',
+    type: 'slaps',
+    cost: 250,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'pinwheel',
+    name: 'Pinwheel',
+    type: 'slaps',
+    cost: 300,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'swapper',
+    name: 'Swapper',
+    type: 'slaps',
+    cost: 350,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'screwdriver',
+    name: 'Screwdriver',
+    type: 'slaps',
+    cost: 400,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'bull',
+    name: 'Bull',
+    type: 'slaps',
+    cost: 475,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'dice',
+    name: 'Dice',
+    type: 'slaps',
+    cost: 585,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'ghost',
+    name: 'Ghost',
+    type: 'slaps',
+    cost: 666,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'thanos',
+    name: 'Thanos',
+    type: 'slaps',
+    cost: 795,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'stun',
+    name: 'Stun',
+    type: 'slaps',
+    cost: 870,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'lolbomb',
+    name: 'L.O.L.B.O.M.B',
+    type: 'slaps',
+    cost: 925,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'zahando',
+    name: 'Za Hando',
+    type: 'slaps',
+    cost: 1000,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
   },
 
   {
@@ -12038,6 +13166,72 @@ const GLOVES = [
   },
 
   {
+    id: 'magnet',
+    name: 'Magnet',
+    type: 'slaps',
+    cost: 1125,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'pusher',
+    name: 'Pusher',
+    type: 'slaps',
+    cost: 1250,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'anchor',
+    name: 'Anchor',
+    type: 'slaps',
+    cost: 1350,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
     id: 'space',
     name: 'Space',
     type: 'slaps',
@@ -12056,6 +13250,160 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: null,
+  },
+
+  {
+    id: 'boomerang',
+    name: 'Boomerang',
+    type: 'slaps',
+    cost: 1625,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'speedrun',
+    name: 'Speedrun',
+    type: 'slaps',
+    cost: 1750,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'mail',
+    name: 'Mail',
+    type: 'slaps',
+    cost: 2000,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'thick',
+    name: 'T H I C K',
+    type: 'slaps',
+    cost: 2250,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'golden',
+    name: 'Golden',
+    type: 'slaps',
+    cost: 2500,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'squid',
+    name: 'Squid',
+    type: 'slaps',
+    cost: 2750,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'mr',
+    name: 'MR',
+    type: 'slaps',
+    cost: 3000,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
   },
 
   {
@@ -12078,6 +13426,116 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: null,
+  },
+
+  {
+    id: 'reaper',
+    name: 'Reaper',
+    type: 'slaps',
+    cost: 3500,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'baby',
+    name: 'Baby',
+    type: 'slaps',
+    cost: 3750,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'replica',
+    name: 'Replica',
+    type: 'slaps',
+    cost: 4000,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'mace',
+    name: 'Mace',
+    type: 'slaps',
+    cost: 4250,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'offense',
+    name: 'Offense',
+    type: 'slaps',
+    cost: 4500,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
   },
 
   {
@@ -12148,6 +13606,72 @@ const GLOVES = [
       'True Love [Metal Remix]':   { id: 'truelove',             roblox: '9133539469', info: "Fase de 250 kills" },
       'Threats of The Ocean Floor':{ id: 'threatsoceanfloor',    roblox: '17755766444', info: "Fase de 1000 kills" },
     },
+  },
+
+  {
+    id: 'pineslapple',
+    name: 'Pineslapple',
+    type: 'slaps',
+    cost: 5250,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'reverse',
+    name: 'Reverse',
+    type: 'slaps',
+    cost: 5500,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'shukuchi',
+    name: 'Shukuchi',
+    type: 'slaps',
+    cost: 6000,              // en slaps
+    quote: 'Nunca pises un ladrillo.',
+    releaseDate: '04/06/2021',
+    power: 40,                 // 1-5, opcional
+    speed: 14,                 // 1-5, opcional
+    mechanics: [
+      'Los ladrillos hacen que la gente se caiga durante 4 segundos.',
+      'Con suficiente técnica puedes lanzar los ladrillos.',
+      "El guante tiene un contador de ladrillos para conseguir el guante Trap."
+    ],
+    abilities: [
+      '[E] Litter Trap: Suelta un ladrillo. (5s cooldown)',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
   },
 
   {
@@ -12295,7 +13819,7 @@ const GLOVES = [
     id: 'comingsoonglove',
     name: "Proximamente (03/07/2026)",
     type: 'slaps',
-    cost: 0,
+    cost: 999999999,
     quote: '¿Bombas rellenas de polvo estelar? Vaya idea más horrible.',
     releaseDate: '03/07/2026',
     power: 50,
@@ -12341,7 +13865,59 @@ const GLOVES = [
     },
     misc: true
   },
-  
+
+  {
+    id: 'spectator',
+    name: 'Spectator',
+    type: 'robux',
+    cost: 113,            // en robux
+    quote: "'Se teletransporta detrás de ti' Nada personal, niño.",
+    power: 60,
+    speed: 20,
+    mechanics: [
+      'El guante tiene velocidad de slap infinito.',
+      'Cada slap rellena tu barra de esquive.',
+      "Cada vez que te golpeen, si tienes parte de tu barra rellenada, esquivarás el golpe."
+    ],
+    abilities: [
+      '[E] Aura farming: Desprendes aura y te teletransportas detrás de tu enemigo si te pegan. (2s cooldown / 6s si se falla).',
+    ],
+    gamepasses: [
+      { name: 'Spectator', url: 'https://www.roblox.com/game-pass/19150776/Spectator' },
+      // Puedes añadir más gamepasses aquí, ej:
+      // { name: 'Otro Gamepass', url: 'https://www.roblox.com/game-pass/XXXX/Otro-Gamepass' },
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'custom',
+    name: 'Custom',
+    type: 'robux',
+    cost: 394,            // en robux
+    quote: "'Se teletransporta detrás de ti' Nada personal, niño.",
+    power: 60,
+    speed: 20,
+    mechanics: [
+      'El guante tiene velocidad de slap infinito.',
+      'Cada slap rellena tu barra de esquive.',
+      "Cada vez que te golpeen, si tienes parte de tu barra rellenada, esquivarás el golpe."
+    ],
+    abilities: [
+      '[E] Aura farming: Desprendes aura y te teletransportas detrás de tu enemigo si te pegan. (2s cooldown / 6s si se falla).',
+    ],
+    gamepasses: [
+      { name: 'CUSTOM GLOVE', url: 'https://www.roblox.com/game-pass/33742082/CUSTOM-GLOVE' },
+      // Puedes añadir más gamepasses aquí, ej:
+      // { name: 'Otro Gamepass', url: 'https://www.roblox.com/game-pass/XXXX/Otro-Gamepass' },
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
   {
     id: 'ultrainstinct',
     name: 'Ultra Instinct',
@@ -12365,6 +13941,32 @@ const GLOVES = [
     ],
     tutorialUrl: null,
     songs: null,
+  },
+
+  {
+    id: 'titan',
+    name: 'Titan',
+    type: 'robux',
+    cost: 299,            // en robux
+    quote: "'Se teletransporta detrás de ti' Nada personal, niño.",
+    power: 60,
+    speed: 20,
+    mechanics: [
+      'El guante tiene velocidad de slap infinito.',
+      'Cada slap rellena tu barra de esquive.',
+      "Cada vez que te golpeen, si tienes parte de tu barra rellenada, esquivarás el golpe."
+    ],
+    abilities: [
+      '[E] Aura farming: Desprendes aura y te teletransportas detrás de tu enemigo si te pegan. (2s cooldown / 6s si se falla).',
+    ],
+    gamepasses: [
+      { name: 'VIP!', url: 'https://www.roblox.com/upgrades/redeem?ap=0&subscriptionTargetKey=EXP-7712167342386184309' },
+      // Puedes añadir más gamepasses aquí, ej:
+      // { name: 'Otro Gamepass', url: 'https://www.roblox.com/game-pass/XXXX/Otro-Gamepass' },
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
   },
 
   /* ── EJEMPLO TIPO: LOGRO (admite 1 o varios badges) ── */
@@ -12455,6 +14057,7 @@ const GLOVES = [
     id: 'hallowjack',
     name: 'Hallow Jack',
     type: 'logro',
+    status: "halloween",
     obtainMethod: 'Entra a la dimensión de [REDACTED] y escapa sin morir.',
     badges: [
       { name: "Jack's will", url: 'https://www.roblox.com/badges/2124836318' },
@@ -12535,6 +14138,7 @@ const GLOVES = [
     id: 'mitten',
     name: 'Mitten',
     type: 'logro',
+    status: "christmas",
     obtainMethod: 'Entra a la dimensión de [REDACTED] y escapa sin morir.',
     badges: [
       { name: "Lucky Gift", url: 'https://www.roblox.com/badges/2124875920' },
@@ -13163,6 +14767,7 @@ const GLOVES = [
     id: 'rattlebones',
     name: 'Rattlebones',
     type: 'logro',
+    status: "halloween",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: 'Candy King', url: 'https://www.roblox.com/badges/2128772719/Candy-King' },
@@ -13308,6 +14913,7 @@ const GLOVES = [
     id: 'snowball',
     name: 'Snowball',
     type: 'logro',
+    status: "christmas",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "Engineer's Gift", url: 'https://www.roblox.com/badges/2129648848/Engineers-Gift' },
@@ -14050,6 +15656,7 @@ const GLOVES = [
     id: 'necromancer',
     name: 'Necromancer',
     type: 'logro',
+    status: "halloween",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "Sweet-Tooth Sovereign", url: 'https://www.roblox.com/badges/2152906832/Sweet-Tooth-Sovereign' },
@@ -14180,6 +15787,7 @@ const GLOVES = [
     id: 'santa',
     name: 'Santa',
     type: 'logro',
+    status: "christmas",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "Yuletime Might", url: 'https://www.roblox.com/badges/2895206704788569/Yuletime-Might' },
@@ -14861,6 +16469,7 @@ const GLOVES = [
     id: 'poltergeist',
     name: "Poltergeist",
     type: 'logro',
+    status: "halloween",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "Fetch me their Souls", url: 'https://www.roblox.com/badges/868768988664040/Fetch-me-their-Souls' },
@@ -14991,6 +16600,7 @@ const GLOVES = [
     id: 'jerry',
     name: "Jerry",
     type: 'logro',
+    status: "christmas",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "Snow man left behind", url: 'https://www.roblox.com/badges/182408299845710/Snow-man-left-behind' },
@@ -15599,6 +17209,7 @@ const GLOVES = [
     id: 'harvester',
     name: "Harvester",
     type: 'logro',
+    status: "halloween",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "The Cornfeared", url: 'https://www.roblox.com/badges/847759908824783/The-Cornfeared' },
@@ -15703,6 +17314,7 @@ const GLOVES = [
     id: 'elf',
     name: "Elf",
     type: 'logro',
+    status: "christmas",
     obtainMethod: 'Teletranspórtate con Warp al mismo tiempo que mueres por el vacío.',
     badges: [
       { name: "Snowball Synergy", url: 'https://www.roblox.com/badges/2748677045206815/Snowball-Synergy' },
@@ -16115,6 +17727,67 @@ const GLOVES = [
     songs: null,
   },
 
+  /* ── EJEMPLO TIPO: STAFF ── */
+  {
+    id: 'barzil',
+    name: 'Barzil',
+    type: 'staff',
+    baseId: null,          // banner: default_killstreak.png (baseId); imagen guante: defglove_<id_staff>.png (id propio)
+    baseType: 'slaps',       // solo informativo: de qué tipo era el original
+    quote: 'Llegar a la fase de las 250 kills cuesta mucho, así que es mejor saltárselo.',
+    releaseDate: '01/07/2021',
+    obtainMethod: 'Exclusivo del equipo de Staff. No obtenible por jugadores normales.',
+    power: 999,
+    speed: 16,
+    mechanics: [
+      "edgelord es la versión de Staff de Killstreak, actuando como una versión mejorada y sin cooldown de la fase de 250 kills.",
+      'Mientras tienes edgelord equipado, no hay guante, ya que te activa las habilidades automáticamente.',
+      "edgelord tiene su propia aura glicheada y música; ambas se pueden desactivar con su propia habilidad.",
+      "edgelord solo se puede usar correctamente con un teclado, ya que no tiene soporte ni para móviles ni para consolas.",
+      "Telekinesis puede ragdolear a CUALQUIER persona, siendo el único guante capaz de ragdolear los avatares de Avatar.",
+      "Eres inmune a cualquier tipo de golpe o knockback.",
+      "Debido a su invencibilidad, no puede morir de NINGUNA forma, teniendo que cambiarse de guante forzosamente para volverse vulnerable."
+
+    ],
+    abilities: [
+      '[E] Telekinesis: Lanza volando a quien esté delante de ti. (0s cooldown)',
+      "[T] Teleportation: Te teletransporta a donde esté el cursor. (0s cooldown)",
+      "[F] Activatable aura and music: Activa/desactiva el aura y la música del guante. (0s cooldown)"
+    ],
+    tutorialUrl: null,
+    songs: null,
+  },
+  
+  {
+    id: 'edgelord',
+    name: 'edgelord',
+    type: 'staff',
+    baseId: 'killstreak',          // banner: default_killstreak.png (baseId); imagen guante: defglove_<id_staff>.png (id propio)
+    baseType: 'slaps',       // solo informativo: de qué tipo era el original
+    quote: 'Llegar a la fase de las 250 kills cuesta mucho, así que es mejor saltárselo.',
+    releaseDate: '01/07/2021',
+    obtainMethod: 'Exclusivo del equipo de Staff. No obtenible por jugadores normales.',
+    power: 100,
+    speed: 0,
+    mechanics: [
+      "edgelord es la versión de Staff de Killstreak, actuando como una versión mejorada y sin cooldown de la fase de 250 kills.",
+      'Mientras tienes edgelord equipado, no hay guante, ya que te activa las habilidades automáticamente.',
+      "edgelord tiene su propia aura glicheada y música; ambas se pueden desactivar con su propia habilidad.",
+      "edgelord solo se puede usar correctamente con un teclado, ya que no tiene soporte ni para móviles ni para consolas.",
+      "Telekinesis puede ragdolear a CUALQUIER persona, siendo el único guante capaz de ragdolear los avatares de Avatar.",
+      "Eres inmune a cualquier tipo de golpe o knockback.",
+      "Debido a su invencibilidad, no puede morir de NINGUNA forma, teniendo que cambiarse de guante forzosamente para volverse vulnerable."
+
+    ],
+    abilities: [
+      '[E] Telekinesis: Lanza volando a quien esté delante de ti. (0s cooldown)',
+      "[T] Teleportation: Te teletransporta a donde esté el cursor. (0s cooldown)",
+      "[F] Activatable aura and music: Activa/desactiva el aura y la música del guante. (0s cooldown)"
+    ],
+    tutorialUrl: null,
+    songs: null,
+  },
+
 ];
 
 
@@ -16180,10 +17853,11 @@ const EXTRA_ALBUMS = [
 
 /* ── Tipos: metadatos visuales ── */
 const GLOVE_TYPE_META = {
-  slaps: { label: '👋 Slaps',  badgeClass: 'gtbadge-slaps', ribbonClass: 'gribbon-slaps', obtainLabel: '💰 PRECIO (SLAPS)' },
-  robux: { label: '💎 Robux',  badgeClass: 'gtbadge-robux', ribbonClass: 'gribbon-robux', obtainLabel: '💎 PRECIO (ROBUX)' },
-  logro: { label: '🏅 Logro',  badgeClass: 'gtbadge-logro', ribbonClass: 'gribbon-logro', obtainLabel: '🏅 MÉTODO DE OBTENCIÓN' },
-  otro:  { label: '🔮 Otro',   badgeClass: 'gtbadge-otro',  ribbonClass: 'gribbon-otro',  obtainLabel: '🔮 MÉTODO DE OBTENCIÓN' },
+  slaps: { label: '👋 Slaps',      badgeClass: 'gtbadge-slaps', ribbonClass: 'gribbon-slaps', obtainLabel: '💰 PRECIO (SLAPS)' },
+  robux: { label: '💎 Robux',      badgeClass: 'gtbadge-robux', ribbonClass: 'gribbon-robux', obtainLabel: '💎 PRECIO (ROBUX)' },
+  logro: { label: '🏅 Logro',      badgeClass: 'gtbadge-logro', ribbonClass: 'gribbon-logro', obtainLabel: '🏅 MÉTODO DE OBTENCIÓN' },
+  otro:  { label: '🔮 Otro',       badgeClass: 'gtbadge-otro',  ribbonClass: 'gribbon-otro',  obtainLabel: '🔮 MÉTODO DE OBTENCIÓN' },
+  staff: { label: '🟣 Staff-only', badgeClass: 'gtbadge-staff',ribbonClass: 'gribbon-staff', obtainLabel: '🟣 MÉTODO DE OBTENCIÓN' },
 };
 
 /* ── Estados de disponibilidad: metadatos visuales (todos opcionales) ──
@@ -16191,7 +17865,6 @@ const GLOVE_TYPE_META = {
    si glove.status === 'obtainable' simplemente no se muestra ninguna pastilla.
    El antiguo estado genérico "event" se ha separado en halloween / christmas. */
 const GLOVE_STATUS_META = {
-  unobtainable: { label: 'No disponible',      icon: '🔴', cls: 'gstatus-unobtainable' },
   scavenger:    { label: 'Guante Escondido',      icon: '🔎', cls: 'gstatus-scavenger' },
   halloween:    { label: 'Solo en Halloween',   icon: '🎃', cls: 'gstatus-halloween' },
   christmas:    { label: 'Solo en Navidad',     icon: '🎄', cls: 'gstatus-christmas' },
@@ -16230,15 +17903,87 @@ function checkGlovesUnlock() {
 }
 
 /* ============================================================
-   FILTER
+   FILTROS (menú multi-selección)
    ============================================================ */
-function setGlovesFilter(type) {
-  glovesTypeFilter = type;
-  document.querySelectorAll('.gtype-filter').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.type === type);
-  });
-  renderGlovesGrid();
+/* Estado de los filtros. Todo empieza marcado EXCEPTO el tipo 'staff'
+   (los guantes de Staff-only empiezan ocultos, como si fuesen secretos). */
+const glovesFilters = {
+  type:   new Set(['slaps', 'robux', 'logro', 'otro']),
+  status: new Set(['normal', 'scavenger', 'unobtainable', 'halloween', 'christmas']),
+  owner:  new Set(['owned', 'notowned']),
+};
+let glovesShowLocked = true;
+
+/* Devuelve la "clave" de estado de un guante para los filtros:
+   si no tiene status reconocido en GLOVE_STATUS_META, cae en 'normal'. */
+function glovesStatusKey(g) {
+  return (g.status && GLOVE_STATUS_META[g.status]) ? g.status : 'normal';
 }
+
+/* true si el filtro de propiedad NO deja pasar tanto obtenidos como pendientes
+   (se usa para saber si hace falta re-renderizar al marcar/desmarcar "mío") */
+function glovesOwnerFilterRestrictive() {
+  return !(glovesFilters.owner.has('owned') && glovesFilters.owner.has('notowned'));
+}
+
+/* Click en una casilla del menú de filtros (tipo / estado / propiedad) */
+function toggleGloveFilterValue(checkbox) {
+  const cat = checkbox.dataset.cat;
+  const val = checkbox.dataset.val;
+  if (!glovesFilters[cat]) return;
+  if (checkbox.checked) glovesFilters[cat].add(val);
+  else glovesFilters[cat].delete(val);
+  renderGlovesGrid();
+  updateGlovesFilterBadge();
+}
+
+/* Click en la casilla "Incluir bloqueados" */
+function toggleGlovesShowLocked(checkbox) {
+  glovesShowLocked = checkbox.checked;
+  renderGlovesGrid();
+  updateGlovesFilterBadge();
+}
+
+/* Restablece todos los filtros a su estado por defecto */
+function resetGlovesFilters() {
+  glovesFilters.type   = new Set(['slaps', 'robux', 'logro', 'otro']);
+  glovesFilters.status = new Set(['normal', 'scavenger', 'unobtainable', 'halloween', 'christmas']);
+  glovesFilters.owner  = new Set(['owned', 'notowned']);
+  glovesShowLocked = true;
+  syncGlovesFilterCheckboxes();
+  renderGlovesGrid();
+  updateGlovesFilterBadge();
+}
+
+/* Sincroniza las casillas del menú con el estado real de glovesFilters
+   (se usa tras resetGlovesFilters, o al abrir el menú por primera vez) */
+function syncGlovesFilterCheckboxes() {
+  document.querySelectorAll('#gloves-filter-menu input[data-cat]').forEach(inp => {
+    const set = glovesFilters[inp.dataset.cat];
+    inp.checked = !!set && set.has(inp.dataset.val);
+  });
+  const lockedCb = document.getElementById('gfm-show-locked');
+  if (lockedCb) lockedCb.checked = glovesShowLocked;
+}
+
+/* Abre/cierra el menú desplegable de filtros */
+function toggleGlovesFilterMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('gloves-filter-menu');
+  if (!menu) return;
+  menu.classList.toggle('open');
+}
+
+/* Cierra el menú si se hace clic fuera de él */
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('gloves-filter-wrap');
+  const menu = document.getElementById('gloves-filter-menu');
+  if (!wrap || !menu || !menu.classList.contains('open')) return;
+  if (!wrap.contains(e.target)) menu.classList.remove('open');
+});
+
+/* El badge de filtros desactivados fue eliminado; esta función queda vacía */
+function updateGlovesFilterBadge() {}
 
 /* ── Guardar / cargar guantes marcados como "míos" ── */
 function saveOwnedGloves() {
@@ -16264,8 +18009,8 @@ function toggleOwnedGlove(gloveId) {
     btn.textContent = isOwned ? '✅ Mío' : '＋ Marcar como mío';
   });
   updateGloveFilterCounts();
-  // Si el filtro activo es owned/notowned, re-renderizar
-  if (glovesTypeFilter === 'owned' || glovesTypeFilter === 'notowned') renderGlovesGrid();
+  // Si el filtro de propiedad es restrictivo (no deja pasar todo), re-renderizar
+  if (glovesOwnerFilterRestrictive()) renderGlovesGrid();
 }
 
 /* ============================================================
@@ -16278,12 +18023,16 @@ function renderGlovesGrid() {
   grid.innerHTML = '';
 
   updateGloveFilterCounts();
+  updateGlovesFilterBadge();
 
   const query = (document.getElementById('gloves-search-input')?.value || '').toLowerCase().trim();
   const list  = GLOVES.filter(g => {
-    if (glovesTypeFilter === 'owned'    && !ownedGlovesSet.has(g.id)) return false;
-    if (glovesTypeFilter === 'notowned' &&  ownedGlovesSet.has(g.id)) return false;
-    if (glovesTypeFilter !== 'all' && glovesTypeFilter !== 'owned' && glovesTypeFilter !== 'notowned' && g.type !== glovesTypeFilter) return false;
+    if (!glovesFilters.type.has(g.type)) return false;
+    if (!glovesFilters.status.has(glovesStatusKey(g))) return false;
+    const isOwned = ownedGlovesSet.has(g.id);
+    if (isOwned  && !glovesFilters.owner.has('owned'))    return false;
+    if (!isOwned && !glovesFilters.owner.has('notowned')) return false;
+    if (g.locked && !glovesShowLocked) return false;
     return g.name.toLowerCase().includes(query);
   }).sort((a, b) => {
     // Los guantes bloqueados siempre van al final
@@ -16291,6 +18040,9 @@ function renderGlovesGrid() {
     if (!a.locked && b.locked) return -1;
     return 0;
   });
+
+  const summaryEl = document.getElementById('gloves-filter-summary');
+  if (summaryEl) summaryEl.textContent = `Mostrando ${list.length} de ${GLOVES.length} guantes`;
 
   if (list.length === 0) {
     empty.style.display = 'block';
@@ -16305,18 +18057,32 @@ function renderGlovesGrid() {
   });
 }
 
-/* Cuenta cuántos guantes hay por tipo y lo refleja en los botones de filtro */
+/* Cuenta cuántos guantes hay por cada valor de cada categoría de filtro,
+   y lo refleja en los contadores de cada casilla del menú de filtros */
 function updateGloveFilterCounts() {
-  const counts = { all: GLOVES.length, slaps: 0, robux: 0, logro: 0, otro: 0, owned: 0, notowned: 0 };
+  const counts = {
+    type:   { slaps: 0, robux: 0, logro: 0, otro: 0, staff: 0 },
+    status: { normal: 0, scavenger: 0, unobtainable: 0, halloween: 0, christmas: 0 },
+    owner:  { owned: 0, notowned: 0 },
+    locked: 0,
+  };
   GLOVES.forEach(g => {
-    if (counts[g.type] !== undefined) counts[g.type]++;
-    if (ownedGlovesSet.has(g.id)) counts.owned++;
-    else counts.notowned++;
+    if (counts.type[g.type] !== undefined) counts.type[g.type]++;
+    const sk = glovesStatusKey(g);
+    if (counts.status[sk] !== undefined) counts.status[sk]++;
+    if (ownedGlovesSet.has(g.id)) counts.owner.owned++;
+    else counts.owner.notowned++;
+    if (g.locked) counts.locked++;
   });
-  Object.keys(counts).forEach(type => {
-    const el = document.getElementById('gtcount-' + type);
-    if (el) el.textContent = ' (' + counts[type] + ')';
-  });
+
+  const setCountText = (id, n) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = ' (' + n + ')';
+  };
+  Object.keys(counts.type).forEach(t   => setCountText('gfcount-type-'   + t, counts.type[t]));
+  Object.keys(counts.status).forEach(s => setCountText('gfcount-status-' + s, counts.status[s]));
+  Object.keys(counts.owner).forEach(o  => setCountText('gfcount-owner-'  + o, counts.owner[o]));
+  setCountText('gfcount-locked', counts.locked);
 }
 
 
@@ -16325,8 +18091,10 @@ function updateGloveFilterCounts() {
    ============================================================ */
 function createGloveCard(glove) {
   const meta = GLOVE_TYPE_META[glove.type] || GLOVE_TYPE_META.otro;
-  // ¿Tiene maestría asociada?
-  const linkedMastery = MASTERIES.find(m => m.id === glove.id);
+  // Para guantes staff: si baseId es null/nil se usa el propio id para el banner de la tarjeta
+  const hasBaseId = glove.type === 'staff' && glove.baseId && glove.baseId !== 'nil';
+  const assetId = hasBaseId ? glove.baseId : glove.id;
+  const linkedMastery = MASTERIES.find(m => m.id === assetId);
   const statusMeta = GLOVE_STATUS_META[glove.status];
   const isLocked = !!glove.locked;
 
@@ -16357,9 +18125,9 @@ function createGloveCard(glove) {
   card.dataset.id   = glove.id;
 
   card.innerHTML = `
-    <div class="glove-owned-tick">✓</div>
+    <div class="glove-owned-tick${glove.id === 'acrobat' && !isLocked ? ' acrobat-manual-tick' : ''}"${glove.id === 'acrobat' && !isLocked ? ` onclick="toggleOwnedGlove('acrobat');event.stopPropagation();" title="Marcar Acrobat como obtenido (manual)"` : ''}>✓</div>
     <div class="glove-card-top">
-      <img class="glove-card-banner" src="default_${glove.id}.png" alt="${glove.name}"
+      <img class="glove-card-banner" src="default_${assetId}.png" alt="${glove.name}"
         onerror="this.onerror=null;this.src='preview_placeholder.png'">
       <div class="glove-type-ribbon ${meta.ribbonClass}">${meta.label}</div>
       ${isLocked ? '<div class="card-lock-overlay"></div><div class="card-lock-icon">🔒</div>' : ''}
@@ -16374,7 +18142,7 @@ function createGloveCard(glove) {
         onclick="${isLocked
           ? `triggerGloveLockDeny(this.closest('.glove-card'))`
           : `openGloveDetail('${glove.id}',event)`}">📖 VER MÁS</button>
-      ${linkedMastery && !isLocked ? `<button class="btn btn-glove-mastery" onclick="openGloveGoMastery('${glove.id}',event)" title="Ver maestría"><img class="btn-glove-mastery-icon" src="masteryicon.png" alt="Maestría" width="20" height="20" style="width:20px;height:20px;max-width:20px;max-height:20px;object-fit:contain;flex-shrink:0;display:block;" onerror="this.style.display='none';this.insertAdjacentText('afterend','⚔️')"></button>` : ''}
+      ${linkedMastery && !isLocked ? `<button class="btn btn-glove-mastery" onclick="openGloveGoMastery('${assetId}',event)" title="Ver maestría"><img class="btn-glove-mastery-icon" src="masteryicon.png" alt="Maestría" width="20" height="20" style="width:20px;height:20px;max-width:20px;max-height:20px;object-fit:contain;flex-shrink:0;display:block;" onerror="this.style.display='none';this.insertAdjacentText('afterend','⚔️')"></button>` : ''}
     </div>
   `;
 
@@ -16401,6 +18169,74 @@ function setGloveStatNum(numId, rowId, value) {
 /* ============================================================
    OPEN / CLOSE GLOVE DETAIL
    ============================================================ */
+/* ============================================================
+   LINKIFY OBTAIN METHOD
+   Tokeniza el texto del método de obtención y convierte las
+   palabras que coincidan con un id de guante en spans clicables
+   amarillos. El matching es por palabra completa, insensible a
+   mayúsculas. Los guantes bloqueados se marcan en rojo.
+   ============================================================ */
+function linkifyObtainMethod(text) {
+  if (!text || !GLOVES || !GLOVES.length) return document.createTextNode(text || '');
+
+  // Lista ordenada de más largo a más corto para greedy longest-match
+  const byName = GLOVES
+    .map(g => ({ key: g.name.toLowerCase(), glove: g }))
+    .sort((a, b) => b.key.length - a.key.length);
+
+  // Set de primeros caracteres para saltar rápido los trozos sin posible match
+  const firstChars = new Set(byName.map(e => e.key[0]));
+
+  const notWordChar = c => !/[\wáéíóúüñÁÉÍÓÚÜÑ']/i.test(c);
+
+  const frag  = document.createDocumentFragment();
+  const lower = text.toLowerCase();
+  let i = 0;
+
+  while (i < text.length) {
+    // Solo intentar match si el carácter actual puede iniciar algún nombre
+    if (firstChars.has(lower[i])) {
+      let matched  = null;
+      let matchLen = 0;
+
+      for (const { key, glove } of byName) {
+        if (lower.startsWith(key, i)) {
+          const before = i > 0                   ? lower[i - 1]           : ' ';
+          const after  = i + key.length < lower.length ? lower[i + key.length] : ' ';
+          if (notWordChar(before) && notWordChar(after)) {
+            matched  = glove;
+            matchLen = key.length;
+            break; // ya es el más largo que encaja
+          }
+        }
+      }
+
+      if (matched) {
+        const span = document.createElement('span');
+        span.textContent = text.slice(i, i + matchLen);
+        span.title = matched.locked ? '🔒 Guante bloqueado' : '🥊 Ver ' + matched.name;
+        if (matched.locked) {
+          span.className = 'obtain-glove-link locked-link';
+          span.addEventListener('click', () => showToast('🔒 Este guante está bloqueado'));
+        } else {
+          span.className = 'obtain-glove-link';
+          span.addEventListener('click', () => openGloveDetail(matched.id));
+        }
+        frag.appendChild(span);
+        i += matchLen;
+        continue;
+      }
+    }
+
+    // Acumular texto literal hasta el próximo posible inicio de nombre
+    const start = i++;
+    while (i < text.length && !firstChars.has(lower[i])) i++;
+    frag.appendChild(document.createTextNode(text.slice(start, i)));
+  }
+
+  return frag;
+}
+
 function openGloveDetail(id, e) {
   if (e) e.stopPropagation();
   const glove = GLOVES.find(g => g.id === id);
@@ -16413,6 +18249,9 @@ function openGloveDetail(id, e) {
   }
   gloveDetailOpen = glove;
   const meta = GLOVE_TYPE_META[glove.type] || GLOVE_TYPE_META.otro;
+  // Para guantes staff: si baseId es null/nil se usa el propio id en banner y defglove
+  const hasBaseId = glove.type === 'staff' && glove.baseId && glove.baseId !== 'nil';
+  const assetId = hasBaseId ? glove.baseId : glove.id;
 
   // Title
   document.getElementById('glove-detail-title').textContent = '🥊 ' + glove.name.toUpperCase();
@@ -16425,7 +18264,7 @@ function openGloveDetail(id, e) {
   bannerImg.style.display = 'block';
   bannerPh.style.display  = 'none';
   bannerImg.onerror = () => { bannerImg.onerror = null; bannerImg.src = 'preview_placeholder.png'; };
-  bannerImg.src = 'default_' + glove.id + '.png';
+  bannerImg.src = 'default_' + assetId + '.png';
 
   // Tutorial button
   const tutBtn = document.getElementById('glove-detail-tut-btn');
@@ -16436,12 +18275,15 @@ function openGloveDetail(id, e) {
   }
 
   // Glove image
+  // Los guantes staff usan su propio id para la imagen del guante (defglove_<id>.png),
+  // aunque el banner siga usando assetId (baseId).
+  const defgloveId = (glove.type === 'staff') ? glove.id : assetId;
   const gloveImg = document.getElementById('glove-detail-glove-img');
   const glovePh  = document.getElementById('glove-detail-glove-ph');
   gloveImg.style.display = 'block';
   glovePh.style.display  = 'none';
   gloveImg.onerror = () => { gloveImg.onerror = null; gloveImg.src = 'preview_placeholder.png'; };
-  gloveImg.src = 'defglove_' + glove.id + '.png';
+  gloveImg.src = 'defglove_' + defgloveId + '.png';
 
   // Name
   document.getElementById('glove-detail-name').textContent = glove.name;
@@ -16460,7 +18302,8 @@ function openGloveDetail(id, e) {
   } else if (glove.type === 'robux') {
     obtainText.innerHTML = `<img class="slap-icon-inline" src="robuxicon.png" alt="Robux" onerror="this.remove()">${glove.cost.toLocaleString()}`;
   } else {
-    obtainText.textContent = glove.obtainMethod || '—';
+    obtainText.textContent = '';
+    obtainText.appendChild(linkifyObtainMethod(glove.obtainMethod || '—'));
   }
 
   // Estado (disponibilidad)
@@ -16649,7 +18492,7 @@ function openGloveDetail(id, e) {
   if (hasSongs) {
     vinylWrap.style.display = 'block';
     vinylCaseImg.onerror = () => { vinylCaseImg.onerror = null; vinylCaseImg.src = 'preview_placeholder.png'; };
-    vinylCaseImg.src = 'default_' + glove.id + '.png';
+    vinylCaseImg.src = 'default_' + assetId + '.png';
   } else {
     vinylWrap.style.display = 'none';
   }
@@ -16657,11 +18500,22 @@ function openGloveDetail(id, e) {
   document.getElementById('glove-detail-view').classList.add('open');
   document.body.style.overflow = 'hidden';
   updateSlapsFabVisibility();
-  if (glove.id === 'killstreak') triggerKillstreakFlash();
+
+  // Botón "Ver guante normal" — solo en guantes staff con baseId válido
+  const goBaseBtn = document.getElementById('btn-glove-detail-go-base');
+  if (goBaseBtn) {
+    if (hasBaseId) {
+      goBaseBtn.style.display = 'flex';
+      goBaseBtn.onclick = () => openGloveDetail(glove.baseId);
+    } else {
+      goBaseBtn.style.display = 'none';
+    }
+  }
+  if (assetId === 'killstreak' && glove.id !== 'edgelord') triggerKillstreakFlash();
 
   /* ── Roaring: apply Deltarune theme ── */
   const gdv = document.getElementById('glove-detail-view');
-  if (glove.id === 'roaring') {
+  if (assetId === 'roaring') {
     gdv.classList.add('roaring-active');
     /* Replace emoji so the blinking ❤ ::before pseudo takes over cleanly */
     const titleEl = document.getElementById('glove-detail-title');
@@ -17435,18 +19289,19 @@ function openMusicPlayer() {
   if (!glove || !glove.songs) return;
   const entries = Object.entries(glove.songs);
   if (!entries.length) return;
+  const assetId = (glove.type === 'staff' && glove.baseId && glove.baseId !== 'nil') ? glove.baseId : glove.id;
 
   musicTrackList  = entries.map(([name, val]) => ({ name, ...normalizeSongEntry(val) }));
   musicTrackIndex = 0;
   musicShuffleOn  = false;
   musicShuffleBag = [];
   musicShuffleHistory = [];
-  musicCurrentGloveId = glove.id;
+  musicCurrentGloveId = assetId;
   const shuffleBtn = document.getElementById('music-btn-shuffle');
   if (shuffleBtn) shuffleBtn.classList.remove('active');
 
   /* ── Roaring: el reproductor grande también usa el tema Deltarune ── */
-  document.getElementById('music-player-overlay').classList.toggle('roaring-active', glove.id === 'roaring');
+  document.getElementById('music-player-overlay').classList.toggle('roaring-active', assetId === 'roaring');
 
   // Animación: la caja de vinilo "vuela" fuera de la pantalla.
   // Para que no ensanche el contenedor con scroll que la rodea, primero la
@@ -19372,12 +21227,54 @@ document.querySelectorAll('.footer-modal-overlay').forEach(overlay => {
    El Worker debe responder a:
      POST /users/v1/usernames/users
      GET  /badges/v1/users/{id}/badges/awarded-dates?badgeIds=...
-   (Desde marzo 2026 este último endpoint exige autenticación.
+     GET  /inventory/v1/users/{id}/items/GamePass/{gamePassId}   (modo "Gamepasses")
+   (Desde marzo 2026 el endpoint de badges exige autenticación.
    El Worker la resuelve adjuntando la cookie de una cuenta "bot"
    — ver ROBLOSECURITY en cloudflare-worker.js. Si esa cuenta se
    bloquea o Roblox restringe más esto, volverá a fallar.)
    ============================================================ */
 const PROXY_BASE_URL = 'https://slap-proxy.gameover09g.workers.dev';
+
+/* ============================================================
+   EXTRA: Badges sin guante y Gamepasses extra
+   Aquí puedes añadir badges o gamepasses que NO están ligados a
+   ningún guante de la lista GLOVES (la sección "badges"/
+   "gamepasses" de cada guante en GLOVES sigue usándose tal cual
+   para el modo "Guantes de Badge"). Estos se comprueban en los
+   modos "Badges sin Guante" y "Gamepasses" del buscador.
+
+   EXTRA_BADGES  — pega aquí la URL del badge (la que ves en la
+                   página del badge en Roblox, tipo
+                   https://www.roblox.com/badges/123456789/Nombre)
+   EXTRA_GAMEPASSES — pega aquí la URL del gamepass, tipo
+                   https://www.roblox.com/game-pass/123456/Nombre
+   ============================================================ */
+const EXTRA_BADGES = [
+  // { name: 'Nombre del badge', url: 'https://www.roblox.com/badges/123456789/Nombre' },
+  { name: 'Welcome', url: 'https://www.roblox.com/es/badges/2124743766/Welcome' },
+  { name: 'You met the owner', url: 'https://www.roblox.com/es/badges/2124760252/You-met-the-owner' },
+  { name: 'you met snow', url: 'https://www.roblox.com/es/badges/2124760875/you-met-snow' },
+  { name: '[REDACTED]', url: 'https://www.roblox.com/badges/2124760911/REDACTED' },
+  { name: 'Divine punishment', url: 'https://www.roblox.com/badges/2124760917/Divine-punishment' },
+  { name: 'really?', url: 'https://www.roblox.com/badges/2124760923/really' },
+  { name: 'barzil', url: 'https://www.roblox.com/badges/2124775097/barzil' },
+  { name: 'The one', url: 'https://www.roblox.com/badges/2124807750/The-one' },
+  { name: 'Ascend', url: 'https://www.roblox.com/badges/2124807752/Ascend' },
+  { name: '1 0 0', url: 'https://www.roblox.com/badges/2124836270/1-0-0' },
+  { name: 'The "Reverse" Incident', url: 'https://www.roblox.com/badges/2124912059/The-Reverse-Incident' },
+  { name: 'Clipped Wings', url: 'https://www.roblox.com/badges/2147535393/Clipped-Wings' },
+  { name: 'Apostle of Judgement', url: 'https://www.roblox.com/badges/4414399146292319/Apostle-of-Judgement' },
+];
+
+const EXTRA_GAMEPASSES = [
+  // { name: 'Nombre del gamepass', url: 'https://www.roblox.com/game-pass/123456/Nombre' },
+  { name: '2x Slaps (141 Robux)', url: 'https://www.roblox.com/game-pass/15037108/2x-Slaps' },
+  { name: '5x Slaps (OFF SALE)', url: 'https://www.roblox.com/game-pass/15037147/5x-Slaps' },
+  { name: 'Radio (57 Robux)', url: 'https://www.roblox.com/game-pass/16067226/Radio' },
+  { name: 'Custom death audio (57 Robux)', url: 'https://www.roblox.com/game-pass/21651535/Custom-death-audio' },
+  { name: 'Animation Pack (57 Robux)', url: 'https://www.roblox.com/game-pass/37665008/Animation-Pack' },
+  { name: 'nothing (2 Robux)', url: 'https://www.roblox.com/game-pass/16127797/nothing' },
+];
 
 /* ============================================================
    Helpers DOM — null-safe
@@ -19393,6 +21290,7 @@ function openRobloxCheck() {
   status.className   = '';
   results.innerHTML  = '';
   inp.value = '';
+  setRcrMode('gloves');
   setTimeout(() => inp.focus(), 80);
 }
 function closeRobloxCheck() {
@@ -19418,6 +21316,50 @@ function buildGloveBadgeIndex() {
     });
   });
   return index;
+}
+
+/* ── Lista plana de badges sueltos (modo "Badges sin Guante") ── */
+function buildExtraBadgeList() {
+  const list = [];
+  (EXTRA_BADGES || []).forEach(b => {
+    if (!b || !b.url) return;
+    const m = b.url.match(/\/badges\/(\d+)/i) || b.url.match(/badgeId=(\d+)/i);
+    if (!m) return;
+    list.push({ badgeId: String(m[1]), badgeName: b.name || ('Badge ' + m[1]), badgeUrl: b.url });
+  });
+  return list;
+}
+
+/* ── Lista plana de gamepasses sueltos (modo "Gamepasses") ── */
+function buildExtraGamepassList() {
+  const list = [];
+  (EXTRA_GAMEPASSES || []).forEach(g => {
+    if (!g || !g.url) return;
+    const m = g.url.match(/\/game-pass\/(\d+)/i) || g.url.match(/gamePassId=(\d+)/i);
+    if (!m) return;
+    list.push({ gamepassId: String(m[1]), gamepassName: g.name || ('Gamepass ' + m[1]), gamepassUrl: g.url });
+  });
+  return list;
+}
+
+/* ── Gamepasses de guantes type:'robux', agrupados por guante
+     (mismo patrón que buildGloveBadgeIndex pero para gamepasses) ── */
+function buildGloveGamepassGroups() {
+  const groups = {};
+  if (typeof GLOVES === 'undefined') return groups;
+  GLOVES.forEach(g => {
+    if (g.type !== 'robux' || !Array.isArray(g.gamepasses) || !g.gamepasses.length) return;
+    const entries = [];
+    g.gamepasses.forEach(gp => {
+      const item = (typeof gp === 'string') ? { name: gp, url: null } : gp;
+      if (!item || !item.url) return;
+      const m = item.url.match(/\/game-pass\/(\d+)/i) || item.url.match(/gamePassId=(\d+)/i);
+      if (!m) return;
+      entries.push({ gamepassId: String(m[1]), gamepassName: item.name || g.name, gamepassUrl: item.url });
+    });
+    if (entries.length) groups[g.id] = { gloveName: g.name, gloveId: g.id, gamepasses: entries };
+  });
+  return groups;
 }
 
 /* ============================================================
@@ -19495,6 +21437,54 @@ async function getAwardedBadges(userId, badgeIds) {
   return awarded;
 }
 
+/* ------------------------------------------------------------
+   Comprobación de gamepasses (modo "Gamepasses").
+   Usa inventory.roblox.com/v1/users/{id}/items/GamePass/{id},
+   que se consulta uno por uno (Roblox no tiene un endpoint de
+   lote para esto). Por precaución el Worker también adjunta la
+   cookie de la cuenta bot aquí (ver cloudflare-worker.js), por si
+   Roblox empieza a exigir autenticación en este endpoint también.
+   ------------------------------------------------------------ */
+async function getOwnedGamepasses(userId, gamepassIds) {
+  const owned = {};
+  let failedCount = 0;
+  let lastBadStatus = null;
+
+  await Promise.all(gamepassIds.map(async (id) => {
+    const url = `${PROXY_BASE_URL}/inventory/v1/users/${userId}/items/GamePass/${id}`;
+    try {
+      const r = await fetch(url);
+      if (!r.ok) {
+        lastBadStatus = r.status;
+        failedCount++;
+        console.warn('gamepass check HTTP', r.status, id);
+        return;
+      }
+      const json = await r.json();
+      const list = Array.isArray(json) ? json : (json.data || []);
+      owned[id] = list.length > 0;
+    } catch (err) {
+      failedCount++;
+      console.warn('gamepass check error:', err);
+    }
+  }));
+
+  if (failedCount > 0 && failedCount === gamepassIds.length) {
+    if (lastBadStatus === 401) {
+      throw new Error(
+        'El Worker devuelve 401 al consultar gamepasses. Es posible que Roblox también exija autenticación aquí; ' +
+        'revisa que el secreto ROBLOSECURITY esté configurado en tu Cloudflare Worker.'
+      );
+    }
+    throw new Error(
+      `El proxy falló al consultar los gamepasses (HTTP ${lastBadStatus ?? 'error de red'}). ` +
+      'Revisa la consola del navegador y los logs del Worker.'
+    );
+  }
+
+  return owned;
+}
+
 /* ============================================================
    Utilidades
    ============================================================ */
@@ -19564,7 +21554,7 @@ function applySlapsFilter() {
     card.classList.toggle('owned', ownedGlovesSet.has(card.dataset.id));
   });
   updateGloveFilterCounts();
-  if (glovesTypeFilter === 'owned' || glovesTypeFilter === 'notowned') renderGlovesGrid();
+  if (glovesOwnerFilterRestrictive()) renderGlovesGrid();
 
   // Feedback visual
   const btn = document.getElementById('slaps-fab-apply');
@@ -19590,6 +21580,46 @@ function updateSlapsFabVisibility() {
 
 let rcrAllRows   = [];   // [{gloveId, gloveName, status, element}]
 let rcrFilter    = 'all';
+let rcrMode      = 'gloves';   // 'gloves' | 'badges' | 'gamepasses'
+
+function setRcrMode(mode) {
+  rcrMode = mode;
+  document.querySelectorAll('.rcr-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+
+  // Limpiar resultados/controles del modo anterior
+  const resultsEl  = document.getElementById('roblox-check-results');
+  const rowsEl     = document.getElementById('rcr-rows-container');
+  const controlsEl = document.getElementById('rcr-controls');
+  if (resultsEl)  resultsEl.innerHTML = '';
+  if (rowsEl)     rowsEl.innerHTML = '';
+  if (controlsEl) controlsEl.style.display = 'none';
+  rcrAllRows = [];
+  rcrFilter  = 'all';
+  document.querySelectorAll('.rcr-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+  setStatus('', '');
+
+  updateRcrFilterLabels();
+}
+
+function updateRcrFilterLabels() {
+  const completeBtn = document.getElementById('rcr-filter-complete-btn');
+  const partialBtn  = document.getElementById('rcr-filter-partial-btn');
+  const pendingBtn  = document.getElementById('rcr-filter-pending-btn');
+  if (!completeBtn || !partialBtn || !pendingBtn) return;
+  if (rcrMode === 'badges') {
+    // Badges sin guante: ítems sueltos, no existe estado "parcial"
+    partialBtn.style.display = 'none';
+    completeBtn.textContent  = '✅ Obtenidos';
+    pendingBtn.textContent   = '❌ No obtenidos';
+  } else {
+    // Guantes de Badge / Gamepasses: pueden agrupar varios ítems por guante
+    partialBtn.style.display = '';
+    completeBtn.textContent  = '✅ Completos';
+    pendingBtn.textContent   = '❌ Pendientes';
+  }
+}
 
 function setRcrFilter(f) {
   rcrFilter = f;
@@ -19634,166 +21664,14 @@ async function submitRobloxCheck() {
 
   try {
     const user = await getRobloxUserId(username);
-    setStatus(`✅ ${user.name} (ID: ${user.id}) — consultando badges…`, 'ok');
 
-    const index       = buildGloveBadgeIndex();
-    const allBadgeIds = Object.keys(index);
-    if (!allBadgeIds.length) { setStatus('No hay guantes con badges configurados.', 'error'); return; }
-
-    const awarded = await getAwardedBadges(user.id, allBadgeIds);
-
-    /* Agrupar por guante */
-    const gloveMap = {};
-    GLOVES.forEach(g => {
-      if (!Array.isArray(g.badges) || !g.badges.length) return;
-      if (!gloveMap[g.id]) gloveMap[g.id] = { gloveName: g.name, gloveType: g.type, gloveId: g.id, badges: [] };
-      g.badges.forEach(b => {
-        if (!b.url) return;
-        const m = b.url.match(/\/badges\/(\d+)/i) || b.url.match(/badgeId=(\d+)/i);
-        if (!m) return;
-        gloveMap[g.id].badges.push({
-          badgeId: String(m[1]), badgeName: b.name, badgeUrl: b.url,
-          awardedDate: awarded[m[1]] || null
-        });
-      });
-    });
-
-    let totalComplete=0, totalPartial=0, totalPending=0;
-    const gloveEntries = Object.entries(gloveMap).filter(([,v]) => v.badges.length);
-    gloveEntries.forEach(([,v]) => {
-      const got = v.badges.filter(b=>b.awardedDate).length;
-      if (got===v.badges.length) totalComplete++;
-      else if (got>0) totalPartial++;
-      else totalPending++;
-    });
-
-    /* Barra de resumen */
-    const summaryEl = document.createElement('div');
-    summaryEl.className = 'rcr-summary-bar';
-    summaryEl.innerHTML = `
-      <span class="rcr-sum-num">${totalComplete}</span><span class="rcr-sum-label"> completos</span>
-      &nbsp;·&nbsp;
-      <span style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:#fb923c">${totalPartial}</span><span class="rcr-sum-label"> parciales</span>
-      &nbsp;·&nbsp;
-      <span class="rcr-sum-miss">${totalPending}</span><span class="rcr-sum-label"> pendientes</span>
-      <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>`;
-
-    /* Botón global "Marcar todos los completos como míos" */
-    const markAllBtn = document.createElement('button');
-    markAllBtn.id = 'btn-rcr-mark-all';
-    markAllBtn.style.cssText = 'margin-top:8px;width:100%;background:#0e2210;border:1.5px solid #4ade80;border-radius:8px;color:#4ade80;font-size:0.85rem;font-family:\'Fredoka\',sans-serif;font-weight:600;padding:8px 14px;cursor:pointer;transition:background .15s,opacity .15s;';
-    markAllBtn.textContent = `✅ Marcar mis ${totalComplete} guante(s) completo(s) como "obtenidos"`;
-    markAllBtn.addEventListener('mouseenter', () => { markAllBtn.style.background = '#14532d'; });
-    markAllBtn.addEventListener('mouseleave', () => { markAllBtn.style.background = '#0e2210'; });
-    markAllBtn.addEventListener('click', () => {
-      // Limpiar solo los guantes de tipo logro (badge) antes de remarcar
-      GLOVES.forEach(g => {
-        if (g.type === 'logro') ownedGlovesSet.delete(g.id);
-      });
-      document.querySelectorAll('.glove-card.owned').forEach(card => {
-        const g = GLOVES.find(x => x.id === card.dataset.id);
-        if (g && g.type === 'logro') card.classList.remove('owned');
-      });
-
-      // Luego marcar solo los completos del resultado actual
-      let count = 0;
-      rcrAllRows.forEach(({gloveId, status}) => {
-        if (status === 'complete') {
-          ownedGlovesSet.add(gloveId);
-          count++;
-        }
-      });
-      saveOwnedGloves();
-      // Actualizar ticks en la grid
-      document.querySelectorAll('.glove-card').forEach(card => {
-        if (ownedGlovesSet.has(card.dataset.id)) card.classList.add('owned');
-      });
-      updateGloveFilterCounts();
-      if (glovesTypeFilter === 'owned' || glovesTypeFilter === 'notowned') renderGlovesGrid();
-      markAllBtn.textContent = `✅ ¡${count} guante(s) marcado(s) como obtenidos!`;
-      markAllBtn.style.opacity = '0.6';
-      markAllBtn.disabled = true;
-    });
-
-    const summaryWrap = document.createElement('div');
-    summaryWrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
-    summaryWrap.appendChild(summaryEl);
-    summaryWrap.appendChild(markAllBtn);
-    resultsEl.appendChild(summaryWrap);
-
-    /* Mostrar controles */
-    if (controlsEl) controlsEl.style.display = 'flex';
-    if (document.getElementById('rcr-search-input')) document.getElementById('rcr-search-input').value = '';
-    rcrFilter = 'all';
-    document.querySelectorAll('.rcr-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
-
-    const sorted = gloveEntries.slice().sort(([,a],[,b]) => {
-      const s = v => { const g=v.badges.filter(x=>x.awardedDate).length; return g===v.badges.length?2:g>0?1:0; };
-      return s(a)-s(b);
-    });
-
-    sorted.forEach(([gloveId, gd]) => {
-      const got=gd.badges.filter(b=>b.awardedDate).length, total=gd.badges.length;
-      let status, pillClass, pillText;
-      if (got===total)  { status='complete'; pillClass='complete'; pillText='✅ Completo'; }
-      else if (got>0)   { status='partial';  pillClass='partial';  pillText=`⚠️ Parcial (${got}/${total})`; }
-      else              { status='pending';  pillClass='pending';  pillText='❌ Pendiente'; }
-
-      const isOwned = ownedGlovesSet.has(gloveId); // para tick visual futuro
-      const row = document.createElement('div');
-      row.className = 'rcr-glove-row';
-      if (got===total) row.classList.add('open');
-
-      /* Header con banner + nombre + pill + botón mío */
-      const header = document.createElement('div');
-      header.className = 'rcr-glove-header';
-      header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;user-select:none;';
-
-      const banner = document.createElement('img');
-      banner.className = 'rcr-glove-banner';
-      banner.src = `default_${gloveId}.png`;
-      banner.alt = gd.gloveName;
-      banner.onerror = () => { banner.style.display = 'none'; };
-
-      const nameSpan = document.createElement('span');
-      nameSpan.className = 'rcr-glove-name';
-      nameSpan.textContent = gd.gloveName;
-
-      const pill = document.createElement('span');
-      pill.className = `rcr-status-pill ${pillClass}`;
-      pill.textContent = pillText;
-
-      const chevron = document.createElement('span');
-      chevron.className = 'rcr-chevron';
-      chevron.textContent = '▶';
-
-      header.appendChild(banner);
-      header.appendChild(nameSpan);
-      header.appendChild(pill);
-      header.appendChild(chevron);
-      header.addEventListener('click', () => row.classList.toggle('open'));
-
-      /* Lista de badges */
-      const bl = document.createElement('div');
-      bl.className = 'rcr-badge-list';
-      gd.badges.forEach((b, idx) => {
-        const item = document.createElement('div');
-        item.className = 'rcr-badge-item';
-        const dateStr = b.awardedDate
-          ? `<span class="rcr-badge-date">Obtenido el ${formatDate(b.awardedDate)}</span>`
-          : `<span class="rcr-badge-miss">Sin obtener</span>`;
-        const imgSrc = idx === 0 ? `badge_${gloveId}.png` : `badge${idx+1}_${gloveId}.png`;
-        item.innerHTML = `<img class="rcr-badge-thumb" src="${imgSrc}" alt="" onerror="this.style.display='none'"><span class="rcr-badge-icon">${b.awardedDate?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>${dateStr}`;
-        bl.appendChild(item);
-      });
-
-      row.appendChild(header);
-      row.appendChild(bl);
-      rowsContainer.appendChild(row);
-      rcrAllRows.push({ gloveId, gloveName: gd.gloveName, status, element: row });
-    });
-
-    setStatus(`${user.name}: ${Object.keys(awarded).length}/${allBadgeIds.length} badges · ${totalComplete} guante(s) completo(s)`, 'ok');
+    if (rcrMode === 'badges') {
+      await runExtraBadgesCheck(user, resultsEl, rowsContainer, controlsEl);
+    } else if (rcrMode === 'gamepasses') {
+      await runGamepassesCheck(user, resultsEl, rowsContainer, controlsEl);
+    } else {
+      await runGlovesCheck(user, resultsEl, rowsContainer, controlsEl);
+    }
 
   } catch(err) {
     setStatus('❌ '+(err.message||'Error desconocido.'), 'error');
@@ -19801,6 +21679,467 @@ async function submitRobloxCheck() {
   } finally {
     submitBtn.disabled = false;
   }
+}
+
+/* ============================================================
+   MODO: Guantes de Badge (comportamiento original, sin cambios)
+   ============================================================ */
+async function runGlovesCheck(user, resultsEl, rowsContainer, controlsEl) {
+  setStatus(`✅ ${user.name} (ID: ${user.id}) — consultando badges…`, 'ok');
+
+  const index       = buildGloveBadgeIndex();
+  const allBadgeIds = Object.keys(index);
+  if (!allBadgeIds.length) { setStatus('No hay guantes con badges configurados.', 'error'); return; }
+
+  const awarded = await getAwardedBadges(user.id, allBadgeIds);
+
+  /* Agrupar por guante */
+  const gloveMap = {};
+  GLOVES.forEach(g => {
+    if (!Array.isArray(g.badges) || !g.badges.length) return;
+    if (!gloveMap[g.id]) gloveMap[g.id] = { gloveName: g.name, gloveType: g.type, gloveId: g.id, badges: [] };
+    g.badges.forEach(b => {
+      if (!b.url) return;
+      const m = b.url.match(/\/badges\/(\d+)/i) || b.url.match(/badgeId=(\d+)/i);
+      if (!m) return;
+      gloveMap[g.id].badges.push({
+        badgeId: String(m[1]), badgeName: b.name, badgeUrl: b.url,
+        awardedDate: awarded[m[1]] || null
+      });
+    });
+  });
+
+  /* Mensaje si el inventario está vacío o privado */
+  if (Object.keys(awarded).length === 0) {
+    const emptyMsg = document.createElement('div');
+    emptyMsg.style.cssText = 'background:#1a1000;border:2px solid #3d2800;border-radius:12px;padding:18px 20px;color:#ccc;font-family:\'Fredoka\',sans-serif;font-size:0.92rem;line-height:1.7;';
+    emptyMsg.innerHTML = `<div style="font-family:\'Fredoka One\',cursive;font-size:1.05rem;color:#FFD700;margin-bottom:8px;">⚠️ Sin logros encontrados</div>
+El usuario que buscas no tiene ningún logro o tiene el inventario en privado. En el caso de ser la segunda opción, para usar esta herramienta dile que siga estos pasos:<br><br>
+<span style="background:#111;border:1.5px solid #444;border-radius:8px;padding:6px 12px;display:inline-block;font-family:\'Fredoka One\',cursive;color:#FFD700;letter-spacing:0.5px;">Roblox → Ajustes → Restricciones de privacidad y contenido → Intercambio e inventario → Todos</span>`;
+    resultsEl.appendChild(emptyMsg);
+    setStatus(`${user.name}: sin logros encontrados (inventario vacío o privado)`, 'error');
+    return;
+  }
+
+  let totalComplete=0, totalPartial=0, totalPending=0;
+  const gloveEntries = Object.entries(gloveMap).filter(([,v]) => v.badges.length);
+  gloveEntries.forEach(([,v]) => {
+    const got = v.badges.filter(b=>b.awardedDate).length;
+    if (got===v.badges.length) totalComplete++;
+    else if (got>0) totalPartial++;
+    else totalPending++;
+  });
+
+  /* Barra de resumen */
+  const summaryEl = document.createElement('div');
+  summaryEl.className = 'rcr-summary-bar';
+  summaryEl.innerHTML = `
+    <span class="rcr-sum-num">${totalComplete}</span><span class="rcr-sum-label"> completos</span>
+    &nbsp;·&nbsp;
+    <span style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:#fb923c">${totalPartial}</span><span class="rcr-sum-label"> parciales</span>
+    &nbsp;·&nbsp;
+    <span class="rcr-sum-miss">${totalPending}</span><span class="rcr-sum-label"> pendientes</span>
+    <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>`;
+
+  /* Botón global "Marcar todos los completos como míos" */
+  const markAllBtn = document.createElement('button');
+  markAllBtn.id = 'btn-rcr-mark-all';
+  markAllBtn.style.cssText = 'margin-top:8px;width:100%;background:#0e2210;border:1.5px solid #4ade80;border-radius:8px;color:#4ade80;font-size:0.85rem;font-family:\'Fredoka\',sans-serif;font-weight:600;padding:8px 14px;cursor:pointer;transition:background .15s,opacity .15s;';
+  markAllBtn.textContent = `✅ Marcar mis ${totalComplete} guante(s) completo(s) como "obtenidos"`;
+  markAllBtn.addEventListener('mouseenter', () => { markAllBtn.style.background = '#14532d'; });
+  markAllBtn.addEventListener('mouseleave', () => { markAllBtn.style.background = '#0e2210'; });
+  markAllBtn.addEventListener('click', () => {
+    // Limpiar solo los guantes de tipo logro (badge) antes de remarcar
+    GLOVES.forEach(g => {
+      if (g.type === 'logro') ownedGlovesSet.delete(g.id);
+    });
+    document.querySelectorAll('.glove-card.owned').forEach(card => {
+      const g = GLOVES.find(x => x.id === card.dataset.id);
+      if (g && g.type === 'logro') card.classList.remove('owned');
+    });
+
+    // Luego marcar solo los completos del resultado actual
+    let count = 0;
+    rcrAllRows.forEach(({gloveId, status}) => {
+      if (status === 'complete') {
+        ownedGlovesSet.add(gloveId);
+        count++;
+      }
+    });
+    saveOwnedGloves();
+    // Actualizar ticks en la grid
+    document.querySelectorAll('.glove-card').forEach(card => {
+      if (ownedGlovesSet.has(card.dataset.id)) card.classList.add('owned');
+    });
+    updateGloveFilterCounts();
+    if (glovesOwnerFilterRestrictive()) renderGlovesGrid();
+    markAllBtn.textContent = `✅ ¡${count} guante(s) marcado(s) como obtenidos!`;
+    markAllBtn.style.opacity = '0.6';
+    markAllBtn.disabled = true;
+  });
+
+  const summaryWrap = document.createElement('div');
+  summaryWrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+  summaryWrap.appendChild(summaryEl);
+  summaryWrap.appendChild(markAllBtn);
+  resultsEl.appendChild(summaryWrap);
+
+  /* Mostrar controles */
+  if (controlsEl) controlsEl.style.display = 'flex';
+  updateRcrFilterLabels();
+  if (document.getElementById('rcr-search-input')) document.getElementById('rcr-search-input').value = '';
+  rcrFilter = 'all';
+  document.querySelectorAll('.rcr-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+
+  const sorted = gloveEntries.slice().sort(([,a],[,b]) => {
+    const s = v => { const g=v.badges.filter(x=>x.awardedDate).length; return g===v.badges.length?2:g>0?1:0; };
+    return s(a)-s(b);
+  });
+
+  sorted.forEach(([gloveId, gd]) => {
+    const got=gd.badges.filter(b=>b.awardedDate).length, total=gd.badges.length;
+    let status, pillClass, pillText;
+    if (got===total)  { status='complete'; pillClass='complete'; pillText='✅ Completo'; }
+    else if (got>0)   { status='partial';  pillClass='partial';  pillText=`⚠️ Parcial (${got}/${total})`; }
+    else              { status='pending';  pillClass='pending';  pillText='❌ Pendiente'; }
+
+    const isOwned = ownedGlovesSet.has(gloveId); // para tick visual futuro
+    const row = document.createElement('div');
+    row.className = 'rcr-glove-row';
+    if (got===total) row.classList.add('open');
+
+    /* Header con banner + nombre + pill + botón mío */
+    const header = document.createElement('div');
+    header.className = 'rcr-glove-header';
+    header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;user-select:none;';
+
+    const banner = document.createElement('img');
+    banner.className = 'rcr-glove-banner';
+    banner.src = `default_${gloveId}.png`;
+    banner.alt = gd.gloveName;
+    banner.onerror = () => { banner.style.display = 'none'; };
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'rcr-glove-name';
+    nameSpan.textContent = gd.gloveName;
+
+    const pill = document.createElement('span');
+    pill.className = `rcr-status-pill ${pillClass}`;
+    pill.textContent = pillText;
+
+    const chevron = document.createElement('span');
+    chevron.className = 'rcr-chevron';
+    chevron.textContent = '▶';
+
+    header.appendChild(banner);
+    header.appendChild(nameSpan);
+    header.appendChild(pill);
+    header.appendChild(chevron);
+    header.addEventListener('click', () => row.classList.toggle('open'));
+
+    /* Lista de badges */
+    const bl = document.createElement('div');
+    bl.className = 'rcr-badge-list';
+    gd.badges.forEach((b, idx) => {
+      const item = document.createElement('div');
+      item.className = 'rcr-badge-item';
+      const dateStr = b.awardedDate
+        ? `<span class="rcr-badge-date">Obtenido el ${formatDate(b.awardedDate)}</span>`
+        : `<span class="rcr-badge-miss">Sin obtener</span>`;
+      const imgSrc = idx === 0 ? `badge_${gloveId}.png` : `badge${idx+1}_${gloveId}.png`;
+      item.innerHTML = `<img class="rcr-badge-thumb" src="${imgSrc}" alt="" onerror="this.style.display='none'"><span class="rcr-badge-icon">${b.awardedDate?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>${dateStr}`;
+      bl.appendChild(item);
+    });
+
+    row.appendChild(header);
+    row.appendChild(bl);
+    rowsContainer.appendChild(row);
+    rcrAllRows.push({ gloveId, gloveName: gd.gloveName, status, element: row });
+  });
+
+  setStatus(`${user.name}: ${Object.keys(awarded).length}/${allBadgeIds.length} badges · ${totalComplete} guante(s) completo(s)`, 'ok');
+}
+
+/* ============================================================
+   MODO: Badges sin Guante (usa EXTRA_BADGES, lista plana)
+   ============================================================ */
+async function runExtraBadgesCheck(user, resultsEl, rowsContainer, controlsEl) {
+  setStatus(`✅ ${user.name} (ID: ${user.id}) — consultando badges sin guante…`, 'ok');
+
+  const list = buildExtraBadgeList();
+  if (!list.length) {
+    setStatus('No hay badges sin guante configurados (rellena EXTRA_BADGES en el código).', 'error');
+    return;
+  }
+
+  const awarded = await getAwardedBadges(user.id, list.map(b => b.badgeId));
+  const got = list.filter(b => awarded[b.badgeId]).length;
+  const total = list.length;
+
+  /* Mensaje si el inventario está vacío o privado */
+  if (Object.keys(awarded).length === 0) {
+    const emptyMsg = document.createElement('div');
+    emptyMsg.style.cssText = 'background:#1a1000;border:2px solid #3d2800;border-radius:12px;padding:18px 20px;color:#ccc;font-family:\'Fredoka\',sans-serif;font-size:0.92rem;line-height:1.7;';
+    emptyMsg.innerHTML = `<div style="font-family:\'Fredoka One\',cursive;font-size:1.05rem;color:#FFD700;margin-bottom:8px;">⚠️ Sin logros encontrados</div>
+El usuario que buscas no tiene ningún logro o tiene el inventario en privado. En el caso de ser la segunda opción, para usar esta herramienta dile que siga estos pasos:<br><br>
+<span style="background:#111;border:1.5px solid #444;border-radius:8px;padding:6px 12px;display:inline-block;font-family:\'Fredoka One\',cursive;color:#FFD700;letter-spacing:0.5px;">Roblox → Ajustes → Restricciones de privacidad y contenido → Intercambio e inventario → Todos</span>`;
+    resultsEl.appendChild(emptyMsg);
+    setStatus(`${user.name}: sin logros encontrados (inventario vacío o privado)`, 'error');
+    return;
+  }
+
+  /* Barra de resumen */
+  const summaryEl = document.createElement('div');
+  summaryEl.className = 'rcr-summary-bar';
+  summaryEl.innerHTML = `
+    <span class="rcr-sum-num">${got}</span><span class="rcr-sum-label"> obtenidos</span>
+    &nbsp;·&nbsp;
+    <span class="rcr-sum-miss">${total - got}</span><span class="rcr-sum-label"> pendientes</span>
+    <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>`;
+  resultsEl.appendChild(summaryEl);
+
+  if (controlsEl) controlsEl.style.display = 'flex';
+  updateRcrFilterLabels();
+  if (document.getElementById('rcr-search-input')) document.getElementById('rcr-search-input').value = '';
+  rcrFilter = 'all';
+  document.querySelectorAll('.rcr-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+
+  const sorted = list.slice().sort((a, b) => {
+    const sa = awarded[a.badgeId] ? 1 : 0, sb = awarded[b.badgeId] ? 1 : 0;
+    return sa - sb;
+  });
+
+  sorted.forEach(b => {
+    const isOwned    = !!awarded[b.badgeId];
+    const awardedAt  = awarded[b.badgeId];
+    const status     = isOwned ? 'complete' : 'pending';
+
+    const row = document.createElement('div');
+    row.className = 'rcr-glove-row rcr-flat-row';
+
+    const item = document.createElement('div');
+    item.className = 'rcr-badge-item';
+    const dateStr = isOwned
+      ? (awardedAt && awardedAt !== true
+          ? `<span class="rcr-badge-date">Obtenido el ${formatDate(awardedAt)}</span>`
+          : `<span class="rcr-badge-date">Obtenido</span>`)
+      : `<span class="rcr-badge-miss">Sin obtener</span>`;
+    item.innerHTML = `<span class="rcr-badge-icon">${isOwned?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${b.badgeUrl}" target="_blank" rel="noopener">${b.badgeName}</a></span>${dateStr}`;
+
+    row.appendChild(item);
+    rowsContainer.appendChild(row);
+    rcrAllRows.push({ gloveId: b.badgeId, gloveName: b.badgeName, status, element: row });
+  });
+
+  setStatus(`${user.name}: ${got}/${total} badges sin guante obtenidos`, 'ok');
+}
+
+/* ============================================================
+   MODO: Gamepasses
+   Comprueba TANTO los gamepasses de guantes type:'robux'
+   (agrupados por guante, igual que los badges en "Guantes de
+   Badge") COMO los gamepasses sueltos de EXTRA_GAMEPASSES.
+   ============================================================ */
+async function runGamepassesCheck(user, resultsEl, rowsContainer, controlsEl) {
+  setStatus(`✅ ${user.name} (ID: ${user.id}) — consultando gamepasses…`, 'ok');
+
+  const gloveGroups = buildGloveGamepassGroups();
+  const extraList   = buildExtraGamepassList();
+  const gloveEntries = Object.entries(gloveGroups);
+
+  const gloveIds = gloveEntries.flatMap(([, v]) => v.gamepasses.map(g => g.gamepassId));
+  const extraIds = extraList.map(g => g.gamepassId);
+  const allIds   = Array.from(new Set([...gloveIds, ...extraIds]));
+
+  if (!allIds.length) {
+    setStatus("No hay gamepasses configurados (ni en guantes type:'robux' ni en EXTRA_GAMEPASSES).", 'error');
+    return;
+  }
+
+  const owned = await getOwnedGamepasses(user.id, allIds);
+
+  /* Mensaje si el inventario está vacío o privado (ningún gamepass encontrado) */
+  if (!Object.values(owned).some(v => v)) {
+    const emptyMsg = document.createElement('div');
+    emptyMsg.style.cssText = 'background:#1a1000;border:2px solid #3d2800;border-radius:12px;padding:18px 20px;color:#ccc;font-family:\'Fredoka\',sans-serif;font-size:0.92rem;line-height:1.7;';
+    emptyMsg.innerHTML = `<div style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#FFD700;margin-bottom:8px;">⚠️ Sin gamepasses encontrados</div>
+El usuario que buscas no tiene ningún gamepass o tiene el inventario en privado. En el caso de ser la segunda opción, para usar esta herramienta dile que siga estos pasos:<br><br>
+<span style="background:#111;border:1.5px solid #444;border-radius:8px;padding:6px 12px;display:inline-block;font-family:'Fredoka One',cursive;color:#FFD700;letter-spacing:0.5px;">Roblox → Ajustes → Restricciones de privacidad y contenido → Intercambio e inventario → Todos</span>`;
+    resultsEl.appendChild(emptyMsg);
+    setStatus(`${user.name}: sin gamepasses encontrados (inventario vacío o privado)`, 'error');
+    return;
+  }
+
+  let totalComplete=0, totalPartial=0, totalPending=0;
+  gloveEntries.forEach(([,v]) => {
+    const got = v.gamepasses.filter(g => owned[g.gamepassId]).length;
+    if (got === v.gamepasses.length) totalComplete++;
+    else if (got > 0) totalPartial++;
+    else totalPending++;
+  });
+
+  const totalGamepasses = allIds.length;
+  const gotGamepasses   = allIds.filter(id => owned[id]).length;
+
+  /* Barra de resumen */
+  const summaryEl = document.createElement('div');
+  summaryEl.className = 'rcr-summary-bar';
+  summaryEl.innerHTML = `
+    <span class="rcr-sum-num">${gotGamepasses}</span><span class="rcr-sum-label"> obtenidos</span>
+    &nbsp;·&nbsp;
+    <span class="rcr-sum-miss">${totalGamepasses - gotGamepasses}</span><span class="rcr-sum-label"> pendientes</span>
+    <span style="margin-left:auto;color:#666;font-size:0.78rem">${user.name}</span>`;
+
+  /* Botón global "Marcar mis guantes con gamepass completo como míos"
+     (mismo patrón que en "Guantes de Badge", pero para type:'robux') */
+  let summaryWrap = summaryEl;
+  if (gloveEntries.length) {
+    const markAllBtn = document.createElement('button');
+    markAllBtn.id = 'btn-rcr-mark-all-gamepasses';
+    markAllBtn.style.cssText = 'margin-top:8px;width:100%;background:#0e2210;border:1.5px solid #4ade80;border-radius:8px;color:#4ade80;font-size:0.85rem;font-family:\'Fredoka\',sans-serif;font-weight:600;padding:8px 14px;cursor:pointer;transition:background .15s,opacity .15s;';
+    markAllBtn.textContent = `✅ Marcar mis ${totalComplete} guante(s) con gamepass completo(s) como "obtenidos"`;
+    markAllBtn.addEventListener('mouseenter', () => { markAllBtn.style.background = '#14532d'; });
+    markAllBtn.addEventListener('mouseleave', () => { markAllBtn.style.background = '#0e2210'; });
+    markAllBtn.addEventListener('click', () => {
+      // Limpiar solo los guantes de tipo robux antes de remarcar
+      GLOVES.forEach(g => {
+        if (g.type === 'robux') ownedGlovesSet.delete(g.id);
+      });
+      document.querySelectorAll('.glove-card.owned').forEach(card => {
+        const g = GLOVES.find(x => x.id === card.dataset.id);
+        if (g && g.type === 'robux') card.classList.remove('owned');
+      });
+
+      let count = 0;
+      gloveEntries.forEach(([gloveId, v]) => {
+        const got = v.gamepasses.filter(g => owned[g.gamepassId]).length;
+        if (got === v.gamepasses.length) {
+          ownedGlovesSet.add(gloveId);
+          count++;
+        }
+      });
+      saveOwnedGloves();
+      document.querySelectorAll('.glove-card').forEach(card => {
+        if (ownedGlovesSet.has(card.dataset.id)) card.classList.add('owned');
+      });
+      updateGloveFilterCounts();
+      if (glovesOwnerFilterRestrictive()) renderGlovesGrid();
+      markAllBtn.textContent = `✅ ¡${count} guante(s) marcado(s) como obtenidos!`;
+      markAllBtn.style.opacity = '0.6';
+      markAllBtn.disabled = true;
+    });
+
+    summaryWrap = document.createElement('div');
+    summaryWrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+    summaryWrap.appendChild(summaryEl);
+    summaryWrap.appendChild(markAllBtn);
+  }
+  resultsEl.appendChild(summaryWrap);
+
+  if (controlsEl) controlsEl.style.display = 'flex';
+  updateRcrFilterLabels();
+  if (document.getElementById('rcr-search-input')) document.getElementById('rcr-search-input').value = '';
+  rcrFilter = 'all';
+  document.querySelectorAll('.rcr-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+
+  /* Filas agrupadas por guante (type:'robux') — igual estilo que "Guantes de Badge" */
+  const sortedGloves = gloveEntries.slice().sort(([,a],[,b]) => {
+    const s = v => { const g=v.gamepasses.filter(x=>owned[x.gamepassId]).length; return g===v.gamepasses.length?2:g>0?1:0; };
+    return s(a)-s(b);
+  });
+
+  sortedGloves.forEach(([gloveId, gd]) => {
+    const got = gd.gamepasses.filter(g => owned[g.gamepassId]).length, total = gd.gamepasses.length;
+    let status, pillClass, pillText;
+    if (got===total)  { status='complete'; pillClass='complete'; pillText='✅ Completo'; }
+    else if (got>0)   { status='partial';  pillClass='partial';  pillText=`⚠️ Parcial (${got}/${total})`; }
+    else              { status='pending';  pillClass='pending';  pillText='❌ Pendiente'; }
+
+    const row = document.createElement('div');
+    row.className = 'rcr-glove-row';
+    if (got===total) row.classList.add('open');
+
+    const header = document.createElement('div');
+    header.className = 'rcr-glove-header';
+    header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;user-select:none;';
+
+    const banner = document.createElement('img');
+    banner.className = 'rcr-glove-banner';
+    banner.src = `default_${gloveId}.png`;
+    banner.alt = gd.gloveName;
+    banner.onerror = () => { banner.style.display = 'none'; };
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'rcr-glove-name';
+    nameSpan.textContent = gd.gloveName;
+
+    const pill = document.createElement('span');
+    pill.className = `rcr-status-pill ${pillClass}`;
+    pill.textContent = pillText;
+
+    const chevron = document.createElement('span');
+    chevron.className = 'rcr-chevron';
+    chevron.textContent = '▶';
+
+    header.appendChild(banner);
+    header.appendChild(nameSpan);
+    header.appendChild(pill);
+    header.appendChild(chevron);
+    header.addEventListener('click', () => row.classList.toggle('open'));
+
+    const bl = document.createElement('div');
+    bl.className = 'rcr-badge-list';
+    gd.gamepasses.forEach(g => {
+      const isOwned = !!owned[g.gamepassId];
+      const item = document.createElement('div');
+      item.className = 'rcr-badge-item';
+      const stateStr = isOwned
+        ? `<span class="rcr-badge-date">Comprado</span>`
+        : `<span class="rcr-badge-miss">No comprado</span>`;
+      item.innerHTML = `<span class="rcr-badge-icon">${isOwned?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${g.gamepassUrl}" target="_blank" rel="noopener">${g.gamepassName}</a></span>${stateStr}`;
+      bl.appendChild(item);
+    });
+
+    row.appendChild(header);
+    row.appendChild(bl);
+    rowsContainer.appendChild(row);
+    rcrAllRows.push({ gloveId, gloveName: gd.gloveName, status, element: row });
+  });
+
+  /* Separador, solo si hay ambos tipos de resultado */
+  if (gloveEntries.length && extraList.length) {
+    const sep = document.createElement('div');
+    sep.textContent = 'Gamepasses sin guante';
+    sep.style.cssText = 'font-family:\'Fredoka One\',cursive;font-size:0.78rem;color:#666;letter-spacing:.5px;margin:4px 2px 0;';
+    rowsContainer.appendChild(sep);
+  }
+
+  /* Filas planas (EXTRA_GAMEPASSES) */
+  const sortedExtra = extraList.slice().sort((a, b) => {
+    const sa = owned[a.gamepassId] ? 1 : 0, sb = owned[b.gamepassId] ? 1 : 0;
+    return sa - sb;
+  });
+
+  sortedExtra.forEach(g => {
+    const isOwned = !!owned[g.gamepassId];
+    const status  = isOwned ? 'complete' : 'pending';
+
+    const row = document.createElement('div');
+    row.className = 'rcr-glove-row rcr-flat-row';
+
+    const item = document.createElement('div');
+    item.className = 'rcr-badge-item';
+    const stateStr = isOwned
+      ? `<span class="rcr-badge-date">Comprado</span>`
+      : `<span class="rcr-badge-miss">No comprado</span>`;
+    item.innerHTML = `<span class="rcr-badge-icon">${isOwned?'✅':'❌'}</span><span class="rcr-badge-name"><a href="${g.gamepassUrl}" target="_blank" rel="noopener">${g.gamepassName}</a></span>${stateStr}`;
+
+    row.appendChild(item);
+    rowsContainer.appendChild(row);
+    rcrAllRows.push({ gloveId: g.gamepassId, gloveName: g.gamepassName, status, element: row });
+  });
+
+  setStatus(`${user.name}: ${gotGamepasses}/${totalGamepasses} gamepasses obtenidos · ${totalComplete} guante(s) completo(s)`, 'ok');
 }
 </script>
 
