@@ -1478,192 +1478,6 @@ body {
   color: var(--red-close);
 }
 
-/* ============================================================
-   RESET NUKE OVERLAY
-   ============================================================ */
-#reset-nuke-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 600;
-  background: rgba(0,0,0,0.92);
-  align-items: center;
-  justify-content: center;
-  animation: fadeInDetail .2s ease;
-}
-#reset-nuke-overlay.open { display: flex; }
-
-#reset-nuke-modal {
-  position: relative;
-  background: #0d0505;
-  border: 2px solid #3d0a0a;
-  border-top: 3px solid var(--red-close);
-  border-radius: 16px;
-  box-shadow: 0 0 50px rgba(255,51,51,0.18), 0 16px 50px rgba(0,0,0,0.9);
-  max-width: 460px;
-  width: 92%;
-  overflow: hidden;
-  animation: cardIn .28s ease both;
-}
-
-#reset-nuke-header {
-  background: linear-gradient(90deg, #1a0404 0%, #110202 100%);
-  border-bottom: 1px solid #3d0a0a;
-  padding: 18px 56px 18px 20px;
-  position: relative;
-}
-#reset-nuke-header h2 {
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.2rem;
-  color: var(--red-close);
-  text-shadow: 0 0 20px rgba(255,51,51,0.5);
-  letter-spacing: 2px;
-  margin: 0;
-}
-
-#btn-close-reset-nuke {
-  position: absolute;
-  top: 50%; right: 14px;
-  transform: translateY(-50%);
-  background: #1a0404;
-  color: var(--red-close);
-  border: 2px solid #3d0a0a;
-  border-radius: 10px;
-  width: 34px; height: 34px;
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: filter .15s;
-}
-#btn-close-reset-nuke:hover { filter: brightness(1.3); }
-
-#reset-nuke-body {
-  padding: 22px 22px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.reset-nuke-warning-icon {
-  font-size: 2.8rem;
-  text-align: center;
-  line-height: 1;
-  filter: drop-shadow(0 0 12px rgba(255,51,51,0.6));
-}
-
-.reset-nuke-text {
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.95rem;
-  color: #ccc;
-  text-align: center;
-  line-height: 1.6;
-}
-
-.reset-nuke-list {
-  background: #110000;
-  border: 1.5px solid #2a0505;
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.reset-nuke-list-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.88rem;
-  color: #bbb;
-}
-.reset-nuke-list-item span.rni-icon {
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-
-#reset-nuke-footer {
-  padding: 14px 22px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Hold-to-confirm button */
-#btn-nuke-confirm {
-  position: relative;
-  width: 100%;
-  padding: 13px 16px;
-  background: #1a0404;
-  border: 2px solid var(--red-close);
-  border-radius: 10px;
-  color: var(--red-close);
-  font-family: 'Fredoka One', cursive;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-  outline: none;
-  transition: border-color .15s, box-shadow .15s;
-  box-shadow: 0 0 0 rgba(255,51,51,0);
-}
-#btn-nuke-confirm:hover {
-  box-shadow: 0 0 18px rgba(255,51,51,0.25);
-}
-#btn-nuke-confirm-fill {
-  position: absolute;
-  inset: 0;
-  background: rgba(255,51,51,0.18);
-  width: 0%;
-  transition: none;
-  pointer-events: none;
-  border-radius: 8px;
-}
-#btn-nuke-confirm-fill.filling {
-  transition: width linear;
-}
-#btn-nuke-confirm-label {
-  position: relative;
-  z-index: 1;
-  pointer-events: none;
-}
-#btn-nuke-confirm.done {
-  background: #2a0505;
-  border-color: #ff6666;
-  color: #fff;
-  box-shadow: 0 0 28px rgba(255,51,51,0.45);
-}
-
-#btn-nuke-cancel {
-  width: 100%;
-  padding: 10px 16px;
-  background: transparent;
-  border: 1.5px solid #333;
-  border-radius: 10px;
-  color: #666;
-  font-family: 'Fredoka One', cursive;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: border-color .15s, color .15s;
-}
-#btn-nuke-cancel:hover {
-  border-color: #555;
-  color: #aaa;
-}
-
-#reset-nuke-countdown {
-  font-family: 'Fredoka One', cursive;
-  font-size: 0.78rem;
-  color: #555;
-  text-align: center;
-  min-height: 1.2em;
-  letter-spacing: 0.5px;
-  transition: color .2s;
-}
-#reset-nuke-countdown.active { color: var(--red-close); }
-
 /* ── Indicador de guardado automático ── */
 #autosave-badge {
   font-family: 'Fredoka', sans-serif;
@@ -7025,54 +6839,11 @@ input[type="range"].slap-volume::-moz-range-track {
   </button>
 </div>
 <div style="text-align:center;padding:4px 0 0;">
-  <button id="btn-reset" onclick="openResetNuke()">🗑️ Resetear todo el progreso</button>
+  <button id="btn-reset" onclick="resetAllProgress()">🗑️ Resetear todo el progreso</button>
 </div>
 
 <!-- Toast de guardado -->
 <div id="save-toast">💾 Guardado</div>
-
-<!-- ========================================================
-     RESET NUKE OVERLAY — confirmación de borrado total
-     ======================================================== -->
-<div id="reset-nuke-overlay">
-  <div id="reset-nuke-modal">
-    <div id="reset-nuke-header">
-      <h2>🗑️ RESETEAR PROGRESO</h2>
-      <button id="btn-close-reset-nuke" onclick="closeResetNuke()" title="Cancelar">✕</button>
-    </div>
-    <div id="reset-nuke-body">
-      <div class="reset-nuke-warning-icon">⚠️</div>
-      <div class="reset-nuke-text">
-        Esta acción es <strong style="color:var(--red-close)">permanente e irreversible</strong>.<br>
-        Se borrará todo lo siguiente:
-      </div>
-      <div class="reset-nuke-list">
-        <div class="reset-nuke-list-item">
-          <span class="rni-icon">⚔️</span>
-          <span>Maestrías completadas, misiones y contadores</span>
-        </div>
-        <div class="reset-nuke-list-item">
-          <span class="rni-icon">🥊</span>
-          <span>Guantes marcados como obtenidos</span>
-        </div>
-        <div class="reset-nuke-list-item">
-          <span class="rni-icon">📆</span>
-          <span>Historial completo del diario</span>
-        </div>
-      </div>
-    </div>
-    <div id="reset-nuke-footer">
-      <div id="reset-nuke-countdown">Mantén el botón para confirmar</div>
-      <button id="btn-nuke-confirm"
-        onmousedown="nukeHoldStart()" onmouseup="nukeHoldEnd()" onmouseleave="nukeHoldEnd()"
-        ontouchstart="nukeHoldStart();event.preventDefault()" ontouchend="nukeHoldEnd()" ontouchcancel="nukeHoldEnd()">
-        <div id="btn-nuke-confirm-fill"></div>
-        <span id="btn-nuke-confirm-label">🗑️ Mantén para borrar todo (5s)</span>
-      </button>
-      <button id="btn-nuke-cancel" onclick="closeResetNuke()">Cancelar</button>
-    </div>
-  </div>
-</div>
 
 <!-- ========================================================
      GRID VIEW
@@ -7895,19 +7666,6 @@ input[type="range"].slap-volume::-moz-range-track {
 */
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
-  {
-    version: "1.2.4 - DETECCIÓN DE GAMEPASSES Y MAS LOGROS",
-    date: "27/06/2026",
-    entries: [
-      { emoji: "🥊", color: "#11ffff", text: "Mas guantes de slaps hasta Shuckuchi"},
-      { emoji: "🎖️", color: "#FFD700", text: "Ahora puedes ver los logros que no otorgan guantes y gamepasses"},
-      { emoji: "✅", color: "#39ff14", text: "Puedes marcar Acrobat como completado de forma manual."},
-      { emoji: "🔎", color: "#a78bfa", text: "Filtros mejorados"},
-      { emoji: "🗑️", color: "#FF0000", text: "Ahora resetear todo el progreso tiene un mejor estilo visual y resetea TODO"},
-      { emoji: "💬", color: "#917A7A", text: "Si una persona no tiene ni un logro, te aparece un mensaje explicandote como ponerte el inventario en publico por si ese es el problema"},
-    ]
-  },
-  
   {
     version: "1.2.31 - MINI UPDATE TRAS LOS LOGROS",
     date: "27/06/2026",
@@ -9606,106 +9364,9 @@ function saveHiddenMasteries() {
   } catch(e) { console.warn('No se pudo guardar maestrías ocultas:', e); }
 }
 
-/* ============================================================
-   RESET NUKE MODAL — lógica de apertura, cierre y hold-confirm
-   ============================================================ */
-let _nukeHoldTimer    = null;
-let _nukeHoldInterval = null;
-let _nukeHolding      = false;
-
-function openResetNuke() {
-  const overlay = document.getElementById('reset-nuke-overlay');
-  if (!overlay) return;
-  overlay.classList.add('open');
-  _resetNukeBtn();
-  updateFabVisibility();
-  // Close on backdrop click
-  overlay.addEventListener('mousedown', _nukeBackdropClose);
-}
-
-function closeResetNuke() {
-  const overlay = document.getElementById('reset-nuke-overlay');
-  if (!overlay) return;
-  overlay.classList.remove('open');
-  overlay.removeEventListener('mousedown', _nukeBackdropClose);
-  _cancelNukeHold();
-  _resetNukeBtn();
-  updateFabVisibility();
-}
-
-function _nukeBackdropClose(e) {
-  if (e.target === document.getElementById('reset-nuke-overlay')) closeResetNuke();
-}
-
-function _resetNukeBtn() {
-  const fill  = document.getElementById('btn-nuke-confirm-fill');
-  const label = document.getElementById('btn-nuke-confirm-label');
-  const count = document.getElementById('reset-nuke-countdown');
-  const btn   = document.getElementById('btn-nuke-confirm');
-  if (fill)  { fill.style.transition = 'none'; fill.style.width = '0%'; fill.classList.remove('filling'); }
-  if (label) label.textContent = '🗑️ Mantén para borrar todo (5s)';
-  if (count) { count.textContent = 'Mantén el botón para confirmar'; count.classList.remove('active'); }
-  if (btn)   btn.classList.remove('done');
-}
-
-function _cancelNukeHold() {
-  clearTimeout(_nukeHoldTimer);
-  clearInterval(_nukeHoldInterval);
-  _nukeHoldTimer = null;
-  _nukeHoldInterval = null;
-  _nukeHolding = false;
-}
-
-function nukeHoldStart() {
-  if (_nukeHolding) return;
-  _nukeHolding = true;
-  const DURATION = 5000; // ms
-  const fill  = document.getElementById('btn-nuke-confirm-fill');
-  const label = document.getElementById('btn-nuke-confirm-label');
-  const count = document.getElementById('reset-nuke-countdown');
-  const btn   = document.getElementById('btn-nuke-confirm');
-  const start = Date.now();
-
-  if (fill) {
-    fill.style.transition = 'none';
-    fill.style.width = '0%';
-    // force reflow so transition kicks in fresh
-    void fill.offsetWidth;
-    fill.classList.add('filling');
-    fill.style.transition = `width ${DURATION}ms linear`;
-    fill.style.width = '100%';
-  }
-
-  _nukeHoldInterval = setInterval(() => {
-    const elapsed = Date.now() - start;
-    const remaining = Math.max(0, Math.ceil((DURATION - elapsed) / 1000));
-    if (count) {
-      count.classList.add('active');
-      count.textContent = remaining > 0 ? `Suelta para cancelar · ${remaining}s` : '¡Soltando ahora!';
-    }
-    if (label) label.textContent = `⏳ Borrando en ${Math.max(0, remaining)}s…`;
-  }, 100);
-
-  _nukeHoldTimer = setTimeout(() => {
-    clearInterval(_nukeHoldInterval);
-    if (!_nukeHolding) return;
-    if (btn)   btn.classList.add('done');
-    if (label) label.textContent = '✅ ¡Borrando todo!';
-    if (count) { count.textContent = ''; count.classList.remove('active'); }
-    setTimeout(() => {
-      closeResetNuke();
-      resetAllProgress();
-    }, 350);
-  }, DURATION);
-}
-
-function nukeHoldEnd() {
-  if (!_nukeHolding) return;
-  _cancelNukeHold();
-  _resetNukeBtn();
-}
-
 function resetAllProgress() {
+  if (!confirm('¿Seguro que quieres borrar TODO el progreso?\n\nEsto incluye:\n• Maestrías completadas y misiones\n• Guantes marcados como obtenidos\n• Historial del diario\n\nEsta acción no se puede deshacer.')) return;
+
   // ── Maestrías ──
   progressData = {};
   completedSet.clear();
@@ -21963,7 +21624,7 @@ async function runGamepassesCheck(user, resultsEl, rowsContainer, controlsEl) {
     const emptyMsg = document.createElement('div');
     emptyMsg.style.cssText = 'background:#1a1000;border:2px solid #3d2800;border-radius:12px;padding:18px 20px;color:#ccc;font-family:\'Fredoka\',sans-serif;font-size:0.92rem;line-height:1.7;';
     emptyMsg.innerHTML = `<div style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#FFD700;margin-bottom:8px;">⚠️ Sin gamepasses encontrados</div>
-El usuario que buscas no tiene ningún gamepass o tiene el inventario en privado. En el caso de ser la segunda opción, para usar esta herramienta dile que siga estos pasos:<br><br>
+El usuario que buscas no tiene ningún gamepass o tiene el inventario en privado. Los Gamepasses REGALADOS no se registran! En el caso de ser la segunda opción, para usar esta herramienta dile que siga estos pasos:<br><br>
 <span style="background:#111;border:1.5px solid #444;border-radius:8px;padding:6px 12px;display:inline-block;font-family:'Fredoka One',cursive;color:#FFD700;letter-spacing:0.5px;">Roblox → Ajustes → Restricciones de privacidad y contenido → Intercambio e inventario → Todos</span>`;
     resultsEl.appendChild(emptyMsg);
     setStatus(`${user.name}: sin gamepasses encontrados (inventario vacío o privado)`, 'error');
