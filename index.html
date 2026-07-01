@@ -4514,6 +4514,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .gfm-chip[data-val="logro"]:has(input:checked)        { background:#1a1000; border-color:#fbbf24; color:#fbbf24; }
 .gfm-chip[data-val="otro"]:has(input:checked)         { background:#160a22; border-color:#c084fc; color:#c084fc; }
 .gfm-chip[data-val="staff"]:has(input:checked)        { background:#240a38; border-color:#FFD700; color:#FFD700; box-shadow:0 0 10px rgba(255,215,0,0.25); }
+.gfm-chip[data-val="royale"]:has(input:checked)       { background:#1a1a1a; border-color:#9ca3af; color:#e5e7eb; box-shadow:0 0 10px rgba(156,163,175,0.25); }
 .gfm-chip[data-val="owned"]:has(input:checked)        { background:#0e2210; border-color:#4ade80; color:#4ade80; }
 .gfm-chip[data-val="notowned"]:has(input:checked)     { background:#200a0a; border-color:#f87171; color:#f87171; }
 .gfm-chip[data-val="unobtainable"]:has(input:checked) { background:#1a0a0a; border-color:#ff6b6b; color:#ff6b6b; }
@@ -4577,11 +4578,18 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .glove-card[data-type="logro"]:hover  { border-color: #fbbf24; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(251,191,36,0.35); }
 .glove-card[data-type="otro"]:hover   { border-color: #c084fc; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(192,132,252,0.35); }
 .glove-card[data-type="staff"]:hover  { border-color: #FFD700; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(255,215,0,0.4), 0 0 32px rgba(168,85,247,0.3); }
+.glove-card[data-type="royale"]:hover { border-color: #9ca3af; box-shadow: 0 14px 34px rgba(0,0,0,0.7), 0 0 18px rgba(156,163,175,0.4), 0 0 32px rgba(31,41,55,0.5); }
 
 /* ── Tarjeta morada para guantes de Staff-only ── */
 .glove-card[data-type="staff"] {
   background: linear-gradient(160deg, #2c1248 0%, #190a2c 100%);
   border-color: #4c1d8a;
+}
+
+/* ── Tarjeta negro-gris para guantes de Slap Royale ── */
+.glove-card[data-type="royale"] {
+  background: linear-gradient(160deg, #2b2b2e 0%, #0a0a0b 100%);
+  border-color: #3f3f46;
 }
 
 .glove-card-top {
@@ -4649,6 +4657,20 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .gribbon-logro { background: #fbbf24; color: #1a0e00; }
 .gribbon-otro  { background: #c084fc; color: #0e0618; }
 .gribbon-staff { background: linear-gradient(135deg, #FFD700, #a855f7); color: #1f0a33; }
+.gribbon-royale { background: linear-gradient(135deg, #6b7280, #0a0a0b); color: #f3f4f6; }
+
+/* Segundo ribbon (esquina opuesta) con la SUBCATEGORÍA de los guantes de
+   Slap Royale. No es una pastilla de estado: es un ribbon igual en forma
+   al principal, pero en la esquina contraria y con los colores del tipo
+   normal correspondiente (slaps/robux/logro). */
+.glove-subtype-ribbon {
+  position: absolute;
+  top: 12px; right: -30px; left: auto;
+  transform: rotate(45deg);
+}
+.gribbon-sub-slaps { background: #4ade80; color: #061a0a; }
+.gribbon-sub-robux { background: #60a5fa; color: #030d1a; }
+.gribbon-sub-logro { background: #fbbf24; color: #1a0e00; }
 
 /* Type accent bar at bottom of banner */
 .glove-card[data-type="slaps"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#4ade80; box-shadow:0 0 8px rgba(74,222,128,0.6); z-index:3; }
@@ -4656,6 +4678,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .glove-card[data-type="logro"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#fbbf24; box-shadow:0 0 8px rgba(251,191,36,0.6); z-index:3; }
 .glove-card[data-type="otro"]  .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:#c084fc; box-shadow:0 0 8px rgba(192,132,252,0.6); z-index:3; }
 .glove-card[data-type="staff"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#FFD700,#a855f7); box-shadow:0 0 8px rgba(255,215,0,0.5); z-index:3; }
+.glove-card[data-type="royale"] .glove-card-top::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#6b7280,#0a0a0b); box-shadow:0 0 8px rgba(107,114,128,0.55); z-index:3; }
 
 .glove-card-body {
   padding: 13px 15px 10px;
@@ -4682,6 +4705,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .glove-tl-logro { color: #fbbf24; }
 .glove-tl-otro  { color: #c084fc; }
 .glove-tl-staff { color: #FFD700; }
+.glove-tl-royale { color: #d1d5db; }
 
 /* ── Fila de meta-datos en la tarjeta: precio + estado ── */
 .glove-card-meta-row {
@@ -4828,6 +4852,7 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 .gtbadge-logro { color: #fbbf24; background: #1a0e00; border-color: #fbbf24; }
 .gtbadge-otro  { color: #c084fc; background: #0e0618; border-color: #c084fc; }
 .gtbadge-staff { color: #FFD700; background: #1f0a33; border-color: #a855f7; }
+.gtbadge-royale { color: #e5e7eb; background: #111114; border-color: #6b7280; }
 
 /* ============================================================
    GLOVE DETAIL VIEW
@@ -5234,7 +5259,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #glove-detail-banner-wrap.gbtype-robux::after,
 #glove-detail-banner-wrap.gbtype-logro::after,
 #glove-detail-banner-wrap.gbtype-otro::after,
-#glove-detail-banner-wrap.gbtype-staff::after {
+#glove-detail-banner-wrap.gbtype-staff::after,
+#glove-detail-banner-wrap.gbtype-royale::after {
   content: '';
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -5246,6 +5272,8 @@ body.todo-selecting #grid-view { padding-top: 72px; }
 #glove-detail-banner-wrap.gbtype-logro::after { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.65); }
 #glove-detail-banner-wrap.gbtype-otro::after  { background: #c084fc; box-shadow: 0 0 10px rgba(192,132,252,0.65); }
 #glove-detail-banner-wrap.gbtype-staff::after { background: linear-gradient(90deg,#FFD700,#a855f7); box-shadow: 0 0 10px rgba(255,215,0,0.6); }
+#glove-detail-banner-wrap.gbtype-royale::after { background: linear-gradient(90deg,#6b7280,#0a0a0b); box-shadow: 0 0 10px rgba(107,114,128,0.6); }
+#glove-detail-banner-wrap.gbtype-royale { border-color: #3f3f46; }
 
 /* ── Banner duotono B&N + dorado para Staff-only (igual técnica que en la tarjeta) ── */
 #glove-detail-banner-wrap.gbtype-staff { border-color: #4c1d8a; }
@@ -7248,6 +7276,7 @@ input[type="range"].slap-volume::-moz-range-track {
             <label class="gfm-chip" data-val="logro"><input type="checkbox" data-cat="type" data-val="logro" checked onchange="toggleGloveFilterValue(this)">🏅 Logro<span class="gfm-count" id="gfcount-type-logro"></span></label>
             <label class="gfm-chip" data-val="otro"><input type="checkbox" data-cat="type" data-val="otro" checked onchange="toggleGloveFilterValue(this)">🔮 Otro<span class="gfm-count" id="gfcount-type-otro"></span></label>
             <label class="gfm-chip" data-val="staff"><input type="checkbox" data-cat="type" data-val="staff" onchange="toggleGloveFilterValue(this)">🟣 Staff-only<span class="gfm-count" id="gfcount-type-staff"></span></label>
+            <label class="gfm-chip" data-val="royale"><input type="checkbox" data-cat="type" data-val="royale" checked onchange="toggleGloveFilterValue(this)">⚔️ Slap Royale<span class="gfm-count" id="gfcount-type-royale"></span></label>
           </div>
         </div>
 
@@ -7318,6 +7347,7 @@ input[type="range"].slap-volume::-moz-range-track {
           <div id="glove-detail-name">Guante</div>
           <div class="glove-detail-meta-row">
             <div class="glove-type-badge" id="glove-detail-type-badge"></div>
+            <div class="glove-type-badge" id="glove-detail-subtype-badge" style="display:none"></div>
             <span class="glove-status-pill" id="glove-detail-status-pill" style="display:none"></span>
           </div>
           <div class="glove-detail-release" id="glove-detail-release" style="display:none">
@@ -12780,6 +12810,46 @@ let gloveDetailOpen = null;
    filtros (todos los demás tipos empiezan marcados). Esto hace que los
    guantes de Staff-only estén "ocultos" / sean secretos hasta que alguien
    activa manualmente esa casilla en el menú de filtros. ── */
+/* ── Tipo especial "royale" ──────────────────────────────────────
+   type: 'royale'  →  Guante de Slap Royale. Es un tipo independiente
+   (NO es una variante de otro guante como "staff"; tiene sus propias
+   imágenes: default_(id).png para el banner y defglove_(id).png para
+   el guante, exactamente igual que slaps/robux/logro/otro), pero con
+   diseño visual propio en negro-gris (en vez del morado de "staff").
+
+     subType  : 'slaps' | 'robux' | 'logro'  (OBLIGATORIO en type:'royale')
+                — indica de qué SUBCATEGORÍA es el guante dentro de
+                Slap Royale. No cambia el tipo (sigue siendo 'royale'
+                a todos los efectos de filtros/diseño), pero sí hace
+                que el guante FUNCIONE exactamente igual que un guante
+                normal de ese subType:
+                  · subType:'slaps' → usa "cost" (número) para mostrar
+                    precio en Slaps, igual que type:'slaps'.
+                  · subType:'robux' → usa "cost" (número) y puede usar
+                    "gamepasses", igual que type:'robux'.
+                  · subType:'logro' → puede usar "badges" (uno o varios
+                    logros), igual que type:'logro'. Esto incluye la
+                    compatibilidad total con el detector/visualizador
+                    de logros (imagen badge_(id).png, badge2_(id).png...
+                    y enlace "Ver en Roblox"), tal cual funciona en un
+                    guante logro normal.
+     cost     : number  — solo si subType es 'slaps' o 'robux'.
+     gamepasses: Array<{name,url}> — solo si subType es 'robux' (opcional).
+     badges   : Array<{name,url}> — solo si subType es 'logro' (opcional).
+     obtainMethod: string — se usa igual que en "otro"/"staff" cuando
+                subType es distinto de 'slaps'/'robux' y no hay badges,
+                o como complemento informativo.
+
+   VISUAL: la tarjeta y el detalle usan el diseño negro-gris propio de
+   "royale" (ribbon "⚔️ Slap Royale", borde/backdrop oscuros). Además,
+   se añade un SEGUNDO ribbon (no es una pastilla de estado) en la
+   esquina opuesta de la tarjeta —y una insignia extra en el detalle—
+   mostrando la subcategoría (👋 Slaps / 💎 Robux / 🏅 Logro) con los
+   mismos colores que esos tipos normales, para diferenciarla a simple
+   vista sin dejar de ser, conceptualmente, un guante de Slap Royale.
+
+   FILTROS: el tipo "royale" empieza MARCADO por defecto (no es secreto
+   como "staff"); aparece como una casilla más en el menú de filtros. ── */
 /* ── Campos NUEVOS y OPCIONALES (déjalos fuera si no los usas, no rompen nada):
      quote       : string   — frase corta a modo de cita (se ve como bocadillo)
      releaseDate : string   — fecha de lanzamiento, ej: '11/08/2023'
@@ -20722,6 +20792,396 @@ const GLOVES = [
     locked: true
   },
 
+  /* ── EJEMPLO TIPO: ROYALE (subType: slaps) ── */
+  {
+    id: 'packapunch',
+    name: 'Pack-A-Punch',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 0,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'vigorous',
+    name: 'Vigorous',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 0,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'aerialist',
+    name: 'Aerialist',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 2000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'tank',
+    name: 'Tank',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 3000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'pow',
+    name: 'Pow',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 4000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'faculty',
+    name: 'Faculty',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 5000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'revenge',
+    name: 'Revenge',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 6000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'juggernaut',
+    name: 'Juggernaut',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 7000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'void',
+    name: 'Void',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 8000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'aquarius',
+    name: 'Aquarius',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 9000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'mimic',
+    name: 'Mimic',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 10000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'thundercaller',
+    name: 'Thundercaller',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 13000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'missilelauncher',
+    name: 'Missile-Launcher',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 14000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'glacier',
+    name: 'Glacier',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 15000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'kaboom',
+    name: 'Kaboom',
+    type: 'royale',
+    subType: 'slaps',
+    cost: 16000,
+    quote: 'Empieza con 10 de poder extra',
+    releaseDate: '20/05/2022',
+    power: 50,
+    speed: 14,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Slaps ganados dentro del propio modo.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+
+  /* ── EJEMPLO TIPO: ROYALE (subType: robux) ── */
+  {
+    id: 'vampire',
+    name: 'Vampire',
+    type: 'royale',
+    subType: 'robux',
+    cost: 225,
+    gamepasses: [
+      { name: 'Vampire', url: 'https://www.roblox.com/game-pass/45176930/Vampire' },
+    ],
+    quote: '',
+    releaseDate: '',
+    power: 4,
+    speed: 3,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Robux mediante un gamepass.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  {
+    id: 'cannoneer',
+    name: 'Cannoneer',
+    type: 'royale',
+    subType: 'robux',
+    cost: 197,
+    gamepasses: [
+      { name: 'Cannoneer', url: 'https://roblox-slap-battles.fandom.com/wiki/Purchasables#Regular_Gamepasses' },
+    ],
+    quote: '',
+    releaseDate: '',
+    power: 4,
+    speed: 3,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, comprable con Robux mediante un gamepass.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
+
+  /* ── EJEMPLO TIPO: ROYALE (subType: logro) ── */
+  {
+    id: 'witch',
+    name: 'Witch',
+    type: 'royale',
+    subType: 'logro',
+    status: "halloween",
+    badges: [
+      { name: 'Witch Brew', url: 'https://www.roblox.com/badges/2129002959/Witch-Brew' },
+    ],
+    quote: '',
+    releaseDate: '',
+    power: 5,
+    speed: 2,
+    mechanics: [
+      'Guante exclusivo del modo Slap Royale, obtenido al conseguir el logro correspondiente.',
+    ],
+    abilities: [
+      '[E] Habilidad de ejemplo del guante.',
+    ],
+    tutorialUrl: null,
+    songs: null,
+    locked: true
+  },
 
 ];
 
@@ -20793,6 +21253,16 @@ const GLOVE_TYPE_META = {
   logro: { label: '🏅 Logro',      badgeClass: 'gtbadge-logro', ribbonClass: 'gribbon-logro', obtainLabel: '🏅 MÉTODO DE OBTENCIÓN' },
   otro:  { label: '🔮 Otro',       badgeClass: 'gtbadge-otro',  ribbonClass: 'gribbon-otro',  obtainLabel: '🔮 MÉTODO DE OBTENCIÓN' },
   staff: { label: '🟣 Staff', badgeClass: 'gtbadge-staff',ribbonClass: 'gribbon-staff', obtainLabel: '🟣 MÉTODO DE OBTENCIÓN' },
+  royale:{ label: '⚔️ Slap Royale', badgeClass: 'gtbadge-royale', ribbonClass: 'gribbon-royale', obtainLabel: '⚔️ MÉTODO DE OBTENCIÓN' },
+};
+
+/* ── Metadatos de las subcategorías de "royale" (reutilizan colores/labels
+   de los tipos normales slaps/robux/logro, pero con su propia clase de
+   ribbon "gribbon-sub-*" para no chocar con el ribbon principal) ── */
+const GLOVE_ROYALE_SUBTYPE_META = {
+  slaps: { label: '👋 Slaps', ribbonClass: 'gribbon-sub-slaps', badgeClass: 'gtbadge-slaps', obtainLabel: '💰 PRECIO (SLAPS)' },
+  robux: { label: '💎 Robux', ribbonClass: 'gribbon-sub-robux', badgeClass: 'gtbadge-robux', obtainLabel: '💎 PRECIO (ROBUX)' },
+  logro: { label: '🏅 Logro', ribbonClass: 'gribbon-sub-logro', badgeClass: 'gtbadge-logro', obtainLabel: '🏅 MÉTODO DE OBTENCIÓN' },
 };
 
 /* ── Estados de disponibilidad: metadatos visuales (todos opcionales) ──
@@ -20843,7 +21313,7 @@ function checkGlovesUnlock() {
 /* Estado de los filtros. Todo empieza marcado EXCEPTO el tipo 'staff'
    (los guantes de Staff-only empiezan ocultos, como si fuesen secretos). */
 const glovesFilters = {
-  type:   new Set(['slaps', 'robux', 'logro', 'otro']),
+  type:   new Set(['slaps', 'robux', 'logro', 'otro', 'royale']),
   status: new Set(['normal', 'scavenger', 'unobtainable', 'halloween', 'christmas']),
   owner:  new Set(['owned', 'notowned']),
 };
@@ -20996,7 +21466,7 @@ function renderGlovesGrid() {
    y lo refleja en los contadores de cada casilla del menú de filtros */
 function updateGloveFilterCounts() {
   const counts = {
-    type:   { slaps: 0, robux: 0, logro: 0, otro: 0, staff: 0 },
+    type:   { slaps: 0, robux: 0, logro: 0, otro: 0, staff: 0, royale: 0 },
     status: { normal: 0, scavenger: 0, unobtainable: 0, halloween: 0, christmas: 0 },
     owner:  { owned: 0, notowned: 0 },
     locked: 0,
@@ -21033,13 +21503,20 @@ function createGloveCard(glove) {
   const statusMeta = GLOVE_STATUS_META[glove.status];
   const isLocked = !!glove.locked;
 
+  // Para guantes de type:'royale', el comportamiento de precio/badges/gamepasses
+  // se decide por su subType ('slaps' | 'robux' | 'logro'), igual que un guante
+  // normal de ese subType. Para el resto de tipos, effType === glove.type.
+  const isRoyale  = glove.type === 'royale';
+  const subMeta   = isRoyale ? GLOVE_ROYALE_SUBTYPE_META[glove.subType] : null;
+  const effType   = isRoyale ? glove.subType : glove.type;
+
   // Precio (slaps / robux) o logro(s) necesario(s) para guantes de tipo "logro"
   let priceHtml = '';
-  if (glove.type === 'slaps' && typeof glove.cost === 'number') {
+  if (effType === 'slaps' && typeof glove.cost === 'number') {
     priceHtml = `<span class="glove-card-price price-slaps"><img src="slapicon.png" alt="Slaps" onerror="this.remove()">${glove.cost.toLocaleString()}</span>`;
-  } else if (glove.type === 'robux' && typeof glove.cost === 'number') {
+  } else if (effType === 'robux' && typeof glove.cost === 'number') {
     priceHtml = `<span class="glove-card-price price-robux"><img src="robuxicon.png" alt="Robux" onerror="this.remove()">${glove.cost.toLocaleString()}</span>`;
-  } else if (glove.type === 'logro' && Array.isArray(glove.badges) && glove.badges.length) {
+  } else if (effType === 'logro' && Array.isArray(glove.badges) && glove.badges.length) {
     // Una etiqueta separada por cada badge
     // Imagen: badge_id.png para el primero, badge2_id.png, badge3_id.png... para los siguientes
     priceHtml = glove.badges.map((b, idx) => {
@@ -21065,6 +21542,7 @@ function createGloveCard(glove) {
       <img class="glove-card-banner" src="default_${assetId}.png" alt="${glove.name}"
         onerror="this.onerror=null;this.src='preview_placeholder.png'">
       <div class="glove-type-ribbon ${meta.ribbonClass}">${meta.label}</div>
+      ${subMeta ? `<div class="glove-type-ribbon glove-subtype-ribbon ${subMeta.ribbonClass}">${subMeta.label}</div>` : ''}
       ${isLocked ? '<div class="card-lock-overlay"></div><div class="card-lock-icon">🔒</div>' : ''}
     </div>
     <div class="glove-card-body">
@@ -21188,6 +21666,13 @@ function openGloveDetail(id, e) {
   const hasBaseId = glove.type === 'staff' && glove.baseId && glove.baseId !== 'nil';
   const assetId = hasBaseId ? glove.baseId : glove.id;
 
+  // Para guantes de type:'royale', el precio/badges/gamepasses/obtención se
+  // decide por su subType ('slaps' | 'robux' | 'logro'), igual que un guante
+  // normal de ese subType. Para el resto de tipos, effType === glove.type.
+  const isRoyale = glove.type === 'royale';
+  const subMeta  = isRoyale ? GLOVE_ROYALE_SUBTYPE_META[glove.subType] : null;
+  const effType  = isRoyale ? glove.subType : glove.type;
+
   // Title
   document.getElementById('glove-detail-title').textContent = '🥊 ' + glove.name.toUpperCase();
 
@@ -21228,13 +21713,23 @@ function openGloveDetail(id, e) {
   badge.textContent = meta.label;
   badge.className   = 'glove-type-badge ' + meta.badgeClass;
 
+  // Insignia extra con la subcategoría (solo guantes type:'royale')
+  const subBadge = document.getElementById('glove-detail-subtype-badge');
+  if (subMeta) {
+    subBadge.textContent  = subMeta.label;
+    subBadge.className    = 'glove-type-badge ' + subMeta.badgeClass;
+    subBadge.style.display = 'inline-flex';
+  } else {
+    subBadge.style.display = 'none';
+  }
+
   // Obtain
   const obtainLabel = document.getElementById('glove-detail-obtain-label');
   const obtainText  = document.getElementById('glove-detail-obtain-text');
-  obtainLabel.textContent = meta.obtainLabel;
-  if (glove.type === 'slaps') {
+  obtainLabel.textContent = subMeta ? subMeta.obtainLabel : meta.obtainLabel;
+  if (effType === 'slaps' && typeof glove.cost === 'number') {
     obtainText.innerHTML = `<img class="slap-icon-inline" src="slapicon.png" alt="Slaps" onerror="this.remove()">${glove.cost.toLocaleString()}`;
-  } else if (glove.type === 'robux') {
+  } else if (effType === 'robux' && typeof glove.cost === 'number') {
     obtainText.innerHTML = `<img class="slap-icon-inline" src="robuxicon.png" alt="Robux" onerror="this.remove()">${glove.cost.toLocaleString()}`;
   } else {
     obtainText.textContent = '';
@@ -21282,7 +21777,7 @@ function openGloveDetail(id, e) {
   // Limpiar bloques de badges extras añadidos por un guante anterior
   badgeWrap.parentElement.querySelectorAll('[data-extra-badge="true"]').forEach(el => el.remove());
 
-  if (glove.type === 'logro' && Array.isArray(glove.badges) && glove.badges.length) {
+  if (effType === 'logro' && Array.isArray(glove.badges) && glove.badges.length) {
     badgeWrap.classList.add('visible');
     // Imagen principal: siempre badge_(id).png (primer badge)
     badgeImg.src = 'badge_' + glove.id + '.png';
@@ -21359,7 +21854,7 @@ function openGloveDetail(id, e) {
   const gamepassImg  = document.getElementById('glove-detail-gamepass-img');
   const gamepassList = document.getElementById('glove-detail-gamepass-list');
   gamepassList.innerHTML = '';
-  if (glove.type === 'robux' && Array.isArray(glove.gamepasses) && glove.gamepasses.length) {
+  if (effType === 'robux' && Array.isArray(glove.gamepasses) && glove.gamepasses.length) {
     gamepassWrap.classList.add('visible');
     // Imagen del gamepass (única, representa al guante)
     gamepassImg.src = 'gamepass_' + glove.id + '.png';
@@ -21637,13 +22132,13 @@ function openGloveTutorial() {
    ============================================================ */
 const ROADMAP_ITEMS = [
   { id:'roadmap',      track:'start', done:true,  icon:'🗺️', label:'Creación del Roadmap para futuras updates',       desc:'Registro para ideas de futuras updates (NADA DE ESTO ES UN 100%)' },
-  { id:'slaproyale', track:'main',  done:false,  icon:'🔫', label:'Guantes de slap royale', desc:'Al menos registrarlos y crear su propia etiqueta', next:true},
-  { id:'hardbadges', track:'extra',  done:false,  icon:'💀', label:'Recompensa por logros', desc:'Pequeños detalles para la propia pagina web por completar logros o retos dificiles', },
+  { id:'slaproyale', track:'main',  done:true,  icon:'🔫', label:'Guantes de slap royale', desc:'Al menos registrarlos y crear su propia etiqueta',},
+  { id:'hardbadges', track:'extra',  done:false,  icon:'💀', label:'Recompensa por logros', desc:'Pequeños detalles para la propia pagina web por completar logros o retos dificiles', next:true},
   { id:'extra', track:'main',  done:false,  icon:'🧤', label:'Guantes extra', desc:'Mas guantes de la categoria "Otros", como ejemplo el guante linterna de las boss fights',},
   { id:'changelog', track:'extra',  done:false,  icon:'📜', label:'Changelog de Slap Battles', desc:'Seccion segundaria en el changelog para ver las updates del slap battles', },
   { id:'owner', track:'extra',  done:false,  icon:'👀', label:'Stalk de Tencell', desc:'Sistema de avisos de cuando el usuario @tencell se une a Slap Battles y (si se puede) sistema de union a ese server.', },
   { id:'badges', track:'extra',  done:false,  icon:'🎖️', label:'Rework de los logros', desc:'Sistema mas complejo pero mas seguro y sin requerir mantenimiento semanal', },
-  { id:'guantes', track:'main',  done:false,  icon:'🥊', label:'Guantes terminados', desc:'Terminar todos los guantes', },
+  { id:'guantes', track:'main',  done:false,  icon:'🥊', label:'Guantes terminados', desc:'Terminar todos los guantes: descripcion, habilidades, etc.', },
 ];
 
 const RM = {
