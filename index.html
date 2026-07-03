@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slap Battles – Glove Mastery Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;500;600&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
@@ -7095,6 +7095,743 @@ input[type="range"].slap-volume::-moz-range-track {
   display: block;
 }
 
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║          SALA DE TROFEOS  (estilo PlayStation)            ║
+   ╚══════════════════════════════════════════════════════════╝
+   ============================================================ */
+:root {
+  --trophy-platinum: #cfe8ff;
+  --trophy-gold:      #FFD700;
+  --trophy-silver:    #c8c8d4;
+  --trophy-bronze:    #cd7f32;
+  --trophy-locked:    #3a3a3a;
+  --trophy-unlock:    #4fd1ff;
+}
+
+#trophy-view {
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+  padding: 18px 20px 70px;
+  max-width: 1080px;
+  margin: 0 auto;
+  animation: fadeIn .25s ease;
+  position: relative;
+}
+#trophy-view::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,215,0,.07), transparent 45%),
+    radial-gradient(circle at 84% 78%, rgba(207,232,255,.05), transparent 50%);
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+
+/* ── Cabecera ── */
+.trophy-room-header { text-align: center; padding: 4px 0 0; position: relative; }
+.trophy-room-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.9rem;
+  letter-spacing: .5px;
+  color: var(--yellow-bright);
+  text-shadow: 0 0 22px rgba(255,215,0,.4), 0 0 44px rgba(255,215,0,.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  animation: trophyTitleGlow 3.2s ease-in-out infinite;
+}
+@keyframes trophyTitleGlow {
+  0%,100% { text-shadow: 0 0 18px rgba(255,215,0,.35), 0 0 40px rgba(255,215,0,.12); }
+  50%     { text-shadow: 0 0 28px rgba(255,215,0,.55), 0 0 56px rgba(255,215,0,.22); }
+}
+.trophy-room-subtitle {
+  font-family: 'Fredoka', sans-serif;
+  font-size: .86rem;
+  color: #888;
+  margin-top: 6px;
+}
+.trophy-room-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,215,0,.12), rgba(255,215,0,.03));
+  border: 1.5px solid rgba(255,215,0,.35);
+  font-family: 'Fredoka One', cursive;
+  font-size: .78rem;
+  color: var(--yellow-bright);
+  letter-spacing: .4px;
+}
+
+/* ── Barra resumen (chips de rareza + barra global) ── */
+#trophy-summary-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(155deg, var(--bg-panel), #202020);
+  border: 2px solid #222;
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+}
+.trophy-rarity-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: #1f1f1f;
+  border: 1.5px solid #333;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: 'Fredoka One', cursive;
+  font-size: .8rem;
+  color: #ccc;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: transform .15s, box-shadow .2s, background .2s;
+}
+.trophy-rarity-chip:hover { transform: translateY(-2px); }
+.trophy-rarity-chip .trc-count {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  opacity: .8;
+}
+.trophy-rarity-chip.rarity-platinum { border-color: var(--trophy-platinum); color: var(--trophy-platinum); }
+.trophy-rarity-chip.rarity-gold     { border-color: var(--trophy-gold);     color: var(--trophy-gold); }
+.trophy-rarity-chip.rarity-silver   { border-color: var(--trophy-silver);   color: var(--trophy-silver); }
+.trophy-rarity-chip.rarity-bronze   { border-color: var(--trophy-bronze);   color: var(--trophy-bronze); }
+.trophy-rarity-chip.active.rarity-platinum { background: rgba(207,232,255,.14); box-shadow: 0 0 14px rgba(207,232,255,.35); }
+.trophy-rarity-chip.active.rarity-gold     { background: rgba(255,215,0,.14);   box-shadow: 0 0 14px rgba(255,215,0,.4); }
+.trophy-rarity-chip.active.rarity-silver   { background: rgba(200,200,212,.14); box-shadow: 0 0 14px rgba(200,200,212,.35); }
+.trophy-rarity-chip.active.rarity-bronze   { background: rgba(205,127,50,.16);  box-shadow: 0 0 14px rgba(205,127,50,.4); }
+
+.trophy-overall-bar-wrap {
+  position: relative;
+  flex: 1 1 220px;
+  min-width: 180px;
+  height: 30px;
+  background: #161616;
+  border: 1.5px solid #2c2c2c;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-left: auto;
+}
+.trophy-overall-bar-fill {
+  position: absolute; inset: 0 auto 0 0; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--trophy-bronze), var(--yellow-bright));
+  background-size: 200% 100%;
+  transition: width .7s cubic-bezier(.2,.8,.2,1);
+  box-shadow: 0 0 14px rgba(255,215,0,.5);
+}
+.trophy-overall-bar-fill::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255,255,255,.18) 0 10px,
+    transparent 10px 20px
+  );
+  animation: trophyBarStripes 1.4s linear infinite;
+  opacity: .5;
+}
+@keyframes trophyBarStripes { from { background-position: 0 0; } to { background-position: 40px 0; } }
+.trophy-overall-bar-fill.full {
+  animation: trophyBarFullPulse 2s ease-in-out infinite;
+}
+@keyframes trophyBarFullPulse {
+  0%,100% { box-shadow: 0 0 14px rgba(255,215,0,.5); }
+  50%     { box-shadow: 0 0 28px rgba(255,215,0,.85); }
+}
+.trophy-overall-bar-label {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  height: 100%;
+  font-family: 'Fredoka One', cursive;
+  font-size: .78rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.85);
+}
+
+/* ── Trofeo evolutivo: Slap Royale Conqueror ── */
+.trophy-hero-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: linear-gradient(145deg,#232323,#1b1b1b);
+  border: 2px solid #2d2d2d;
+  border-radius: 18px;
+  padding: 24px;
+  overflow: hidden;
+  transition: border-color .3s, box-shadow .3s;
+}
+.trophy-hero-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(circle at 12% 25%, rgba(255,255,255,.05), transparent 60%);
+  pointer-events:none;
+}
+.rc-evolutive-tag {
+  position: absolute;
+  top: 14px; right: 16px;
+  font-family: 'Fredoka One', cursive;
+  font-size: .62rem;
+  letter-spacing: .5px;
+  color: #999;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+.trophy-hero-card.rc-tier-locked { border-color:#2d2d2d; }
+.trophy-hero-card.rc-tier-unlock { border-color: var(--trophy-unlock); box-shadow: 0 0 22px rgba(79,209,255,.25); }
+.trophy-hero-card.rc-tier-copper { border-color: var(--trophy-bronze); box-shadow: 0 0 22px rgba(205,127,50,.28); }
+.trophy-hero-card.rc-tier-silver { border-color: var(--trophy-silver); box-shadow: 0 0 22px rgba(200,200,212,.28); }
+.trophy-hero-card.rc-tier-gold   { border-color: var(--trophy-gold);   box-shadow: 0 0 30px rgba(255,215,0,.4); animation: rcGoldPulse 2.4s ease-in-out infinite; }
+@keyframes rcGoldPulse {
+  0%,100% { box-shadow: 0 0 26px rgba(255,215,0,.35); }
+  50%     { box-shadow: 0 0 44px rgba(255,215,0,.62); }
+}
+
+.rc-badge-frame {
+  position: relative;
+  flex-shrink: 0;
+  width: 128px; height: 128px;
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  background:#111;
+  border: 4px solid var(--trophy-locked);
+  transition: border-color .3s;
+}
+.rc-tier-unlock .rc-badge-frame { border-color: var(--trophy-unlock); }
+.rc-tier-copper .rc-badge-frame { border-color: var(--trophy-bronze); }
+.rc-tier-silver .rc-badge-frame { border-color: var(--trophy-silver); }
+.rc-tier-gold   .rc-badge-frame { border-color: var(--trophy-gold); }
+.rc-badge-frame img {
+  width: 76%; height: 76%;
+  object-fit: contain;
+  filter: grayscale(1) brightness(.6);
+  transition: filter .3s;
+}
+.rc-tier-unlock .rc-badge-frame img,
+.rc-tier-copper .rc-badge-frame img,
+.rc-tier-silver .rc-badge-frame img,
+.rc-tier-gold   .rc-badge-frame img { filter:none; }
+
+.rc-info { flex: 1; min-width: 0; }
+.rc-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.26rem;
+  color: var(--yellow-bright);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.rc-current-tier-label {
+  font-family: 'Fredoka', sans-serif;
+  font-size: .85rem;
+  color: #999;
+  margin: 3px 0 14px;
+  transition: color .3s;
+}
+.rc-tier-unlock .rc-current-tier-label { color: var(--trophy-unlock); }
+.rc-tier-copper .rc-current-tier-label { color: var(--trophy-bronze); }
+.rc-tier-silver .rc-current-tier-label { color: var(--trophy-silver); }
+.rc-tier-gold   .rc-current-tier-label { color: var(--trophy-gold); }
+
+/* barra de progreso por niveles */
+#rc-progress-track {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 8px;
+}
+#rc-progress-track::before {
+  content:'';
+  position:absolute; top:6px; left:6%; right:6%; height:3px;
+  background:#333; z-index:0;
+}
+.rc-progress-seg {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  flex: 1;
+}
+.rc-progress-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #333; border: 2px solid #444;
+  transition: background .25s, border-color .25s, box-shadow .25s;
+}
+.rc-progress-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: .66rem;
+  color: #555;
+  letter-spacing: .3px;
+  transition: color .25s;
+}
+.rc-progress-seg.done .rc-progress-label { color: #ddd; }
+.rc-progress-seg.done.rc-seg-unlock .rc-progress-dot { background:var(--trophy-unlock); border-color:var(--trophy-unlock); box-shadow:0 0 8px rgba(79,209,255,.6); }
+.rc-progress-seg.done.rc-seg-copper .rc-progress-dot { background:var(--trophy-bronze); border-color:var(--trophy-bronze); box-shadow:0 0 8px rgba(205,127,50,.6); }
+.rc-progress-seg.done.rc-seg-silver .rc-progress-dot { background:var(--trophy-silver); border-color:var(--trophy-silver); box-shadow:0 0 8px rgba(200,200,212,.6); }
+.rc-progress-seg.done.rc-seg-gold   .rc-progress-dot { background:var(--trophy-gold);   border-color:var(--trophy-gold);   box-shadow:0 0 10px rgba(255,215,0,.7); }
+
+/* checklist de los 4 guantes */
+#rc-checklist {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 6px;
+}
+.rc-check-item {
+  display: flex; align-items: center; gap: 10px;
+  background: #161616;
+  border: 1.5px solid #262626;
+  border-radius: 9px;
+  padding: 6px 10px;
+  opacity: .55;
+  transition: opacity .25s, border-color .25s;
+}
+.rc-check-item.done { opacity: 1; border-color: #333; }
+.rc-check-icon { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; background:#000; flex-shrink:0; }
+.rc-check-text { display: flex; flex-direction: column; min-width: 0; }
+.rc-check-name { font-family: 'Fredoka One', cursive; font-size: .76rem; color: #ddd; }
+.rc-check-sub  { font-family: 'Fredoka', sans-serif; font-size: .68rem; color: #666; }
+.rc-check-item.done .rc-check-sub { color: var(--green-done); }
+
+/* ── Grid de trofeos individuales ── */
+.trophy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px,1fr));
+  gap: 18px;
+}
+.trophy-card {
+  position: relative;
+  background: linear-gradient(165deg, var(--bg-card), #262626);
+  border: 2px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 20px 14px 16px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  animation: cardIn .35s ease backwards;
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s;
+}
+.trophy-card:hover { transform: translateY(-4px) scale(1.015); }
+.trophy-card:active { transform: translateY(-1px) scale(.99); }
+
+.trophy-card.locked { filter: saturate(.3) brightness(.72); }
+.trophy-card.locked:hover { filter: saturate(.45) brightness(.85); }
+
+.trophy-card.unlocked.rarity-platinum { border-color: var(--trophy-platinum); box-shadow:0 0 18px rgba(207,232,255,.28), inset 0 0 30px rgba(207,232,255,.04); }
+.trophy-card.unlocked.rarity-gold     { border-color: var(--trophy-gold);     box-shadow:0 0 18px rgba(255,215,0,.3),  inset 0 0 30px rgba(255,215,0,.05); }
+.trophy-card.unlocked.rarity-silver   { border-color: var(--trophy-silver);   box-shadow:0 0 18px rgba(200,200,212,.25);}
+.trophy-card.unlocked.rarity-bronze   { border-color: var(--trophy-bronze);   box-shadow:0 0 18px rgba(205,127,50,.25); }
+
+/* Aura de color de fondo, incluso bloqueado, para intuir la rareza */
+.trophy-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% -10%, var(--trc-glow, transparent), transparent 65%);
+  opacity: .5;
+  pointer-events: none;
+}
+.trophy-card.rarity-platinum { --trc-glow: rgba(207,232,255,.16); }
+.trophy-card.rarity-gold     { --trc-glow: rgba(255,215,0,.16); }
+.trophy-card.rarity-silver   { --trc-glow: rgba(200,200,212,.14); }
+.trophy-card.rarity-bronze   { --trc-glow: rgba(205,127,50,.16); }
+
+/* Barrido de brillo en tarjetas desbloqueadas */
+.trophy-card.unlocked::after {
+  content: '';
+  position: absolute; top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.16), transparent);
+  transform: skewX(-18deg);
+  animation: trophyCardShimmer 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes trophyCardShimmer {
+  0%   { left: -60%; }
+  35%  { left: 130%; }
+  100% { left: 130%; }
+}
+
+/* Cinta de rareza en la esquina */
+.trophy-card-ribbon {
+  position: absolute;
+  top: 10px; right: -30px;
+  transform: rotate(40deg);
+  width: 110px;
+  padding: 3px 0;
+  font-family: 'Fredoka One', cursive;
+  font-size: .58rem;
+  letter-spacing: .5px;
+  text-align: center;
+  color: #111;
+  box-shadow: 0 2px 6px rgba(0,0,0,.4);
+  z-index: 2;
+}
+.trophy-card.rarity-platinum .trophy-card-ribbon { background: var(--trophy-platinum); }
+.trophy-card.rarity-gold     .trophy-card-ribbon { background: var(--trophy-gold); }
+.trophy-card.rarity-silver   .trophy-card-ribbon { background: var(--trophy-silver); }
+.trophy-card.rarity-bronze   .trophy-card-ribbon { background: var(--trophy-bronze); color: #fff; }
+.trophy-card.locked .trophy-card-ribbon { filter: grayscale(.6) brightness(.6); }
+
+/* Etiqueta "NUEVO" para trofeos recién conseguidos */
+.trophy-card-new-tag {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: linear-gradient(90deg, var(--green-done), #1fb800);
+  color: #0a1a00;
+  font-family: 'Fredoka One', cursive;
+  font-size: .58rem;
+  letter-spacing: .4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(57,255,20,.55);
+  animation: trophyNewPulse 1.6s ease-in-out infinite;
+}
+@keyframes trophyNewPulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.08); }
+}
+
+.trophy-card-icon-wrap {
+  position: relative;
+  width: 78px; height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #1c1c1c, #0a0a0a);
+  border: 3px solid #333;
+  display: flex; align-items:center; justify-content:center;
+  margin-bottom: 12px;
+  overflow: hidden;
+  z-index: 1;
+}
+.trophy-card.unlocked .trophy-card-icon-wrap { box-shadow: 0 0 0 4px rgba(255,255,255,.03); }
+.trophy-card.unlocked.rarity-platinum .trophy-card-icon-wrap { border-color: var(--trophy-platinum); box-shadow: 0 0 16px rgba(207,232,255,.5); }
+.trophy-card.unlocked.rarity-gold     .trophy-card-icon-wrap { border-color: var(--trophy-gold);     box-shadow: 0 0 16px rgba(255,215,0,.55); }
+.trophy-card.unlocked.rarity-silver   .trophy-card-icon-wrap { border-color: var(--trophy-silver);   box-shadow: 0 0 16px rgba(200,200,212,.45); }
+.trophy-card.unlocked.rarity-bronze   .trophy-card-icon-wrap { border-color: var(--trophy-bronze);   box-shadow: 0 0 16px rgba(205,127,50,.45); }
+.trophy-card-icon { width: 70%; height: 70%; object-fit: contain; position: relative; z-index: 1; }
+.trophy-card.locked .trophy-card-icon { filter: grayscale(1) brightness(.4); }
+.trophy-card-lock-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(.5px);
+  font-size: 1.35rem;
+  z-index: 2;
+}
+.trophy-card-rarity-tag {
+  font-family: 'Fredoka One', cursive;
+  font-size: .66rem;
+  letter-spacing: .4px;
+  margin-bottom: 4px;
+}
+.trophy-card.rarity-platinum .trophy-card-rarity-tag { color: var(--trophy-platinum); }
+.trophy-card.rarity-gold     .trophy-card-rarity-tag { color: var(--trophy-gold); }
+.trophy-card.rarity-silver   .trophy-card-rarity-tag { color: var(--trophy-silver); }
+.trophy-card.rarity-bronze   .trophy-card-rarity-tag { color: var(--trophy-bronze); }
+.trophy-card-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: .92rem;
+  color: #eee;
+  margin-bottom: 5px;
+}
+.trophy-card-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: .71rem;
+  color: #888;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  min-height: 30px;
+}
+.trophy-card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: .67rem;
+  color: var(--green-done);
+  background: rgba(57,255,20,.08);
+  border: 1px solid rgba(57,255,20,.28);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.trophy-card-hint {
+  font-family: 'Fredoka', sans-serif;
+  font-size: .64rem;
+  color: #555;
+  font-style: italic;
+  line-height: 1.4;
+}
+.trophy-card-check-btn {
+  background: linear-gradient(135deg,#241f00,#1a1600);
+  border: 1.5px solid var(--yellow-mid);
+  color: var(--yellow-bright);
+  font-family: 'Fredoka One', cursive;
+  font-size: .68rem;
+  border-radius: 999px;
+  padding: 7px 13px;
+  cursor: pointer;
+  transition: background .2s, transform .15s, box-shadow .2s;
+}
+.trophy-card-check-btn:hover { background: #2b2400; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,.25); }
+
+.trophy-room-footer-note {
+  font-family: 'Fredoka', sans-serif;
+  font-size: .72rem;
+  color: #555;
+  text-align: center;
+  line-height: 1.65;
+  padding: 2px 10px 0;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Modal de detalle de trofeo ── */
+#trophy-modal-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0,0,0,.78);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+  padding: 20px;
+}
+#trophy-modal-overlay.active { opacity: 1; pointer-events: all; }
+#trophy-modal {
+  position: relative;
+  background: var(--bg-panel);
+  border: 2px solid #2c2c2c;
+  border-radius: 16px;
+  width: min(420px,100%);
+  padding: 30px 24px 22px;
+  text-align: center;
+  transform: scale(.94);
+  transition: transform .2s;
+}
+#trophy-modal-overlay.active #trophy-modal { transform: scale(1); }
+#trophy-modal.rarity-platinum { border-color: var(--trophy-platinum); box-shadow: 0 0 40px rgba(207,232,255,.22); }
+#trophy-modal.rarity-gold     { border-color: var(--trophy-gold);     box-shadow: 0 0 40px rgba(255,215,0,.24); }
+#trophy-modal.rarity-silver   { border-color: var(--trophy-silver);   box-shadow: 0 0 40px rgba(200,200,212,.2); }
+#trophy-modal.rarity-bronze   { border-color: var(--trophy-bronze);   box-shadow: 0 0 40px rgba(205,127,50,.2); }
+#trophy-modal-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; color: #666;
+  font-size: 1.15rem; cursor: pointer; line-height:1;
+}
+#trophy-modal-close:hover { color: #ccc; }
+#trophy-modal-icon-wrap {
+  width: 104px; height: 104px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #1c1c1c, #0a0a0a);
+  border: 3px solid var(--yellow-bright);
+  display: flex; align-items:center; justify-content:center;
+  margin: 0 auto 14px;
+  box-shadow: 0 0 24px rgba(255,215,0,.35);
+}
+#trophy-modal.rarity-platinum #trophy-modal-icon-wrap { border-color: var(--trophy-platinum); box-shadow: 0 0 24px rgba(207,232,255,.4); }
+#trophy-modal.rarity-gold     #trophy-modal-icon-wrap { border-color: var(--trophy-gold);     box-shadow: 0 0 24px rgba(255,215,0,.4); }
+#trophy-modal.rarity-silver   #trophy-modal-icon-wrap { border-color: var(--trophy-silver);   box-shadow: 0 0 24px rgba(200,200,212,.35); }
+#trophy-modal.rarity-bronze   #trophy-modal-icon-wrap { border-color: var(--trophy-bronze);   box-shadow: 0 0 24px rgba(205,127,50,.35); }
+#trophy-modal-icon { width: 70%; height: 70%; object-fit: contain; }
+#trophy-modal-name  { font-family: 'Fredoka One', cursive; font-size: 1.18rem; color: #fff; margin-bottom: 4px; }
+#trophy-modal-rarity{ font-family: 'Fredoka One', cursive; font-size: .78rem; color: var(--yellow-bright); margin-bottom: 12px; }
+#trophy-modal-desc  { font-family: 'Fredoka', sans-serif; font-size: .85rem; color: #bbb; line-height: 1.55; margin-bottom: 10px; }
+#trophy-modal-status{
+  display: inline-block;
+  font-family: 'Fredoka', sans-serif; font-size: .78rem; color: #888;
+  margin-bottom: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+}
+#trophy-modal-badge-link {
+  display: inline-block;
+  font-family: 'Fredoka', sans-serif;
+  font-size: .75rem;
+  color: #777;
+  text-decoration: underline;
+  margin-bottom: 16px;
+}
+#trophy-modal-badge-link:hover { color: var(--yellow-mid); }
+#trophy-modal-reward { margin-bottom: 14px; }
+#trophy-modal-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+/* ── Toast de trofeo desbloqueado (estilo PS5) ── */
+.trophy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 140%);
+  z-index: 10000;
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg,#1c1c1c,#141414);
+  border: 2px solid var(--yellow-bright);
+  border-radius: 14px;
+  padding: 12px 20px 12px 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.6);
+  transition: transform .45s cubic-bezier(.2,.9,.3,1.2);
+  max-width: 92vw;
+  pointer-events: none;
+}
+.trophy-toast.show { transform: translate(-50%, 0); }
+.trophy-toast.rarity-platinum { border-color: var(--trophy-platinum); box-shadow: 0 10px 34px rgba(207,232,255,.28), 0 10px 30px rgba(0,0,0,.6); animation: trophyToastGlow 1.8s ease-in-out infinite; }
+.trophy-toast.rarity-gold     { border-color: var(--trophy-gold);     box-shadow: 0 10px 34px rgba(255,215,0,.32),  0 10px 30px rgba(0,0,0,.6); animation: trophyToastGlow 1.8s ease-in-out infinite; }
+.trophy-toast.rarity-silver   { border-color: var(--trophy-silver); }
+.trophy-toast.rarity-bronze   { border-color: var(--trophy-bronze); }
+@keyframes trophyToastGlow {
+  0%,100% { filter: brightness(1); }
+  50%     { filter: brightness(1.18); }
+}
+#trophy-toast-icon { width: 48px; height: 48px; object-fit: contain; border-radius: 10px; background:#000; flex-shrink:0; }
+.trophy-toast-text { display: flex; flex-direction: column; text-align: left; }
+#trophy-toast-eyebrow { font-family: 'Fredoka One', cursive; font-size: .64rem; color: var(--yellow-bright); letter-spacing: .6px; }
+#trophy-toast-name    { font-family: 'Fredoka One', cursive; font-size: .94rem; color: #fff; }
+#trophy-toast-rarity  { font-family: 'Fredoka', sans-serif; font-size: .66rem; color: #999; }
+
+@media (max-width: 640px) {
+  .trophy-hero-card { flex-direction: column; text-align: center; }
+  .rc-title { justify-content: center; }
+  .trophy-overall-bar-wrap { margin-left: 0; flex-basis: 100%; }
+}
+
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║     RECOMPENSAS: TEMAS DE PÁGINA DESBLOQUEABLES            ║
+   ╚══════════════════════════════════════════════════════════╝
+   Cada tema se activa poniendo una clase "theme-<id>" en <body>.
+   Se desbloquean al conseguir el trofeo asociado en la Sala de
+   Trofeos (ver THEMES en el script, al final del archivo) y se
+   activan/desactivan desde la tarjeta o el modal de ese trofeo.
+   ============================================================ */
+
+/* ── Tema "Nah, I'd Win" — recompensa del trofeo del mismo nombre.
+      Paleta gris con toques azul claro, fondo con background_guide.png
+      y tipografía pixelada de videojuego retro en los títulos. ── */
+body.theme-nahiwin {
+  --yellow-bright:  #bfe3ff;
+  --yellow-mid:     #8fc4e8;
+  --yellow-dark:    #5f93b8;
+  --yellow-stripe1: #a9d4ee;
+  --yellow-stripe2: #6fa0bf;
+
+  --bg-outer:       #15191c;
+  --bg-panel:       #1d2327;
+  --bg-card:        #21282c;
+  --bg-card-inner:  #2b3338;
+
+  --border-bold:    #0a0d0f;
+  --border-card:    #333d43;
+
+  --text-yellow:    #bfe3ff;
+  --shadow-glow:    0 0 18px rgba(191,227,255,.45);
+
+  background: var(--bg-outer);
+}
+body.theme-nahiwin::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url('background_guide.png') center / cover no-repeat fixed;
+  filter: saturate(.5) brightness(.5) contrast(1.05);
+}
+body.theme-nahiwin::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(12,16,19,.72) 0%, rgba(12,16,19,.92) 100%);
+  pointer-events: none;
+}
+/* Titulares y nombres en tipografía pixelada retro */
+body.theme-nahiwin #app-header h1.shimmer-text,
+body.theme-nahiwin .trophy-room-title,
+body.theme-nahiwin .rc-title,
+body.theme-nahiwin .gfm-section-title,
+body.theme-nahiwin .footer-brand-title,
+body.theme-nahiwin .footer-col-title,
+body.theme-nahiwin .cal-entry-title,
+body.theme-nahiwin #glove-detail-name,
+body.theme-nahiwin .trophy-card-name,
+body.theme-nahiwin .glove-card-name,
+body.theme-nahiwin .card-name,
+body.theme-nahiwin #trophy-modal-name {
+  font-family: 'Press Start 2P', 'Fredoka One', cursive !important;
+  letter-spacing: .5px !important;
+  line-height: 1.7 !important;
+  font-size: .85em;
+}
+body.theme-nahiwin .page-nav-btn span,
+body.theme-nahiwin .pns-label {
+  font-family: 'Press Start 2P', 'Fredoka One', cursive !important;
+  letter-spacing: .3px !important;
+  font-size: .72em;
+}
+/* Texto general con un aire de terminal retro, sin romper la legibilidad */
+body.theme-nahiwin .trophy-room-subtitle,
+body.theme-nahiwin .trophy-card-desc,
+body.theme-nahiwin #trophy-modal-desc {
+  font-family: 'VT323', 'Fredoka', monospace !important;
+  font-size: 1.15em;
+  letter-spacing: .3px;
+}
+
+/* ── Recompensa: bloque de tema dentro de tarjeta/modal de trofeo ── */
+.trophy-card-reward-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Fredoka One', cursive;
+  font-size: .6rem;
+  color: var(--trophy-unlock);
+  background: rgba(79,209,255,.1);
+  border: 1px solid rgba(79,209,255,.35);
+  border-radius: 999px;
+  padding: 3px 9px;
+  margin-bottom: 8px;
+}
+.trophy-reward-block {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(79,209,255,.06);
+  border: 1.5px dashed rgba(79,209,255,.4);
+  text-align: left;
+}
+.trophy-reward-block-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: .74rem;
+  color: var(--trophy-unlock);
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.trophy-reward-block-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: .74rem;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.theme-reward-btn {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(79,209,255,.16), rgba(79,209,255,.05));
+  border: 1.5px solid var(--trophy-unlock);
+  color: var(--trophy-unlock);
+  font-family: 'Fredoka One', cursive;
+  font-size: .7rem;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+}
+.theme-reward-btn:hover:not(:disabled) { background: rgba(79,209,255,.24); transform: translateY(-1px); }
+.theme-reward-btn:disabled { opacity: .5; cursor: not-allowed; }
+.theme-reward-btn.active { background: var(--trophy-unlock); color: #06222b; }
+
 </style>
 </head>
 <body>
@@ -7137,6 +7874,9 @@ input[type="range"].slap-volume::-moz-range-track {
   </button>
 </div>
 <div id="page-nav-secondary">
+  <button class="page-nav-btn-sec" id="nav-trophies" onclick="switchPage('trophies')" title="Sala de Trofeos">
+    <span class="pns-icon">🏆</span><span class="pns-label">Trofeos</span>
+  </button>
   <button class="page-nav-btn-sec" id="nav-roadmap" onclick="switchPage('roadmap')" title="Roadmap">
     <span class="pns-icon">🗺️</span><span class="pns-label">Roadmap</span>
   </button>
@@ -7166,6 +7906,7 @@ input[type="range"].slap-volume::-moz-range-track {
       <div class="reset-nuke-list">
         <div class="reset-nuke-list-item"><span class="rni-icon">⚔️</span><span>Maestrías completadas, misiones y contadores</span></div>
         <div class="reset-nuke-list-item"><span class="rni-icon">🥊</span><span>Guantes marcados como obtenidos</span></div>
+        <div class="reset-nuke-list-item"><span class="rni-icon">🏆</span><span>Trofeos desbloqueados en la Sala de Trofeos</span></div>
         <div class="reset-nuke-list-item"><span class="rni-icon">📆</span><span>Historial completo del diario</span></div>
       </div>
     </div>
@@ -7223,6 +7964,83 @@ input[type="range"].slap-volume::-moz-range-track {
 
 <!-- RM node tooltip -->
 <div id="rm-tooltip" style="display:none"></div>
+
+<!-- ========================================================
+     ╔══════════════════════════════════════════════════════╗
+     ║              SALA DE TROFEOS (Trophy Room)            ║
+     ╚══════════════════════════════════════════════════════╝
+     Sistema de trofeos al estilo PlayStation. Los trofeos
+     ligados a un guante (avatar, mortis y los 4 niveles del
+     Slap Royale Conqueror) se desbloquean solos según
+     ownedGlovesSet. Apostle of Judgement y Clipped Wings no
+     tienen guante asociado, así que se desbloquean solos en
+     cuanto el comprobador "Badges sin Guante" detecta esos
+     logros en la cuenta de Roblox — ver TROPHIES /
+     unlockManualTrophy() / syncManualTrophiesFromAwarded() en
+     el script de más abajo.
+     ======================================================== -->
+<div id="trophy-view" style="display:none">
+
+  <div class="trophy-room-header">
+    <div class="trophy-room-title">🏆 SALA DE TROFEOS</div>
+    <div class="trophy-room-subtitle">Trofeos por logros de Slap Battles · Pulsa un trofeo para ver los detalles</div>
+    <div id="trophy-room-rank" class="trophy-room-rank"></div>
+  </div>
+
+  <!-- Resumen: chips de rareza + barra global -->
+  <div id="trophy-summary-bar"></div>
+
+  <!-- Trofeo evolutivo: Slap Royale Conqueror -->
+  <div id="rc-hero-card" class="trophy-hero-card rc-tier-locked">
+    <div class="rc-evolutive-tag">⚡ TROFEO EVOLUTIVO</div>
+    <div class="rc-badge-frame">
+      <img id="rc-badge-img" src="preview_placeholder.png" alt="Slap Royale Conqueror" onerror="this.onerror=null;this.src='preview_placeholder.png'">
+    </div>
+    <div class="rc-info">
+      <div class="rc-title">👑 Slap Royale Conqueror <span id="rc-progress-pct" style="font-size:.72rem;color:#666;font-family:'Fredoka',sans-serif;font-weight:400;"></span></div>
+      <div id="rc-current-tier-label" class="rc-current-tier-label">Bloqueado — todavía sin nivel</div>
+      <div id="rc-progress-track"></div>
+      <div id="rc-checklist"></div>
+    </div>
+  </div>
+
+  <!-- Grid de trofeos individuales (placeholders) -->
+  <div id="trophy-grid" class="trophy-grid"></div>
+
+  <div class="trophy-room-footer-note">
+    🔓 Los trofeos ligados a un guante (Avatar, Mortis y los 4 niveles del Slap Royale Conqueror) se desbloquean solos
+    en cuanto ese guante se marca como obtenido — a mano en la pestaña Guantes o con el comprobador de logros de
+    Roblox. Los trofeos sin guante asociado (Apóstol del Juicio, Alas Cortadas) se desbloquean solos también: pulsa
+    "🔍 Comprobar con Roblox" en su tarjeta para consultar tu cuenta con el comprobador de "Badges sin Guante".
+  </div>
+</div>
+
+<!-- Modal de detalle de trofeo -->
+<div id="trophy-modal-overlay" onclick="if(event.target===this) closeTrophyDetail()">
+  <div id="trophy-modal">
+    <button id="trophy-modal-close" onclick="closeTrophyDetail()" title="Cerrar">✕</button>
+    <div id="trophy-modal-icon-wrap">
+      <img id="trophy-modal-icon" src="preview_placeholder.png" alt="">
+    </div>
+    <div id="trophy-modal-name"></div>
+    <div id="trophy-modal-rarity"></div>
+    <div id="trophy-modal-desc"></div>
+    <div id="trophy-modal-status"></div>
+    <a id="trophy-modal-badge-link" href="#" target="_blank" rel="noopener">🔗 Ver logro en Roblox</a>
+    <div id="trophy-modal-reward"></div>
+    <div id="trophy-modal-actions"></div>
+  </div>
+</div>
+
+<!-- Toast de trofeo desbloqueado (estilo notificación de PS5) -->
+<div id="trophy-toast" class="trophy-toast">
+  <img id="trophy-toast-icon" src="preview_placeholder.png" alt="">
+  <div class="trophy-toast-text">
+    <span id="trophy-toast-eyebrow">🏆 TROFEO DESBLOQUEADO</span>
+    <span id="trophy-toast-name"></span>
+    <span id="trophy-toast-rarity"></span>
+  </div>
+</div>
 
 <!-- ========================================================
      GRID VIEW
@@ -9605,24 +10423,24 @@ const MASTERIES = [
   },
 
   {
-    id: "comingsoonmastery",              // ← sin espacios, solo minúsculas/números
-    name: "Proximamente (03/07/2026)",   // ← tal como aparece en el juego
+    id: "firework",              // ← sin espacios, solo minúsculas/números
+    name: "Firework",   // ← tal como aparece en el juego
     previewUrl: "",
     date: "03/07/2026",
-    description: "Puede que el álbum de Osito Gominola, el 13 de noviembre en tiendas, fueron los amigos que hicimos en el camino.",
+    description: "Te concedemos el permiso divino de quemar la noche con explosivos no registrados.",
     upgrades: [
-      "a",
+      "???",
     ],
     missions: [
-      { text: "a",  target: 700, isBool: false },
-      { text: "b",          target: 125,   isBool: false  },
-      { text: "c",  target: 300, isBool: false }
+      { text: "???",  target: 700, isBool: false },
+      { text: "???",          target: 125,   isBool: false  },
+      { text: "???",  target: 300, isBool: false }
     ]
   ,
     difficulty: 1,
-    time: 2,
-    fun: 4,
-    worth: 2,
+    time: 1,
+    fun: 1,
+    worth: 1,
     locked: true
   },
 
@@ -21232,6 +22050,13 @@ const EXTRA_ALBUMS = [
       'Samba Fire (B)': { id: 'sambafireb', roblox: '1841922709' , info:"Portal Barzil." },
     },
   },
+  {
+    id: 'eternalbob',
+    name: 'The Eternal Bob',
+    songs: {
+      "Ancient Myths": { id: 'ancientmyths', roblox: '1837779548' , info: "Boss battle"},
+    },
+  },
   /* ── EJEMPLO (mismo formato que el guante Killstreak) ──
   {
     id: 'miAlbum',
@@ -25125,6 +25950,15 @@ function closeRobloxCheck() {
   if (el) el.classList.remove('open');
 }
 
+/* Atajo usado por la Sala de Trofeos: abre el comprobador de Roblox
+   directamente en modo "Badges sin Guante", que es el que detecta
+   automáticamente los trofeos sin guante asociado (Apóstol del
+   Juicio, Alas Cortadas). */
+function openRobloxCheckForBadges() {
+  openRobloxCheck();
+  setRcrMode('badges');
+}
+
 /* ============================================================
    Badge index
    ============================================================ */
@@ -25703,6 +26537,11 @@ async function runExtraBadgesCheck(user, resultsEl, rowsContainer, controlsEl) {
   const got = list.filter(b => awarded[b.badgeId]).length;
   const total = list.length;
 
+  /* Sincroniza automáticamente los trofeos "sin guante" (Apóstol
+     del Juicio, Alas Cortadas) contra lo que acaba de devolver
+     Roblox — así ya no hace falta marcarlos a mano nunca. */
+  syncManualTrophiesFromAwarded(awarded);
+
   /* Mensaje si el inventario está vacío o privado */
   if (Object.keys(awarded).length === 0) {
     const emptyMsg = document.createElement('div');
@@ -25968,6 +26807,695 @@ El usuario que buscas no tiene ningún gamepass o tiene el inventario en privado
 
   setStatus(`${user.name}: ${gotGamepasses}/${totalGamepasses} gamepasses obtenidos · ${totalComplete} guante(s) completo(s)`, 'ok');
 }
+</script>
+
+<script>
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║          SALA DE TROFEOS — LÓGICA (estilo PlayStation)    ║
+   ╚══════════════════════════════════════════════════════════╝
+
+   CÓMO FUNCIONA
+   -------------
+   Hay dos tipos de trofeo:
+
+   1) Trofeos ligados a un guante (campo gloveId). Se desbloquean
+      SOLOS en cuanto ese guante aparece en ownedGlovesSet — igual
+      da si lo marcaste a mano en la pestaña Guantes o si lo marcó
+      el comprobador automático de logros de Roblox. No hace falta
+      tocar nada más: en cuanto exista un guante con ese id en
+      GLOVES y esté en ownedGlovesSet, el trofeo se enciende.
+
+   2) Trofeos "sin guante" (campo manual:true). Son logros de
+      Roblox que no están ligados a ningún guante de GLOVES (p. ej.
+      "Apostle of Judgement" y "Clipped Wings", que viven sueltos en
+      EXTRA_BADGES). Se desbloquean solos: cada vez que se ejecuta
+      el comprobador "Badges sin Guante" (runExtraBadgesCheck), la
+      función syncManualTrophiesFromAwarded() revisa si esos badges
+      concretos aparecen entre los conseguidos por la cuenta de
+      Roblox consultada y, si es así, llama a
+      unlockManualTrophy('trophy_apostle') / ('trophy_clippedwings')
+      automáticamente. No hay marcado manual en ningún sitio.
+
+   El trofeo evolutivo "Slap Royale Conqueror" es un caso especial:
+   son 4 "niveles" (Unlock/Copper/Silver/Gold), cada uno ligado a
+   un guante distinto. La tarjeta grande muestra siempre el nivel
+   MÁS ALTO conseguido, y debajo hay una checklist con el estado
+   real de los 4 guantes (por si se consiguen fuera de orden).
+   ============================================================ */
+
+/* ── Metadatos de rareza (estilo Bronce/Plata/Oro/Platino) ── */
+const TROPHY_RARITY_META = {
+  platinum: { label: 'Platino', icon: '💎', },
+  gold:     { label: 'Oro',     icon: '🥇', },
+  silver:   { label: 'Plata',   icon: '🥈', },
+  bronze:   { label: 'Bronce',  icon: '🥉', },
+};
+
+/* ── Trofeos "sueltos" (placeholders pedidos) ──
+   Iconos: reutilizan la misma convención que ya usan los guantes
+   de tipo 'logro' en el resto de la app: badge_<id>.png para el
+   primer logro de cada guante. Si el archivo no existe todavía,
+   el onerror cae a preview_placeholder.png automáticamente. */
+const TROPHIES = [
+  {
+    id: 'trophy_avatar',
+    name: 'Guía completada',
+    rarity: 'gold',
+    gloveId: 'avatar',
+    icon: 'badge_avatar.png',
+    badgeName: "Nah, I'd win",
+    badgeUrl: 'https://www.roblox.com/badges/4414076328730650/Nah-I-d-win',
+    desc: "Consigue el guante Avatar tras derrotar al Guía sin ninguna ventaja",
+  },
+  {
+    id: 'trophy_apostle',
+    name: 'Monarca de almas',
+    rarity: 'platinum',
+    manual: true,
+    icon: 'badge_apostle.png',
+    badgeName: 'Apostle of Judgement',
+    badgeUrl: 'https://www.roblox.com/badges/4414399146292319/Apostle-of-Judgement',
+    desc: 'Consigue el logro de Roblox "Apostle of Judgement" tras absorver el alma de 1000 personas como killstreak.',
+  },
+  {
+    id: 'trophy_clippedwings',
+    name: 'Renuncia al poder',
+    rarity: 'silver',
+    manual: true,
+    icon: 'badge_clippedwings.png',
+    badgeName: 'Clipped Wings',
+    badgeUrl: 'https://www.roblox.com/badges/2147535393/Clipped-Wings',
+    desc: 'Consigue el logro de Roblox "Clipped Wings" tras rechazar la ayuda de Rob.',
+  },
+  {
+    id: 'trophy_mortis',
+    name: 'Esclavo del govierno',
+    rarity: 'gold',
+    gloveId: 'mortis',
+    icon: 'badge_mortis.png',
+    badgeName: 'Die Hard',
+    badgeUrl: 'https://www.roblox.com/badges/1605140663413534/Die-Hard',
+    desc: 'Consigue el guante Mortis obteniendo el logro de Roblox "Die Hard".',
+  },
+];
+
+/* ── Trofeo evolutivo: Slap Royale Conqueror ──
+   Unlock → Copper → Silver → Gold, cada uno ligado a un guante. */
+const ROYALE_TIERS = [
+  { key: 'unlock', label: 'Unlock', gloveId: 'dominance', gloveName: 'Dominance', badgeName: 'Island Conqueror', icon: 'badge_dominance.png' },
+  { key: 'copper', label: 'Copper', gloveId: 'charge',    gloveName: 'Charge',    badgeName: 'Killer',           icon: 'badge_charge.png' },
+  { key: 'silver', label: 'Silver', gloveId: 'spy',       gloveName: 'Spy',       badgeName: 'Predator',         icon: 'badge_spy.png' },
+  { key: 'gold',   label: 'Gold',   gloveId: 'detonator', gloveName: 'Detonator', badgeName: 'Head Hunter',      icon: 'badge_detonator.png' },
+];
+
+/* Convierte el key de un nivel del Royale Conqueror en una rareza
+   de las 4 estándar, para que entre en el resumen de arriba junto
+   a los demás trofeos: Unlock y Copper cuentan como "Bronce". */
+function royaleTierRarity(key) {
+  return (key === 'unlock' || key === 'copper') ? 'bronze' : key;
+}
+
+/* ============================================================
+   PERSISTENCIA
+   ============================================================ */
+const STORAGE_KEY_TROPHIES_MANUAL = 'slap_battles_trophies_manual_v1';
+const STORAGE_KEY_TROPHIES_SEEN   = 'slap_battles_trophies_seen_v1';
+const STORAGE_KEY_TROPHIES_AT     = 'slap_battles_trophies_at_v1';
+const STORAGE_KEY_TROPHIES_AT_MS  = 'slap_battles_trophies_at_ms_v1';
+
+let manualTrophiesSet  = new Set();  // ids de TROPHIES marcados a mano
+let seenTrophiesSet    = new Set();  // ids ya "mostrados" (para no repetir el popup)
+let trophyUnlockedAtMap = {};        // id -> fecha legible de desbloqueo
+let trophyUnlockedAtMsMap = {};      // id -> timestamp numérico (para la etiqueta "NUEVO")
+
+function saveManualTrophies() {
+  try { localStorage.setItem(STORAGE_KEY_TROPHIES_MANUAL, JSON.stringify(Array.from(manualTrophiesSet))); } catch(e) { console.warn('No se pudo guardar trofeos manuales:', e); }
+}
+function loadManualTrophies() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_TROPHIES_MANUAL);
+    if (raw) JSON.parse(raw).forEach(id => manualTrophiesSet.add(id));
+  } catch(e) { manualTrophiesSet = new Set(); }
+}
+function saveSeenTrophies() {
+  try { localStorage.setItem(STORAGE_KEY_TROPHIES_SEEN, JSON.stringify(Array.from(seenTrophiesSet))); } catch(e) {}
+}
+function loadSeenTrophies() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_TROPHIES_SEEN);
+    if (raw) JSON.parse(raw).forEach(id => seenTrophiesSet.add(id));
+  } catch(e) { seenTrophiesSet = new Set(); }
+}
+function saveTrophyDates() {
+  try {
+    localStorage.setItem(STORAGE_KEY_TROPHIES_AT, JSON.stringify(trophyUnlockedAtMap));
+    localStorage.setItem(STORAGE_KEY_TROPHIES_AT_MS, JSON.stringify(trophyUnlockedAtMsMap));
+  } catch(e) {}
+}
+function loadTrophyDates() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_TROPHIES_AT);
+    if (raw) trophyUnlockedAtMap = JSON.parse(raw) || {};
+  } catch(e) { trophyUnlockedAtMap = {}; }
+  try {
+    const rawMs = localStorage.getItem(STORAGE_KEY_TROPHIES_AT_MS);
+    if (rawMs) trophyUnlockedAtMsMap = JSON.parse(rawMs) || {};
+  } catch(e) { trophyUnlockedAtMsMap = {}; }
+}
+function stampTrophyDate(id) {
+  const now = new Date();
+  trophyUnlockedAtMap[id] = now.toLocaleString('es-ES', {
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+  });
+  trophyUnlockedAtMsMap[id] = now.getTime();
+}
+/* Un trofeo se considera "NUEVO" si se desbloqueó hace menos de 3 días */
+function isTrophyRecentlyUnlocked(id) {
+  const ms = trophyUnlockedAtMsMap[id];
+  if (!ms) return false;
+  return (Date.now() - ms) < (3 * 24 * 60 * 60 * 1000);
+}
+
+/* ============================================================
+   ESTADO: ¿está desbloqueado?
+   ============================================================ */
+function isFixedTrophyUnlocked(trophy) {
+  if (trophy.manual) return manualTrophiesSet.has(trophy.id);
+  return ownedGlovesSet.has(trophy.gloveId);
+}
+function isRoyaleTierUnlocked(tier) {
+  return ownedGlovesSet.has(tier.gloveId);
+}
+
+/* Ids "automáticos" (no manuales) actualmente desbloqueados —
+   se usa para detectar desbloqueos nuevos vía ownedGlovesSet.
+   Los trofeos sin guante gestionan su propio popup en
+   unlockManualTrophy(), así que no entran aquí. */
+function getAutoTrophyUnlockIds() {
+  const ids = [];
+  TROPHIES.forEach(t => { if (!t.manual && isFixedTrophyUnlocked(t)) ids.push(t.id); });
+  ROYALE_TIERS.forEach(t => { if (isRoyaleTierUnlocked(t)) ids.push('royale_' + t.key); });
+  return ids;
+}
+
+function getRoyaleProgress() {
+  const tiers = ROYALE_TIERS.map(t => ({ ...t, owned: isRoyaleTierUnlocked(t) }));
+  const ownedCount = tiers.filter(t => t.owned).length;
+  let currentIndex = -1;
+  tiers.forEach((t, i) => { if (t.owned) currentIndex = i; }); // se queda con el nivel más alto conseguido
+  return { tiers, ownedCount, currentIndex, total: tiers.length };
+}
+
+function getTrophySummary() {
+  const counts = {
+    platinum: { total: 0, done: 0 },
+    gold:     { total: 0, done: 0 },
+    silver:   { total: 0, done: 0 },
+    bronze:   { total: 0, done: 0 },
+  };
+  TROPHIES.forEach(t => {
+    counts[t.rarity].total++;
+    if (isFixedTrophyUnlocked(t)) counts[t.rarity].done++;
+  });
+  ROYALE_TIERS.forEach(t => {
+    const r = royaleTierRarity(t.key);
+    counts[r].total++;
+    if (isRoyaleTierUnlocked(t)) counts[r].done++;
+  });
+  const totalAll = Object.values(counts).reduce((a, c) => a + c.total, 0);
+  const doneAll  = Object.values(counts).reduce((a, c) => a + c.done, 0);
+  return { counts, totalAll, doneAll, pct: totalAll ? Math.round(doneAll / totalAll * 100) : 0 };
+}
+
+/* Metadatos de un trofeo (fijo o nivel del Royale) a partir de su id,
+   usados para pintar el popup de desbloqueo. */
+function getTrophyDisplayMeta(id) {
+  if (id.indexOf('royale_') === 0) {
+    const key = id.slice('royale_'.length);
+    const tier = ROYALE_TIERS.find(t => t.key === key);
+    if (!tier) return null;
+    return {
+      name: `Slap Royale Conqueror — Nivel ${tier.label}`,
+      icon: tier.icon,
+      rarity: royaleTierRarity(key),
+    };
+  }
+  const t = TROPHIES.find(x => x.id === id);
+  if (!t) return null;
+  return { name: t.name, icon: t.icon, rarity: t.rarity };
+}
+
+/* ============================================================
+   DETECCIÓN DE NUEVOS DESBLOQUEOS (trofeos automáticos)
+   Se llama cada vez que cambia ownedGlovesSet (ver el parche de
+   saveOwnedGloves más abajo). Compara contra seenTrophiesSet para
+   lanzar el popup sólo la primera vez que se desbloquea cada uno.
+   ============================================================ */
+function checkForNewTrophyUnlocks() {
+  const unlockedNow = getAutoTrophyUnlockIds();
+  const newlyUnlocked = unlockedNow.filter(id => !seenTrophiesSet.has(id));
+  if (!newlyUnlocked.length) return;
+  newlyUnlocked.forEach(id => {
+    seenTrophiesSet.add(id);
+    if (!trophyUnlockedAtMap[id]) stampTrophyDate(id);
+  });
+  saveSeenTrophies();
+  saveTrophyDates();
+  queueTrophyToasts(newlyUnlocked);
+}
+
+/* La primera vez que carga la página con esta función instalada,
+   evita lanzar un aluvión de popups por guantes que el jugador ya
+   tenía marcados de antes: los da por "vistos" sin mostrar nada. */
+function bootstrapSeenTrophies() {
+  if (localStorage.getItem(STORAGE_KEY_TROPHIES_SEEN) !== null) return;
+  getAutoTrophyUnlockIds().forEach(id => seenTrophiesSet.add(id));
+  saveSeenTrophies();
+}
+
+/* ============================================================
+   DESBLOQUEO AUTOMÁTICO (Apostle of Judgement / Clipped Wings)
+   Estos trofeos no están ligados a ningún guante de GLOVES, así
+   que se desbloquean en cuanto el comprobador "Badges sin Guante"
+   (runExtraBadgesCheck) detecta el logro correspondiente en la
+   cuenta de Roblox consultada. Ya no existe marcado manual.
+   ============================================================ */
+function unlockManualTrophy(id) {
+  const trophy = TROPHIES.find(t => t.id === id);
+  if (!trophy || !trophy.manual) return;
+  if (manualTrophiesSet.has(id)) return; // ya estaba desbloqueado
+  manualTrophiesSet.add(id);
+  stampTrophyDate(id);
+  seenTrophiesSet.add(id);
+  saveManualTrophies();
+  saveSeenTrophies();
+  saveTrophyDates();
+  queueTrophyToasts([id]);
+  renderTrophyRoom();
+}
+
+/* Recorre TROPHIES buscando trofeos manuales cuyo badge aparezca
+   en el mapa "awarded" que devuelve getAwardedBadges() dentro del
+   comprobador "Badges sin Guante", y los desbloquea automáticamente. */
+function syncManualTrophiesFromAwarded(awarded) {
+  if (typeof TROPHIES === 'undefined' || !awarded) return;
+  TROPHIES.forEach(t => {
+    if (!t.manual || !t.badgeUrl) return;
+    const m = t.badgeUrl.match(/\/badges\/(\d+)/i);
+    if (!m) return;
+    if (awarded[m[1]]) unlockManualTrophy(t.id);
+  });
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderTrophyRoom() {
+  renderTrophySummary();
+  renderRoyaleHero();
+  renderTrophyGrid();
+}
+
+/* ── Filtro por rareza en la sala de trofeos ── */
+let trophyRarityFilter = null; // null = todas | 'platinum' | 'gold' | 'silver' | 'bronze'
+function setTrophyRarityFilter(key) {
+  trophyRarityFilter = (trophyRarityFilter === key) ? null : key;
+  renderTrophySummary();
+  renderTrophyGrid();
+}
+
+/* ── Rango del jugador según % de trofeos conseguidos ── */
+function getTrophyRankTitle(pct) {
+  if (pct >= 100) return { icon: '👑', label: 'Leyenda Platino — colección completa' };
+  if (pct >= 75)  return { icon: '🥇', label: 'Casi leyenda — ya casi lo tienes todo' };
+  if (pct >= 50)  return { icon: '🥈', label: 'Veterano de Slap Battles' };
+  if (pct >= 25)  return { icon: '🥉', label: 'Aprendiz en ascenso' };
+  if (pct > 0)    return { icon: '🔰', label: 'Novato prometedor' };
+  return { icon: '🔒', label: 'Sin empezar — ¡tu primer trofeo te espera!' };
+}
+
+function renderTrophySummary() {
+  const wrap = document.getElementById('trophy-summary-bar');
+  if (!wrap) return;
+  const { counts, totalAll, doneAll, pct } = getTrophySummary();
+  const chip = (key) => `
+    <div class="trophy-rarity-chip rarity-${key}${trophyRarityFilter === key ? ' active' : ''}" onclick="setTrophyRarityFilter('${key}')" title="Filtrar por ${TROPHY_RARITY_META[key].label}">
+      <span>${TROPHY_RARITY_META[key].icon}</span>
+      <span>${TROPHY_RARITY_META[key].label} <span class="trc-count">${counts[key].done}/${counts[key].total}</span></span>
+    </div>`;
+  wrap.innerHTML = `
+    ${chip('platinum')}${chip('gold')}${chip('silver')}${chip('bronze')}
+    <div class="trophy-overall-bar-wrap">
+      <div class="trophy-overall-bar-fill${pct >= 100 ? ' full' : ''}" style="width:${pct}%"></div>
+      <span class="trophy-overall-bar-label">🏆 ${doneAll}/${totalAll} trofeos · ${pct}%</span>
+    </div>`;
+
+  const rankEl = document.getElementById('trophy-room-rank');
+  if (rankEl) {
+    const rank = getTrophyRankTitle(pct);
+    rankEl.innerHTML = `<span>${rank.icon}</span><span>${rank.label}</span>`;
+  }
+}
+
+function renderRoyaleHero() {
+  const card = document.getElementById('rc-hero-card');
+  if (!card) return;
+  const { tiers, ownedCount, currentIndex, total } = getRoyaleProgress();
+  const currentTier = currentIndex >= 0 ? tiers[currentIndex] : null;
+
+  card.className = 'trophy-hero-card ' + (currentTier ? `rc-tier-${currentTier.key}` : 'rc-tier-locked');
+
+  const badgeImg = document.getElementById('rc-badge-img');
+  if (badgeImg) {
+    badgeImg.onerror = function () { this.onerror = null; this.src = 'preview_placeholder.png'; };
+    badgeImg.src = currentTier ? currentTier.icon : 'preview_placeholder.png';
+    badgeImg.alt = currentTier ? `Nivel ${currentTier.label}` : 'Slap Royale Conqueror';
+  }
+
+  const tierLabel = document.getElementById('rc-current-tier-label');
+  if (tierLabel) {
+    tierLabel.textContent = currentTier
+      ? `Nivel actual: ${currentTier.label} (${currentTier.gloveName})`
+      : 'Bloqueado — todavía sin nivel';
+  }
+
+  const pctEl = document.getElementById('rc-progress-pct');
+  if (pctEl) pctEl.textContent = `${ownedCount}/${total} guantes`;
+
+  const track = document.getElementById('rc-progress-track');
+  if (track) {
+    track.innerHTML = tiers.map(t => `
+      <div class="rc-progress-seg ${t.owned ? 'done rc-seg-' + t.key : ''}">
+        <span class="rc-progress-dot"></span>
+        <span class="rc-progress-label">${t.label}</span>
+      </div>`).join('');
+  }
+
+  const checklist = document.getElementById('rc-checklist');
+  if (checklist) {
+    checklist.innerHTML = tiers.map(t => {
+      const dateStr = trophyUnlockedAtMap['royale_' + t.key];
+      const sub = t.owned
+        ? ('✅ Conseguido' + (dateStr ? ' · ' + dateStr : ''))
+        : ('🔒 Consigue el guante ' + t.gloveName + ' (logro "' + t.badgeName + '")');
+      return `
+      <div class="rc-check-item ${t.owned ? 'done' : ''}">
+        <img class="rc-check-icon" src="${t.icon}" alt="${t.gloveName}" onerror="this.onerror=null;this.src='preview_placeholder.png'">
+        <div class="rc-check-text">
+          <span class="rc-check-name">${t.label} — ${t.gloveName}</span>
+          <span class="rc-check-sub">${sub}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderTrophyGrid() {
+  const grid = document.getElementById('trophy-grid');
+  if (!grid) return;
+
+  const visible = trophyRarityFilter
+    ? TROPHIES.filter(t => t.rarity === trophyRarityFilter)
+    : TROPHIES;
+
+  if (!visible.length) {
+    grid.innerHTML = `<div class="trophy-card-hint" style="grid-column:1/-1;padding:24px 0;">No hay trofeos de esta rareza todavía.</div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map((t, i) => {
+    const unlocked = isFixedTrophyUnlocked(t);
+    const rarityMeta = TROPHY_RARITY_META[t.rarity];
+    const dateStr = unlocked ? trophyUnlockedAtMap[t.id] : null;
+    const isNew = unlocked && isTrophyRecentlyUnlocked(t.id);
+
+    let footerHtml;
+    if (unlocked) {
+      footerHtml = `<div class="trophy-card-date">✅ ${dateStr ? 'Desbloqueado: ' + dateStr : 'Desbloqueado'}</div>`;
+    } else if (t.manual) {
+      footerHtml = `<button class="trophy-card-check-btn" onclick="event.stopPropagation();openRobloxCheckForBadges()">🔍 Comprobar con Roblox</button>`;
+    } else {
+      footerHtml = `<div class="trophy-card-hint">Se desbloquea al marcar el guante ${GLOVES.find(g=>g.id===t.gloveId) ? GLOVES.find(g=>g.id===t.gloveId).name : ''} como obtenido</div>`;
+    }
+
+    return `
+    <div class="trophy-card rarity-${t.rarity} ${unlocked ? 'unlocked' : 'locked'}" data-id="${t.id}" style="animation-delay:${Math.min(i,10)*40}ms" onclick="openTrophyDetail('${t.id}')">
+      <div class="trophy-card-ribbon">${rarityMeta.label}</div>
+      ${isNew ? '<div class="trophy-card-new-tag">✨ NUEVO</div>' : ''}
+      <div class="trophy-card-icon-wrap">
+        <img class="trophy-card-icon" src="${t.icon}" alt="${t.name}" onerror="this.onerror=null;this.src='preview_placeholder.png'">
+        ${!unlocked ? '<div class="trophy-card-lock-overlay">🔒</div>' : ''}
+      </div>
+      <div class="trophy-card-rarity-tag">${rarityMeta.icon} ${rarityMeta.label}</div>
+      ${t.rewardThemeId ? '<div class="trophy-card-reward-tag">🎁 Tema de página</div>' : ''}
+      <div class="trophy-card-name">${t.name}</div>
+      <div class="trophy-card-desc">${t.desc}</div>
+      ${footerHtml}
+      ${(unlocked && t.rewardThemeId) ? renderThemeRewardBlock(t) : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   MODAL DE DETALLE
+   ============================================================ */
+function openTrophyDetail(id) {
+  const t = TROPHIES.find(x => x.id === id);
+  if (!t) return;
+  const unlocked = isFixedTrophyUnlocked(t);
+  const overlay = document.getElementById('trophy-modal-overlay');
+  if (!overlay) return;
+
+  const modalBox = document.getElementById('trophy-modal');
+  if (modalBox) modalBox.className = 'rarity-' + t.rarity;
+
+  const icon = document.getElementById('trophy-modal-icon');
+  icon.onerror = function () { this.onerror = null; this.src = 'preview_placeholder.png'; };
+  icon.src = t.icon;
+  icon.alt = t.name;
+
+  document.getElementById('trophy-modal-name').textContent = t.name;
+  document.getElementById('trophy-modal-rarity').innerHTML = `${TROPHY_RARITY_META[t.rarity].icon} ${TROPHY_RARITY_META[t.rarity].label}`;
+  document.getElementById('trophy-modal-desc').textContent = t.desc;
+
+  const dateStr = trophyUnlockedAtMap[t.id];
+  document.getElementById('trophy-modal-status').textContent = unlocked
+    ? ('✅ Conseguido' + (dateStr ? ' · ' + dateStr : ''))
+    : '🔒 Todavía bloqueado';
+
+  const badgeLink = document.getElementById('trophy-modal-badge-link');
+  badgeLink.href = t.badgeUrl;
+  badgeLink.textContent = `🔗 Ver "${t.badgeName}" en Roblox`;
+
+  const actionsWrap = document.getElementById('trophy-modal-actions');
+  actionsWrap.innerHTML = (t.manual && !unlocked)
+    ? `<button class="btn btn-primary" onclick="closeTrophyDetail();openRobloxCheckForBadges();">🔍 Comprobar con tu cuenta de Roblox</button>`
+    : '';
+
+  const rewardWrap = document.getElementById('trophy-modal-reward');
+  if (rewardWrap) rewardWrap.innerHTML = renderThemeRewardBlock(t);
+  refreshThemeButtons();
+
+  overlay.classList.add('active');
+}
+
+function closeTrophyDetail() {
+  const overlay = document.getElementById('trophy-modal-overlay');
+  if (overlay) overlay.classList.remove('active');
+}
+
+/* ============================================================
+   TOAST ESTILO PS5 ("Trofeo desbloqueado")
+   ============================================================ */
+let trophyToastQueue = [];
+let trophyToastShowing = false;
+
+function queueTrophyToasts(ids) {
+  ids.forEach(id => {
+    const meta = getTrophyDisplayMeta(id);
+    if (meta) trophyToastQueue.push(meta);
+  });
+  if (!trophyToastShowing) showNextTrophyToast();
+}
+
+function showNextTrophyToast() {
+  const toast = document.getElementById('trophy-toast');
+  if (!trophyToastQueue.length || !toast) { trophyToastShowing = false; return; }
+  trophyToastShowing = true;
+  const meta = trophyToastQueue.shift();
+
+  const iconEl = document.getElementById('trophy-toast-icon');
+  iconEl.onerror = function () { this.onerror = null; this.src = 'preview_placeholder.png'; };
+  iconEl.src = meta.icon;
+  document.getElementById('trophy-toast-name').textContent = meta.name;
+  const rMeta = TROPHY_RARITY_META[meta.rarity];
+  document.getElementById('trophy-toast-rarity').textContent = rMeta ? `${rMeta.icon} ${rMeta.label}` : '';
+
+  toast.className = 'trophy-toast rarity-' + meta.rarity;
+  // Doble rAF para forzar el reflow antes de animar (si no, la transición no se dispara)
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+
+  clearTimeout(showNextTrophyToast._t);
+  showNextTrophyToast._t = setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(showNextTrophyToast, 450);
+  }, 4200);
+}
+
+/* ============================================================
+   ENGANCHES CON EL RESTO DE LA APP
+   ============================================================ */
+
+/* Cualquier cambio persistido en ownedGlovesSet (marcar/desmarcar
+   guante a mano, checker de logros, filtro rápido de slaps, etc.)
+   pasa siempre por saveOwnedGloves(), así que es el único punto
+   que hace falta enganchar para detectar trofeos nuevos. */
+const _origSaveOwnedGloves = saveOwnedGloves;
+saveOwnedGloves = function () {
+  _origSaveOwnedGloves();
+  checkForNewTrophyUnlocks();
+  const trophyView = document.getElementById('trophy-view');
+  if (trophyView && trophyView.style.display !== 'none') renderTrophyRoom();
+};
+
+/* El botón "Resetear progreso" también debe vaciar los trofeos
+   marcados a mano (los ligados a guante ya se resetean solos
+   porque ownedGlovesSet.clear() dispara el hook de arriba). */
+const _origResetAllProgress = resetAllProgress;
+resetAllProgress = function () {
+  _origResetAllProgress();
+  manualTrophiesSet.clear();
+  seenTrophiesSet.clear();
+  trophyUnlockedAtMap = {};
+  trophyUnlockedAtMsMap = {};
+  saveManualTrophies();
+  saveSeenTrophies();
+  saveTrophyDates();
+  const trophyView = document.getElementById('trophy-view');
+  if (trophyView && trophyView.style.display !== 'none') renderTrophyRoom();
+};
+
+/* Patch de switchPage para dar de alta la página 'trophies',
+   siguiendo el mismo patrón que ya usa el Roadmap más arriba. */
+const _origSwitchPageForTrophies = switchPage;
+switchPage = function (page) {
+  const trophyView  = document.getElementById('trophy-view');
+  const btnTrophies = document.getElementById('nav-trophies');
+
+  if (page !== 'trophies') {
+    if (trophyView)  trophyView.style.display = 'none';
+    if (btnTrophies) btnTrophies.classList.remove('active');
+  }
+
+  _origSwitchPageForTrophies(page);
+
+  if (page === 'trophies') {
+    ['grid-view', 'slap-view', 'calendar-view', 'soundtrack-view', 'roadmap-view'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page-nav-btn-sec').forEach(b => b.classList.remove('active'));
+    if (btnTrophies) btnTrophies.classList.add('active');
+    if (trophyView)  trophyView.style.display = 'flex';
+    const sw = document.getElementById('search-bar-wrap'), sb = document.getElementById('stats-bar');
+    if (sw) sw.style.display = 'none';
+    if (sb) sb.style.display = 'none';
+    renderTrophyRoom();
+  }
+};
+
+/* ============================================================
+   ╔══════════════════════════════════════════════════════════╗
+   ║   RECOMPENSAS: TEMAS DE PÁGINA DESBLOQUEABLES POR TROFEO   ║
+   ╚══════════════════════════════════════════════════════════╝
+   Cada entrada de THEMES describe una skin completa de la página
+   (colores, fondo y tipografía, ver el CSS ".theme-<id>" al
+   principio del archivo) ligada al trofeo con id `trophyId`. En
+   cuanto ese trofeo se desbloquea, el jugador puede activarla o
+   desactivarla desde la tarjeta/modal del trofeo en la Sala de
+   Trofeos — no hace falta tocar nada más para añadir temas
+   nuevos: basta con añadir aquí la entrada y su clase CSS.
+   ============================================================ */
+const THEMES = {
+  theme_nahiwin: {
+    trophyId: 'trophy_avatar',
+    bodyClass: 'theme-nahiwin',
+    name: '¡Nah, I\'d Win!',
+    desc: 'Paleta gris con toques azul claro, fondo con background_guide.png y tipografía pixelada de videojuego retro.',
+  },
+};
+
+const STORAGE_KEY_ACTIVE_THEME = 'slap_battles_active_theme_v1';
+let activeThemeId = null;
+
+/* Un tema sólo puede activarse si el trofeo que lo otorga ya está desbloqueado */
+function isThemeUnlocked(themeId) {
+  const theme = THEMES[themeId];
+  if (!theme) return false;
+  const trophy = TROPHIES.find(t => t.id === theme.trophyId);
+  return trophy ? isFixedTrophyUnlocked(trophy) : false;
+}
+
+function applyTheme(themeId) {
+  Object.values(THEMES).forEach(t => document.body.classList.remove(t.bodyClass));
+  if (themeId && THEMES[themeId] && isThemeUnlocked(themeId)) {
+    document.body.classList.add(THEMES[themeId].bodyClass);
+    activeThemeId = themeId;
+  } else {
+    activeThemeId = null;
+  }
+  saveActiveTheme();
+  refreshThemeButtons();
+}
+
+function toggleTheme(themeId) {
+  if (!isThemeUnlocked(themeId)) return;
+  applyTheme(activeThemeId === themeId ? null : themeId);
+}
+
+function saveActiveTheme() {
+  try { localStorage.setItem(STORAGE_KEY_ACTIVE_THEME, activeThemeId || ''); } catch(e) {}
+}
+function loadActiveTheme() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_ACTIVE_THEME);
+    if (raw && THEMES[raw] && isThemeUnlocked(raw)) applyTheme(raw);
+  } catch(e) {}
+}
+
+/* Sincroniza todos los botones de tema visibles (tarjeta + modal)
+   con el estado real de desbloqueo/activación. */
+function refreshThemeButtons() {
+  document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+    const id = btn.dataset.themeBtn;
+    const unlocked = isThemeUnlocked(id);
+    const active = activeThemeId === id;
+    btn.disabled = !unlocked;
+    btn.classList.toggle('active', active);
+    btn.textContent = !unlocked ? '🔒 Tema bloqueado' : (active ? '✓ Tema activo — pulsa para quitar' : '🎨 Activar tema');
+  });
+}
+
+/* Bloque HTML reutilizable de "recompensa de tema" para tarjeta/modal */
+function renderThemeRewardBlock(trophy) {
+  if (!trophy.rewardThemeId || !THEMES[trophy.rewardThemeId]) return '';
+  const theme = THEMES[trophy.rewardThemeId];
+  const unlocked = isThemeUnlocked(trophy.rewardThemeId);
+  return `
+    <div class="trophy-reward-block" onclick="event.stopPropagation()">
+      <div class="trophy-reward-block-title">🎁 Recompensa: tema de página "${theme.name}"</div>
+      <div class="trophy-reward-block-desc">${theme.desc}</div>
+      <button class="theme-reward-btn" data-theme-btn="${trophy.rewardThemeId}" ${unlocked ? '' : 'disabled'} onclick="toggleTheme('${trophy.rewardThemeId}')">🔒 Tema bloqueado</button>
+    </div>`;
+}
+
+/* ── Arranque ── */
+loadManualTrophies();
+loadSeenTrophies();
+loadTrophyDates();
+bootstrapSeenTrophies();
+loadActiveTheme();
 </script>
 
 </body>
