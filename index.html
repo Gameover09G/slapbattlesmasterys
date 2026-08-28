@@ -32955,12 +32955,17 @@ const FEEDBACK_CONFIG = {
     len: () => localStorage.length
   };
 
-  const LEGACY_AVATAR = (id) =>
-    'https://www.roblox.com/headshot-thumbnail/image?userId=' + id + '&width=150&height=150&format=png';
-  const FALLBACK_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">' +
-    '<rect width="150" height="150" fill="#1a1a1a"/>' +
-    '<text x="75" y="100" font-size="64" text-anchor="middle">?</text></svg>');
+  /* Roblox retiró /headshot-thumbnail/image, así que la única vía es la
+     API de miniaturas a través del Worker. Mientras llega (o si falla),
+     se pinta una inicial en un cuadro, que queda mejor que un hueco. */
+  function placeholderAvatar(name) {
+    const letter = (String(name || '?').trim()[0] || '?').toUpperCase();
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">' +
+      '<rect width="150" height="150" fill="#2e2e2e"/>' +
+      '<text x="75" y="103" font-size="72" font-family="sans-serif" font-weight="bold" ' +
+      'fill="#F0B800" text-anchor="middle">' + letter.replace(/[<>&]/g, '') + '</text></svg>');
+  }
 
   let session = null;
   let candidate = null;
@@ -32993,7 +32998,8 @@ const FEEDBACK_CONFIG = {
     for (let i = 0; i < list.length; i++) {
       try {
         const r = await fetch(list[i] + path, opts);
-        if (r.status === 404 && i < list.length - 1) { lastErr = new Error('HTTP 404'); continue; }
+        // Si este Worker no sabe atender la ruta (404, 403…), probar el otro
+        if (!r.ok && i < list.length - 1) { lastErr = new Error('HTTP ' + r.status); continue; }
         return r;
       } catch (e) { lastErr = e; }
     }
@@ -33104,30 +33110,37 @@ const FEEDBACK_CONFIG = {
   }
 
   /* ── Avatares ────────────────────────────────────────────── */
-  async function resolveAvatar(userId) {
+  async function resolveAvatar(userId, allowRetry) {
     if (avatarCache[userId]) return avatarCache[userId];
-    if (readBases().length) {
-      try {
-        const r = await roFetch('/thumbnails/v1/users/avatar-headshot?userIds=' + userId +
-                                '&size=150x150&format=Png&isCircular=false');
-        if (r.ok) {
-          const j = await r.json();
-          const item = (j.data || [])[0];
-          if (item && item.imageUrl) {
-            avatarCache[userId] = item.imageUrl;
-            try { RAW.set(KEY_AVATARS, JSON.stringify(avatarCache)); } catch (e) {}
-            return item.imageUrl;
-          }
-        }
-      } catch (e) {}
-    }
-    return LEGACY_AVATAR(userId);
+    if (!readBases().length) return null;
+    try {
+      const r = await roFetch('/thumbnails/v1/users/avatar-headshot?userIds=' + userId +
+                              '&size=150x150&format=Png&isCircular=false');
+      if (!r.ok) return null;
+      const item = ((await r.json()).data || [])[0];
+      if (!item) return null;
+
+      /* Roblox genera la miniatura la primera vez que se pide: puede
+         contestar "Pending" con la imagen vacía. Se reintenta una vez. */
+      if (item.state === 'Pending' && allowRetry !== false) {
+        await new Promise(res => setTimeout(res, 1800));
+        return resolveAvatar(userId, false);
+      }
+      if (!item.imageUrl) return null;
+
+      avatarCache[userId] = item.imageUrl;
+      try { RAW.set(KEY_AVATARS, JSON.stringify(avatarCache)); } catch (e) {}
+      return item.imageUrl;
+    } catch (e) { return null; }
   }
-  function paintAvatar(img, userId) {
+
+  function paintAvatar(img, userId, name) {
     if (!img) return;
-    img.onerror = function () { this.onerror = null; this.src = FALLBACK_AVATAR; };
-    img.src = avatarCache[userId] || LEGACY_AVATAR(userId);
-    resolveAvatar(userId).then(u => { if (u && img.src !== u) img.src = u; }).catch(() => {});
+    const ph = placeholderAvatar(name || (session && session.id === userId ? session.username : ''));
+    img.onerror = function () { this.onerror = null; this.src = ph; };
+    img.src = avatarCache[userId] || ph;
+    if (avatarCache[userId]) return;
+    resolveAvatar(userId).then(u => { if (u) img.src = u; }).catch(() => {});
   }
 
   /* ── Roblox / Worker ─────────────────────────────────────── */
@@ -33214,10 +33227,10 @@ const FEEDBACK_CONFIG = {
       $('sba-chip-tick').textContent = '✅';
       $('sba-chip-avatar').style.display = 'block';
       $('sba-chip-face').style.display = 'none';
-      paintAvatar($('sba-chip-avatar'), session.id);
+      paintAvatar($('sba-chip-avatar'), session.id, session.username);
       chip.title = '@' + session.username;
 
-      paintAvatar($('sba-menu-avatar'), session.id);
+      paintAvatar($('sba-menu-avatar'), session.id, session.username);
       $('sba-menu-name').textContent = session.displayName || session.username;
       $('sba-menu-user').textContent = '@' + session.username;
       $('sba-menu-state').innerHTML = '<span class="sba-badge ok">✅ Verificada</span>';
@@ -33317,13 +33330,13 @@ const FEEDBACK_CONFIG = {
     try {
       candidate = await lookupUser(q);
       if (await accountExists(candidate.id)) {
-        paintAvatar($('sba-login-avatar'), candidate.id);
+        paintAvatar($('sba-login-avatar'), candidate.id, candidate.username);
         $('sba-login-name').textContent = candidate.displayName;
         $('sba-login-user').textContent = '@' + candidate.username;
         showPanel('sba-panel-login');
         setTimeout(() => $('sba-pass-login').focus(), 60);
       } else {
-        paintAvatar($('sba-profile-avatar'), candidate.id);
+        paintAvatar($('sba-profile-avatar'), candidate.id, candidate.username);
         $('sba-profile-name').textContent = candidate.displayName;
         $('sba-profile-user').textContent = '@' + candidate.username;
         $('sba-profile-id').textContent = 'ID ' + candidate.id;
@@ -33476,7 +33489,7 @@ const FEEDBACK_CONFIG = {
   /* ── 5. Ajustes ──────────────────────────────────────────── */
   function openSettings() {
     if (!session) { open(); return; }
-    paintAvatar($('sba-set-avatar'), session.id);
+    paintAvatar($('sba-set-avatar'), session.id, session.username);
     $('sba-set-name').textContent = session.displayName || session.username;
     $('sba-set-user').textContent = '@' + session.username;
     const d = session.createdAt ? new Date(session.createdAt) : null;
