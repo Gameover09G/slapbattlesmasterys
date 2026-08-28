@@ -32945,7 +32945,7 @@ const FEEDBACK_CONFIG = {
   const KEY_ACCOUNTS = 'slap_battles_accounts_v1';
   const KEY_PROMPTED = 'slap_battles_account_prompted_v1';
   const KEY_AVATARS  = 'slap_battles_avatar_cache_v1';
-  const PBKDF2_ITER  = 210000;
+  const PBKDF2_ITER  = 100000;   // mismo tope que Cloudflare Workers, para que los hashes sean intercambiables
 
   const RAW = window.__SB_RAW || {
     get: (k) => localStorage.getItem(k),
