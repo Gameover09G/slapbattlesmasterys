@@ -7775,6 +7775,67 @@ input[type="range"].slap-volume::-moz-range-track {
 .theme-reward-btn.active { background: var(--trophy-unlock); color: #06222b; }
 
 </style>
+<!-- ============================================================
+     CUENTAS — separación de datos por cuenta
+     Va ANTES que los scripts de la app a propósito: cuando init()
+     llama a loadProgress(), las claves ya tienen que apuntar al
+     usuario que ha iniciado sesión.
+
+     Con sesión abierta, "slap_battles_progress_v2" se lee y escribe
+     realmente como "slap_battles_progress_v2::u261". Sin sesión, todo
+     queda tal cual (los datos de invitado no se tocan).
+     ============================================================ -->
+<script>
+(function () {
+  var LS;
+  try { LS = window.localStorage; } catch (e) { return; }
+  if (!LS || !window.Storage) return;
+
+  var proto   = Storage.prototype;
+  var origGet = proto.getItem,
+      origSet = proto.setItem,
+      origDel = proto.removeItem,
+      origKey = proto.key;
+
+  /* Acceso sin namespace, para migrar y borrar cuentas */
+  window.__SB_RAW = {
+    get: function (k) { return origGet.call(LS, k); },
+    set: function (k, v) { return origSet.call(LS, k, v); },
+    del: function (k) { return origDel.call(LS, k); },
+    key: function (i) { return origKey.call(LS, i); },
+    len: function () { return LS.length; }
+  };
+
+  /* Claves globales al navegador: nunca se separan por cuenta */
+  var GLOBAL = {
+    'slap_battles_account_v1': 1,
+    'slap_battles_accounts_v1': 1,
+    'slap_battles_account_prompted_v1': 1,
+    'slap_battles_avatar_cache_v1': 1,
+    'cookieNoticeAck': 1,
+    'slap_battles_changelog_seen': 1
+  };
+
+  var sess = null;
+  try { sess = JSON.parse(window.__SB_RAW.get('slap_battles_account_v1') || 'null'); } catch (e) {}
+  if (!sess || !sess.id) return;                 // invitado: sin cambios
+
+  var ns = '::u' + sess.id;
+  window.__SB_NS = ns;
+
+  function map(k) {
+    k = String(k);
+    if (GLOBAL[k]) return k;
+    if (k.length > ns.length && k.slice(-ns.length) === ns) return k;
+    return k + ns;
+  }
+
+  proto.getItem    = function (k)    { return origGet.call(this, this === LS ? map(k) : k); };
+  proto.setItem    = function (k, v) { return origSet.call(this, this === LS ? map(k) : k, v); };
+  proto.removeItem = function (k)    { return origDel.call(this, this === LS ? map(k) : k); };
+})();
+</script>
+
 </head>
 <body>
 
@@ -8851,7 +8912,15 @@ input[type="range"].slap-volume::-moz-range-track {
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
-    version: "pre-2.0 - OVERHAUL",
+    version: "pre-2.0 (parte 2) - LOGIN",
+    date: "03/08/2026",
+    entries: [
+      { emoji: "🔗", color: "#ffffff", text: "Sistema de cuentas para que tu progreso se guarde entre cuentas. Usa un sistema de verificacion para evitar cojer las cuentas de otras personas."},
+    ]
+  },
+  
+  {
+    version: "pre-2.0 (parte 1) - OVERHAUL",
     date: "03/08/2026",
     entries: [
       { emoji: "💬", color: "#ffffff", text: "Sistema de dialogos."},
@@ -32391,6 +32460,1221 @@ const FEEDBACK_CONFIG = {
   };
 
   refreshPendingBadge();
+})();
+</script>
+
+
+<!-- ============================================================
+     SISTEMA DE CUENTA (ROBLOX) — OPCIONAL
+     · La web sigue funcionando entera sin cuenta.
+     · Para tener cuenta hay que verificar el perfil de Roblox:
+       no se puede "iniciar sesión" solo escribiendo un nombre.
+     · Tras verificar por primera vez se crea la cuenta con
+       contraseña. Las siguientes veces basta la contraseña.
+     · El progreso se guarda en localStorage, separado por cuenta.
+     ============================================================ -->
+<style>
+#sba-overlay, #sba-chip-wrap, #sba-menu {
+  --sba-ink:      #111111;
+  --sba-panel:    #2b2b2b;
+  --sba-panel-2:  #232323;
+  --sba-sunk:     #1a1a1a;
+  --sba-yellow:   #FFD700;
+  --sba-yellow-2: #F0B800;
+  --sba-yellow-3: #C89A00;
+  --sba-shadow:   #7d6000;
+  --sba-green:    #39ff14;
+  --sba-red:      #ff5252;
+  --sba-muted:    #9a9a9a;
+}
+
+/* ── CHIP ── */
+#sba-chip-wrap { position: fixed; top: 12px; right: 16px; z-index: 500; font-family: 'Fredoka', sans-serif; }
+#sba-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px 5px 6px;
+  background: linear-gradient(180deg, #333 0%, #262626 100%);
+  border: 3px solid var(--sba-ink);
+  border-radius: 999px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.55);
+  color: #fff; font-family: 'Fredoka', sans-serif; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer;
+  transition: transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .16s, filter .16s;
+}
+#sba-chip:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,0.55); filter: brightness(1.12); }
+#sba-chip:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.55); }
+#sba-chip.logged-in { background: linear-gradient(180deg, var(--sba-yellow) 0%, var(--sba-yellow-2) 100%); color: #201800; }
+#sba-chip-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1a1a1a; border: 2px solid var(--sba-ink); object-fit: cover; display: block; flex: 0 0 auto; }
+#sba-chip-face { width: 28px; height: 28px; border-radius: 50%; background: #1a1a1a; border: 2px solid var(--sba-ink); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex: 0 0 auto; }
+#sba-chip-name { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sba-chip-tick { font-size: 0.72rem; }
+
+/* ── MENÚ ── */
+#sba-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; width: 240px;
+  background: var(--sba-panel); border: 4px solid var(--sba-ink); border-radius: 16px;
+  box-shadow: 0 10px 0 rgba(0,0,0,0.5), 0 18px 40px rgba(0,0,0,0.6);
+  padding: 12px; display: none; font-family: 'Fredoka', sans-serif;
+}
+#sba-menu.open { display: block; animation: sba-pop .22s cubic-bezier(.34,1.56,.64,1); transform-origin: top right; }
+#sba-menu-head { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 2px dashed #444; margin-bottom: 10px; }
+#sba-menu-avatar { width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--sba-ink); background: var(--sba-sunk); object-fit: cover; flex: 0 0 auto; }
+#sba-menu-name { font-family: 'Fredoka One', cursive; font-size: 0.95rem; color: #fff; line-height: 1.1; word-break: break-word; }
+#sba-menu-user { font-size: 0.74rem; color: var(--sba-muted); }
+.sba-menu-btn {
+  display: block; width: 100%; text-align: left;
+  padding: 8px 10px; margin-top: 6px;
+  background: var(--sba-panel-2); border: 2px solid #3d3d3d; border-radius: 10px;
+  color: #eee; font-family: 'Fredoka', sans-serif; font-size: 0.82rem; font-weight: 500;
+  cursor: pointer; text-decoration: none;
+  transition: background .15s, border-color .15s, transform .12s;
+}
+.sba-menu-btn:hover { background: #333; border-color: var(--sba-yellow-3); transform: translateX(2px); }
+.sba-menu-btn.danger:hover { border-color: var(--sba-red); color: #ffbdbd; }
+
+.sba-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 0.68rem; font-weight: 600; border: 2px solid var(--sba-ink); }
+.sba-badge.ok { background: rgba(57,255,20,0.16); color: var(--sba-green); }
+
+/* ── OVERLAY ── */
+#sba-overlay {
+  position: fixed; inset: 0; z-index: 99700;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at 50% 40%, rgba(70,55,0,0.55) 0%, rgba(0,0,0,0.88) 70%);
+  backdrop-filter: blur(4px);
+  font-family: 'Fredoka', sans-serif; overflow-y: auto;
+}
+#sba-overlay.open { display: flex; animation: sba-fade .2s ease; }
+#sba-overlay::before {
+  content: ''; position: absolute; inset: -40%;
+  background: repeating-linear-gradient(45deg, rgba(255,215,0,0.05) 0 22px, rgba(0,0,0,0) 22px 44px);
+  animation: sba-slide 6s linear infinite; pointer-events: none;
+}
+#sba-card {
+  position: relative; width: min(440px, 100%); margin: auto;
+  background: linear-gradient(180deg, #303030 0%, #232323 100%);
+  border: 5px solid var(--sba-ink); border-radius: 26px;
+  box-shadow: 0 14px 0 rgba(0,0,0,0.55), 0 30px 70px rgba(0,0,0,0.75);
+  overflow: hidden; animation: sba-pop .32s cubic-bezier(.34,1.56,.64,1);
+}
+#sba-card-stripes {
+  height: 20px;
+  background: repeating-linear-gradient(45deg, var(--sba-yellow-2) 0 16px, #2b2100 16px 32px);
+  background-size: 45px 45px; border-bottom: 4px solid var(--sba-ink);
+  animation: sba-stripes 1.6s linear infinite;
+}
+#sba-card.danger #sba-card-stripes { background: repeating-linear-gradient(45deg, var(--sba-red) 0 16px, #2b0000 16px 32px); }
+#sba-card-head { position: relative; padding: 18px 22px 6px; text-align: center; }
+#sba-mascot { font-size: 3rem; line-height: 1; display: inline-block; filter: drop-shadow(0 6px 0 rgba(0,0,0,0.45)); animation: sba-wobble 2.4s ease-in-out infinite; }
+#sba-card-head h2 {
+  font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: #fff; margin-top: 6px;
+  transform: rotate(-1.5deg);
+  text-shadow: 3px 3px 0 var(--sba-ink), -1px -1px 0 var(--sba-ink), 1px -1px 0 var(--sba-ink), -1px 1px 0 var(--sba-ink);
+  letter-spacing: 0.5px;
+}
+#sba-card-head p { color: #bdbdbd; font-size: 0.86rem; margin-top: 8px; line-height: 1.45; }
+#sba-close {
+  position: absolute; top: 10px; right: 12px; width: 32px; height: 32px;
+  background: #1c1c1c; border: 3px solid var(--sba-ink); border-radius: 10px;
+  color: #ccc; font-size: 1rem; cursor: pointer; line-height: 1;
+  transition: background .15s, color .15s, transform .15s;
+}
+#sba-close:hover { background: var(--sba-red); color: #fff; transform: rotate(90deg); }
+#sba-card-body { padding: 12px 22px 18px; }
+
+/* ── CAMPOS ── */
+.sba-field { margin-top: 12px; }
+.sba-label { display: block; font-size: 0.74rem; font-weight: 600; color: var(--sba-yellow); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.sba-input {
+  width: 100%; padding: 13px 15px;
+  background: var(--sba-sunk); border: 4px solid var(--sba-ink); border-radius: 14px;
+  color: #fff; font-family: 'Fredoka', sans-serif; font-size: 1rem; outline: none;
+  box-shadow: inset 0 3px 8px rgba(0,0,0,0.6);
+  transition: border-color .18s, box-shadow .18s;
+}
+.sba-input::placeholder { color: #6d6d6d; }
+.sba-input:focus { border-color: var(--sba-yellow-2); box-shadow: inset 0 3px 8px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,215,0,0.25); }
+.sba-input.bad { border-color: var(--sba-red); }
+
+/* Medidor de contraseña */
+#sba-meter { display: flex; gap: 4px; margin-top: 8px; }
+#sba-meter span { flex: 1; height: 6px; border-radius: 3px; background: #3a3a3a; transition: background .2s; }
+#sba-meter.l1 span:nth-child(1) { background: var(--sba-red); }
+#sba-meter.l2 span:nth-child(-n+2) { background: #ff9d3c; }
+#sba-meter.l3 span:nth-child(-n+3) { background: var(--sba-yellow); }
+#sba-meter.l4 span { background: var(--sba-green); }
+#sba-meter-text { font-size: 0.74rem; color: var(--sba-muted); margin-top: 6px; }
+
+/* ── BOTONES ── */
+.sba-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px 16px; margin-top: 14px;
+  border-radius: 16px; border: 4px solid var(--sba-ink);
+  font-family: 'Fredoka One', cursive; font-size: 1rem; letter-spacing: 0.4px;
+  cursor: pointer; transition: transform .12s, box-shadow .12s, filter .15s;
+}
+.sba-btn-main { background: linear-gradient(180deg, var(--sba-yellow) 0%, var(--sba-yellow-2) 100%); color: #241b00; box-shadow: 0 6px 0 var(--sba-shadow); }
+.sba-btn-main:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 0 8px 0 var(--sba-shadow); }
+.sba-btn-main:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 1px 0 var(--sba-shadow); }
+.sba-btn:disabled { filter: grayscale(0.75); cursor: not-allowed; opacity: 0.7; }
+.sba-btn-alt { background: linear-gradient(180deg, #3b3b3b 0%, #2c2c2c 100%); color: #f0f0f0; box-shadow: 0 6px 0 #101010; text-decoration: none; }
+.sba-btn-alt:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-2px); }
+.sba-btn-alt:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 1px 0 #101010; }
+.sba-btn-danger { background: linear-gradient(180deg, #ff5252 0%, #c22 100%); color: #fff; box-shadow: 0 6px 0 #5c0000; }
+.sba-btn-danger:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
+.sba-btn-danger:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 1px 0 #5c0000; }
+.sba-btn-row { display: flex; gap: 10px; }
+.sba-btn-row .sba-btn { margin-top: 14px; font-size: 0.9rem; padding: 12px 10px; }
+
+#sba-guest {
+  display: block; width: 100%; margin-top: 14px; padding: 9px;
+  background: none; border: 2px dashed #4a4a4a; border-radius: 12px;
+  color: var(--sba-muted); font-family: 'Fredoka', sans-serif; font-size: 0.84rem; cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+#sba-guest:hover { color: #fff; border-color: var(--sba-yellow-3); }
+
+.sba-link {
+  display: block; width: 100%; margin-top: 12px;
+  background: none; border: none; color: var(--sba-muted);
+  font-family: 'Fredoka', sans-serif; font-size: 0.8rem;
+  text-decoration: underline dotted; cursor: pointer;
+}
+.sba-link:hover { color: var(--sba-yellow); }
+
+/* ── PERFIL ── */
+#sba-profile, #sba-set-profile {
+  display: flex; align-items: center; gap: 14px; padding: 14px;
+  background: var(--sba-panel-2); border: 4px solid var(--sba-ink); border-radius: 18px;
+  box-shadow: inset 0 0 0 2px rgba(255,215,0,0.18);
+}
+#sba-profile-avatar, #sba-set-avatar {
+  width: 72px; height: 72px; border-radius: 14px; border: 4px solid var(--sba-ink);
+  background: var(--sba-sunk); object-fit: cover; flex: 0 0 auto;
+}
+#sba-profile-name, #sba-set-name { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #fff; word-break: break-word; }
+#sba-profile-user, #sba-set-user { font-size: 0.85rem; color: var(--sba-yellow); }
+#sba-profile-id, #sba-set-since { font-size: 0.72rem; color: var(--sba-muted); margin-top: 3px; }
+
+/* ── ESTADO ── */
+.sba-status { margin-top: 12px; min-height: 20px; font-size: 0.84rem; text-align: center; color: var(--sba-muted); line-height: 1.4; }
+.sba-status.error { color: #ff9d9d; }
+.sba-status.ok { color: var(--sba-green); }
+
+/* ── VERIFICACIÓN ── */
+.sba-steps { counter-reset: sba-step; margin-top: 6px; }
+.sba-step { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; font-size: 0.85rem; color: #ddd; line-height: 1.45; }
+.sba-step::before {
+  counter-increment: sba-step; content: counter(sba-step);
+  flex: 0 0 auto; width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sba-yellow); color: #241b00; border: 3px solid var(--sba-ink); border-radius: 50%;
+  font-family: 'Fredoka One', cursive; font-size: 0.75rem;
+}
+#sba-code-box {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 10px 0 4px; padding: 12px 14px;
+  background: var(--sba-sunk); border: 4px dashed var(--sba-yellow-3); border-radius: 14px;
+}
+#sba-code { font-family: 'VT323', monospace; font-size: 1.35rem; color: var(--sba-yellow); letter-spacing: 1px; word-break: break-all; }
+#sba-code-copy {
+  flex: 0 0 auto; padding: 7px 11px;
+  background: var(--sba-yellow); border: 3px solid var(--sba-ink); border-radius: 10px;
+  color: #241b00; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.78rem; cursor: pointer;
+}
+#sba-code-copy:active { transform: scale(0.94); }
+
+.sba-note {
+  margin-top: 12px; padding: 10px 12px;
+  background: rgba(255,215,0,0.07); border-left: 4px solid var(--sba-yellow-3); border-radius: 8px;
+  font-size: 0.76rem; color: #c9c9c9; line-height: 1.5;
+}
+.sba-note strong { color: var(--sba-yellow); }
+.sba-note.danger { background: rgba(255,82,82,0.09); border-left-color: var(--sba-red); }
+.sba-note.danger strong { color: #ff9d9d; }
+
+.sba-kill-list { margin: 12px 0 0; padding: 0; list-style: none; }
+.sba-kill-list li { display: flex; gap: 8px; padding: 5px 0; font-size: 0.83rem; color: #ddd; }
+
+/* ── PIE ── */
+#sba-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 2px dashed #3d3d3d; }
+#sba-mode { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--sba-muted); }
+#sba-mode-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sba-muted); }
+#sba-mode.local #sba-mode-dot { background: var(--sba-yellow); }
+#sba-mode.server #sba-mode-dot { background: var(--sba-green); }
+#sba-mode.down #sba-mode-dot { background: var(--sba-red); }
+#sba-diag-btn { background: none; border: none; color: var(--sba-muted); font-family: 'Fredoka', sans-serif; font-size: 0.72rem; text-decoration: underline dotted; cursor: pointer; padding: 2px 4px; }
+#sba-diag-btn:hover { color: var(--sba-yellow); }
+#sba-diag {
+  display: none; margin-top: 10px; padding: 10px 12px;
+  background: #131313; border: 3px solid var(--sba-ink); border-radius: 12px;
+  font-family: 'VT323', monospace; font-size: 0.95rem; line-height: 1.5; color: #cfcfcf;
+  max-height: 190px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+}
+#sba-diag.open { display: block; }
+
+.sba-panel { display: none; }
+.sba-panel.active { display: block; animation: sba-fade .2s ease; }
+
+@keyframes sba-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sba-pop { 0% { opacity: 0; transform: scale(0.82) rotate(-3deg); } 70% { transform: scale(1.03) rotate(0.6deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+@keyframes sba-stripes { from { background-position: 0 0; } to { background-position: 45px 0; } }
+@keyframes sba-slide { from { transform: translateX(0); } to { transform: translateX(44px); } }
+@keyframes sba-wobble { 0%, 100% { transform: rotate(-9deg) translateY(0); } 50% { transform: rotate(9deg) translateY(-5px); } }
+
+@media (max-width: 620px) {
+  #sba-chip-wrap { top: 8px; right: 10px; }
+  #sba-chip-name { max-width: 78px; font-size: 0.76rem; }
+  #sba-card-head h2 { font-size: 1.25rem; }
+  #sba-profile-avatar, #sba-set-avatar { width: 58px; height: 58px; }
+}
+#sba-overlay :focus-visible, #sba-chip:focus-visible, .sba-menu-btn:focus-visible { outline: 3px solid var(--sba-yellow); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  #sba-card, #sba-menu, #sba-overlay, #sba-mascot, #sba-card-stripes, #sba-overlay::before { animation: none !important; }
+}
+</style>
+
+<div id="sba-chip-wrap">
+  <button id="sba-chip" type="button" aria-haspopup="true" aria-expanded="false">
+    <span id="sba-chip-face">👤</span>
+    <img id="sba-chip-avatar" alt="" style="display:none">
+    <span id="sba-chip-name">Iniciar sesión</span>
+    <span id="sba-chip-tick"></span>
+  </button>
+
+  <div id="sba-menu" role="menu">
+    <div id="sba-menu-head">
+      <img id="sba-menu-avatar" alt="">
+      <div>
+        <div id="sba-menu-name">—</div>
+        <div id="sba-menu-user">—</div>
+        <div id="sba-menu-state" style="margin-top:5px"></div>
+      </div>
+    </div>
+    <a class="sba-menu-btn" id="sba-menu-profile" href="#" target="_blank" rel="noopener" role="menuitem">🔗 Ver perfil en Roblox</a>
+    <button class="sba-menu-btn" id="sba-menu-settings" type="button" role="menuitem">⚙️ Ajustes de la cuenta</button>
+    <button class="sba-menu-btn" id="sba-menu-switch" type="button" role="menuitem">🔄 Cambiar de cuenta</button>
+    <button class="sba-menu-btn danger" id="sba-menu-logout" type="button" role="menuitem">🚪 Cerrar sesión</button>
+  </div>
+</div>
+
+<div id="sba-overlay" role="dialog" aria-modal="true" aria-labelledby="sba-title">
+  <div id="sba-card">
+    <div id="sba-card-stripes"></div>
+    <button id="sba-close" type="button" aria-label="Cerrar">✕</button>
+
+    <div id="sba-card-head">
+      <div id="sba-mascot">🧤</div>
+      <h2 id="sba-title">CONECTA TU CUENTA</h2>
+      <p id="sba-subtitle">Enlaza tu perfil de Roblox para guardar tu progreso por separado. Es opcional.</p>
+    </div>
+
+    <div id="sba-card-body">
+
+      <!-- 1. BUSCAR -->
+      <div class="sba-panel active" id="sba-panel-search">
+        <div class="sba-field">
+          <label class="sba-label" for="sba-input">Usuario de Roblox</label>
+          <input class="sba-input" id="sba-input" type="text" autocomplete="username" spellcheck="false"
+                 placeholder="Builderman  ·  o pega el enlace de tu perfil">
+        </div>
+        <button class="sba-btn sba-btn-main" id="sba-search-btn" type="button">👋 Continuar</button>
+        <button id="sba-guest" type="button">Seguir sin cuenta →</button>
+        <div class="sba-status" id="sba-status"></div>
+      </div>
+
+      <!-- 2. CONFIRMAR PERFIL -->
+      <div class="sba-panel" id="sba-panel-confirm">
+        <div id="sba-profile">
+          <img id="sba-profile-avatar" alt="Avatar de Roblox">
+          <div>
+            <div id="sba-profile-name">—</div>
+            <div id="sba-profile-user">—</div>
+            <div id="sba-profile-id">—</div>
+          </div>
+        </div>
+        <div class="sba-note">
+          Para crear la cuenta hay que <strong>demostrar que este perfil es tuyo</strong>.
+          Es un paso rápido: pegas un código en tu descripción de Roblox y listo.
+        </div>
+        <button class="sba-btn sba-btn-main" id="sba-verify-btn" type="button">🔒 Verificar que es mía</button>
+        <button class="sba-btn sba-btn-alt" id="sba-back-btn" type="button">↩ No soy yo</button>
+      </div>
+
+      <!-- 3. VERIFICAR -->
+      <div class="sba-panel" id="sba-panel-verify">
+        <div class="sba-steps">
+          <div class="sba-step">Copia este código.</div>
+          <div class="sba-step">Pégalo en la descripción («Acerca de mí») de tu perfil de Roblox y guarda los cambios.</div>
+          <div class="sba-step">Vuelve aquí y pulsa comprobar. Después ya puedes borrarlo del perfil.</div>
+        </div>
+        <div id="sba-code-box">
+          <span id="sba-code">—</span>
+          <button id="sba-code-copy" type="button">Copiar</button>
+        </div>
+        <button class="sba-btn sba-btn-main" id="sba-check-btn" type="button">🔍 Ya lo he pegado, comprobar</button>
+        <div class="sba-btn-row">
+          <a class="sba-btn sba-btn-alt" id="sba-open-profile" href="#" target="_blank" rel="noopener">🔗 Abrir perfil</a>
+          <button class="sba-btn sba-btn-alt" id="sba-verify-back" type="button">↩ Atrás</button>
+        </div>
+        <div class="sba-status" id="sba-status-verify"></div>
+      </div>
+
+      <!-- 4. CREAR CONTRASEÑA -->
+      <div class="sba-panel" id="sba-panel-register">
+        <div class="sba-note" id="sba-reg-note">
+          <strong>Perfil verificado.</strong> Ponle una contraseña a la cuenta para poder volver a entrar
+          sin repetir todo esto.
+        </div>
+        <div class="sba-field">
+          <label class="sba-label" for="sba-pass1">Contraseña</label>
+          <input class="sba-input" id="sba-pass1" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+          <div id="sba-meter"><span></span><span></span><span></span><span></span></div>
+          <div id="sba-meter-text">&nbsp;</div>
+        </div>
+        <div class="sba-field">
+          <label class="sba-label" for="sba-pass2">Repite la contraseña</label>
+          <input class="sba-input" id="sba-pass2" type="password" autocomplete="new-password" placeholder="Otra vez">
+        </div>
+        <button class="sba-btn sba-btn-main" id="sba-register-btn" type="button">🎉 Crear mi cuenta</button>
+        <div class="sba-status" id="sba-status-register"></div>
+      </div>
+
+      <!-- 5. ENTRAR CON CONTRASEÑA -->
+      <div class="sba-panel" id="sba-panel-login">
+        <div id="sba-login-profile" style="text-align:center">
+          <img id="sba-login-avatar" alt="" style="width:72px;height:72px;border-radius:16px;border:4px solid var(--sba-ink);background:var(--sba-sunk);object-fit:cover">
+          <div id="sba-login-name" style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#fff;margin-top:8px">—</div>
+          <div id="sba-login-user" style="font-size:0.82rem;color:var(--sba-yellow)">—</div>
+        </div>
+        <div class="sba-field">
+          <label class="sba-label" for="sba-pass-login">Contraseña</label>
+          <input class="sba-input" id="sba-pass-login" type="password" autocomplete="current-password" placeholder="Tu contraseña">
+        </div>
+        <button class="sba-btn sba-btn-main" id="sba-login-btn" type="button">🔓 Entrar</button>
+        <button class="sba-link" id="sba-forgot-btn" type="button">He olvidado la contraseña</button>
+        <button class="sba-link" id="sba-login-back" type="button">← Usar otra cuenta</button>
+        <div class="sba-status" id="sba-status-login"></div>
+      </div>
+
+      <!-- 6. LISTO -->
+      <div class="sba-panel" id="sba-panel-done" style="text-align:center">
+        <div style="font-size:3.2rem;line-height:1;margin:6px 0 10px">🎉</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:#fff" id="sba-done-title">¡Cuenta creada!</div>
+        <div id="sba-done-text" style="color:#bdbdbd;font-size:0.88rem;margin-top:8px;line-height:1.5"></div>
+        <button class="sba-btn sba-btn-main" id="sba-done-btn" type="button">A darle caña 👋</button>
+      </div>
+
+      <!-- 7. AJUSTES -->
+      <div class="sba-panel" id="sba-panel-settings">
+        <div id="sba-set-profile">
+          <img id="sba-set-avatar" alt="">
+          <div>
+            <div id="sba-set-name">—</div>
+            <div id="sba-set-user">—</div>
+            <div id="sba-set-since">—</div>
+          </div>
+        </div>
+        <div class="sba-note">
+          Tu progreso se guarda en <strong>este navegador</strong>, en un espacio propio de esta cuenta.
+          Otras cuentas de este mismo navegador no lo ven.
+        </div>
+        <button class="sba-btn sba-btn-alt" id="sba-set-logout" type="button">🚪 Cerrar sesión</button>
+        <button class="sba-btn sba-btn-danger" id="sba-set-delete" type="button">🗑️ Eliminar cuenta permanentemente</button>
+      </div>
+
+      <!-- 8. ELIMINAR -->
+      <div class="sba-panel" id="sba-panel-delete">
+        <div class="sba-note danger">
+          <strong>Esto no se puede deshacer.</strong> Se borrará para siempre:
+          <ul class="sba-kill-list">
+            <li><span>⚔️</span><span>Maestrías, misiones y contadores de esta cuenta</span></li>
+            <li><span>🥊</span><span>Guantes marcados y trofeos</span></li>
+            <li><span>📆</span><span>Todo el historial del diario</span></li>
+            <li><span>🔑</span><span>La cuenta y su contraseña</span></li>
+          </ul>
+        </div>
+        <div class="sba-field">
+          <label class="sba-label" for="sba-del-user">Escribe <span id="sba-del-target">tu usuario</span> para confirmar</label>
+          <input class="sba-input" id="sba-del-user" type="text" autocomplete="off" spellcheck="false" placeholder="Tu nombre de usuario">
+        </div>
+        <div class="sba-field">
+          <label class="sba-label" for="sba-del-pass">Contraseña</label>
+          <input class="sba-input" id="sba-del-pass" type="password" autocomplete="current-password" placeholder="Confirma con tu contraseña">
+        </div>
+        <button class="sba-btn sba-btn-danger" id="sba-del-btn" type="button" disabled>🗑️ Eliminar para siempre</button>
+        <button class="sba-btn sba-btn-alt" id="sba-del-back" type="button">↩ Mejor no</button>
+        <div class="sba-status" id="sba-status-delete"></div>
+      </div>
+
+      <div id="sba-foot">
+        <span id="sba-mode"><span id="sba-mode-dot"></span><span id="sba-mode-text">Comprobando…</span></span>
+        <button id="sba-diag-btn" type="button">Diagnóstico</button>
+      </div>
+      <div id="sba-diag"></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   SB ACCOUNT v3 — cuentas verificadas con contraseña
+   ------------------------------------------------------------
+   Flujo:
+     buscar usuario → ¿existe la cuenta?
+       · sí  → pedir contraseña
+       · no  → verificar perfil (código en la descripción)
+               → crear contraseña → cuenta creada
+   No hay forma de entrar sin verificar: escribir un nombre no
+   basta, hay que demostrar que el perfil es tuyo.
+
+   Dos modos:
+     · MODO SERVIDOR (SB_AUTH.apiBase puesto): el Worker guarda la
+       cuenta y el hash de la contraseña. Funciona en cualquier
+       dispositivo.
+     · MODO LOCAL (apiBase vacío): la cuenta vive en este navegador.
+       Sirve para probar, pero es solo de este equipo.
+
+   El progreso se guarda en localStorage separado por cuenta; de eso
+   se encarga el shim que va en el <head>.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const SB_AUTH = {
+    /* ↓ URL del Worker de cuenta. Vacío = modo local. ↓ */
+    apiBase: 'https://slap-auth.gameover09g.workers.dev',
+    proxyBase: (typeof PROXY_BASE_URL === 'string' && PROXY_BASE_URL) ? PROXY_BASE_URL : '',
+    autoPrompt: true
+  };
+
+  const KEY_SESSION  = 'slap_battles_account_v1';
+  const KEY_ACCOUNTS = 'slap_battles_accounts_v1';
+  const KEY_PROMPTED = 'slap_battles_account_prompted_v1';
+  const KEY_AVATARS  = 'slap_battles_avatar_cache_v1';
+  const PBKDF2_ITER  = 210000;
+
+  const RAW = window.__SB_RAW || {
+    get: (k) => localStorage.getItem(k),
+    set: (k, v) => localStorage.setItem(k, v),
+    del: (k) => localStorage.removeItem(k),
+    key: (i) => localStorage.key(i),
+    len: () => localStorage.length
+  };
+
+  const LEGACY_AVATAR = (id) =>
+    'https://www.roblox.com/headshot-thumbnail/image?userId=' + id + '&width=150&height=150&format=png';
+  const FALLBACK_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">' +
+    '<rect width="150" height="150" fill="#1a1a1a"/>' +
+    '<text x="75" y="100" font-size="64" text-anchor="middle">?</text></svg>');
+
+  let session = null;
+  let candidate = null;
+  let pendingCode = null;
+  let ticket = null;
+  let resetMode = false;
+  let avatarCache = {};
+
+  const $ = (id) => document.getElementById(id);
+  const apiBase   = () => SB_AUTH.apiBase.replace(/\/+$/, '');
+  const readBase  = () => (SB_AUTH.apiBase || SB_AUTH.proxyBase).replace(/\/+$/, '');
+  const hasWorker = () => !!SB_AUTH.apiBase;
+  const profileUrl = (id) => 'https://www.roblox.com/users/' + id + '/profile';
+
+  function setStatus(el, msg, kind) {
+    if (!el) return;
+    el.textContent = msg || '';
+    el.className = 'sba-status' + (kind ? ' ' + kind : '');
+  }
+
+  /* ── Contraseñas (modo local): PBKDF2 en el navegador ───── */
+  const b64 = (bytes) => btoa(String.fromCharCode.apply(null, new Uint8Array(bytes)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const unb64 = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+
+  async function derive(password, salt, iterations) {
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' }, key, 256);
+    return new Uint8Array(bits);
+  }
+  async function hashPassword(password) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    return 'pbkdf2$' + PBKDF2_ITER + '$' + b64(salt) + '$' + b64(await derive(password, salt, PBKDF2_ITER));
+  }
+  async function checkPassword(password, stored) {
+    const p = String(stored || '').split('$');
+    if (p.length !== 4 || p[0] !== 'pbkdf2') return false;
+    return b64(await derive(password, unb64(p[2]), parseInt(p[1], 10))) === p[3];
+  }
+
+  function passwordScore(pw) {
+    let s = 0;
+    if (pw.length >= 8) s++;
+    if (pw.length >= 12) s++;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
+    if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) s++;
+    return Math.min(s, 4);
+  }
+  function passwordProblem(pw) {
+    if (!pw) return 'Escribe una contraseña.';
+    if (pw.length < 8) return 'Necesita al menos 8 caracteres.';
+    if (pw.length > 200) return 'Demasiado larga.';
+    return null;
+  }
+
+  /* ── Cuentas locales ─────────────────────────────────────── */
+  function localAccounts() {
+    try { return JSON.parse(RAW.get(KEY_ACCOUNTS) || '{}'); } catch (e) { return {}; }
+  }
+  function saveLocalAccounts(map) {
+    try { RAW.set(KEY_ACCOUNTS, JSON.stringify(map)); } catch (e) {}
+  }
+
+  /* ── Sesión ──────────────────────────────────────────────── */
+  function loadLocal() {
+    try { session = JSON.parse(RAW.get(KEY_SESSION) || 'null'); } catch (e) { session = null; }
+    try { avatarCache = JSON.parse(RAW.get(KEY_AVATARS) || '{}'); } catch (e) { avatarCache = {}; }
+  }
+  function persistSession() {
+    try {
+      if (session) RAW.set(KEY_SESSION, JSON.stringify(session));
+      else RAW.del(KEY_SESSION);
+    } catch (e) {}
+  }
+
+  /* Cambiar de cuenta cambia el espacio de datos: hay que recargar
+     para que la app vuelva a leer el progreso correcto. */
+  function applyAndReload() {
+    persistSession();
+    location.reload();
+  }
+
+  /* ── Datos por cuenta ────────────────────────────────────── */
+  const GLOBAL_KEYS = {
+    'slap_battles_account_v1': 1, 'slap_battles_accounts_v1': 1,
+    'slap_battles_account_prompted_v1': 1, 'slap_battles_avatar_cache_v1': 1,
+    'cookieNoticeAck': 1, 'slap_battles_changelog_seen': 1
+  };
+
+  /* Al crear la primera cuenta, el progreso de invitado se copia dentro
+     para no perderlo. Solo la primera vez y solo si no había nada. */
+  function adoptGuestData(userId) {
+    const ns = '::u' + userId;
+    const keys = [];
+    for (let i = 0; i < RAW.len(); i++) keys.push(RAW.key(i));
+    let moved = 0;
+    keys.forEach(k => {
+      if (!k || GLOBAL_KEYS[k] || k.indexOf('::u') !== -1) return;
+      if (RAW.get(k + ns) !== null) return;              // la cuenta ya tiene lo suyo
+      try { RAW.set(k + ns, RAW.get(k)); moved++; } catch (e) {}
+    });
+    return moved;
+  }
+
+  function wipeAccountData(userId) {
+    const ns = '::u' + userId;
+    const doomed = [];
+    for (let i = 0; i < RAW.len(); i++) {
+      const k = RAW.key(i);
+      if (k && k.length > ns.length && k.slice(-ns.length) === ns) doomed.push(k);
+    }
+    doomed.forEach(k => { try { RAW.del(k); } catch (e) {} });
+    return doomed.length;
+  }
+
+  /* ── Avatares ────────────────────────────────────────────── */
+  async function resolveAvatar(userId) {
+    if (avatarCache[userId]) return avatarCache[userId];
+    const b = readBase();
+    if (b) {
+      try {
+        const r = await fetch(b + '/thumbnails/v1/users/avatar-headshot?userIds=' + userId +
+                              '&size=150x150&format=Png&isCircular=false');
+        if (r.ok) {
+          const j = await r.json();
+          const item = (j.data || [])[0];
+          if (item && item.imageUrl) {
+            avatarCache[userId] = item.imageUrl;
+            try { RAW.set(KEY_AVATARS, JSON.stringify(avatarCache)); } catch (e) {}
+            return item.imageUrl;
+          }
+        }
+      } catch (e) {}
+    }
+    return LEGACY_AVATAR(userId);
+  }
+  function paintAvatar(img, userId) {
+    if (!img) return;
+    img.onerror = function () { this.onerror = null; this.src = FALLBACK_AVATAR; };
+    img.src = avatarCache[userId] || LEGACY_AVATAR(userId);
+    resolveAvatar(userId).then(u => { if (u && img.src !== u) img.src = u; }).catch(() => {});
+  }
+
+  /* ── Roblox / Worker ─────────────────────────────────────── */
+  async function lookupUser(query) {
+    const q = String(query).trim();
+    const byId = q.match(/^(\d{3,})$/) || q.match(/roblox\.com\/users\/(\d+)/i);
+    if (byId) {
+      const id = byId[1], b = readBase();
+      if (b) {
+        try {
+          const r = await fetch(b + '/users/v1/users/' + id);
+          if (r.ok) {
+            const u = await r.json();
+            return { id: String(u.id || id), username: u.name || ('user' + id), displayName: u.displayName || u.name || ('user' + id) };
+          }
+        } catch (e) {}
+      }
+      return { id: String(id), username: 'user' + id, displayName: 'Usuario ' + id };
+    }
+
+    const name = q.replace(/^@/, '');
+    if (!name) throw new Error('Escribe tu nombre de usuario.');
+    if (!/^[A-Za-z0-9_]{3,20}$/.test(name)) throw new Error('Ese nombre no es válido en Roblox. Prueba con el enlace de tu perfil.');
+
+    const b = readBase();
+    if (!b) throw new Error('No hay servidor configurado. Pega el enlace de tu perfil.');
+
+    let r;
+    try {
+      r = await fetch(b + '/users/v1/usernames/users', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernames: [name], excludeBannedUsers: false })
+      });
+    } catch (e) { throw new Error('No se pudo contactar con el servidor. Pega el enlace de tu perfil.'); }
+    if (!r.ok) throw new Error('Roblox respondió ' + r.status + '.');
+
+    const j = await r.json();
+    const list = Array.isArray(j) ? j : (j.data || []);
+    if (!list.length) throw new Error('No existe ningún usuario llamado "' + name + '".');
+    return { id: String(list[0].id), username: list[0].name || name, displayName: list[0].displayName || list[0].name || name };
+  }
+
+  async function accountExists(userId) {
+    if (hasWorker()) {
+      try {
+        const r = await fetch(apiBase() + '/auth/account?userId=' + userId);
+        if (r.ok) return (await r.json()).exists === true;
+      } catch (e) {}
+      return false;
+    }
+    return !!localAccounts()[userId];
+  }
+
+  async function readDescription(userId) {
+    const b = readBase();
+    if (!b) throw new Error('La verificación necesita un servidor configurado.');
+    const r = await fetch(b + '/users/v1/users/' + userId);
+    if (r.status === 404) throw new Error('Tu Worker no enruta /users/v1/users/{id}. Despliega slap-auth-worker.js.');
+    if (!r.ok) throw new Error('No se pudo leer tu perfil (HTTP ' + r.status + ').');
+    return (await r.json()).description || '';
+  }
+
+  async function refreshFromServer() {
+    if (!hasWorker() || !session || !session.token) return;
+    try {
+      const r = await fetch(apiBase() + '/auth/me', { headers: { Authorization: 'Bearer ' + session.token } });
+      if (r.status === 401) { session = null; persistSession(); renderChip(); return; }
+      const j = await r.json();
+      if (j && j.ok && j.account) {
+        session.username = j.account.username || session.username;
+        session.displayName = j.account.displayName || session.displayName;
+        session.createdAt = j.account.createdAt || session.createdAt;
+        persistSession();
+        renderChip();
+      }
+    } catch (e) {}
+  }
+
+  /* ── Render ──────────────────────────────────────────────── */
+  function renderChip() {
+    const chip = $('sba-chip');
+    if (!chip) return;
+    if (session) {
+      chip.classList.add('logged-in');
+      $('sba-chip-name').textContent = session.displayName || session.username;
+      $('sba-chip-tick').textContent = '✅';
+      $('sba-chip-avatar').style.display = 'block';
+      $('sba-chip-face').style.display = 'none';
+      paintAvatar($('sba-chip-avatar'), session.id);
+      chip.title = '@' + session.username;
+
+      paintAvatar($('sba-menu-avatar'), session.id);
+      $('sba-menu-name').textContent = session.displayName || session.username;
+      $('sba-menu-user').textContent = '@' + session.username;
+      $('sba-menu-state').innerHTML = '<span class="sba-badge ok">✅ Verificada</span>';
+      $('sba-menu-profile').href = profileUrl(session.id);
+    } else {
+      chip.classList.remove('logged-in');
+      $('sba-chip-name').textContent = 'Iniciar sesión';
+      $('sba-chip-tick').textContent = '';
+      $('sba-chip-avatar').style.display = 'none';
+      $('sba-chip-face').style.display = 'flex';
+      chip.title = 'Conectar tu cuenta de Roblox (opcional)';
+    }
+  }
+
+  function renderMode(state, text) {
+    $('sba-mode').className = state;
+    $('sba-mode-text').textContent = text;
+  }
+  async function detectMode() {
+    if (!hasWorker()) {
+      renderMode('local', 'Cuenta solo en este navegador');
+      return;
+    }
+    renderMode('', 'Conectando…');
+    try {
+      const r = await fetch(apiBase() + '/auth/health');
+      renderMode(r.ok ? 'server' : 'down', r.ok ? 'Cuenta en servidor' : 'Worker responde ' + r.status);
+    } catch (e) { renderMode('down', 'No se llega al Worker'); }
+  }
+
+  const HEADS = {
+    'sba-panel-search':   ['🧤', 'CONECTA TU CUENTA', 'Enlaza tu perfil de Roblox para guardar tu progreso por separado. Es opcional.'],
+    'sba-panel-confirm':  ['🔍', '¿ERES TÚ?',          'Comprueba que es tu perfil antes de seguir.'],
+    'sba-panel-verify':   ['🔒', 'DEMUESTRA QUE ES TUYA', 'Solo el dueño de la cuenta puede editar su descripción.'],
+    'sba-panel-register': ['🔑', 'CREA TU CONTRASEÑA', 'Último paso. Con ella entrarás la próxima vez.'],
+    'sba-panel-login':    ['👋', 'BIENVENIDO DE VUELTA', 'Escribe tu contraseña para entrar.'],
+    'sba-panel-done':     ['🎉', '¡TODO LISTO!',       ''],
+    'sba-panel-settings': ['⚙️', 'AJUSTES DE LA CUENTA', ''],
+    'sba-panel-delete':   ['⚠️', 'ELIMINAR LA CUENTA', 'Lee bien lo de abajo antes de seguir.']
+  };
+
+  function showPanel(id) {
+    document.querySelectorAll('#sba-card-body .sba-panel').forEach(p => p.classList.remove('active'));
+    const p = $(id);
+    if (p) p.classList.add('active');
+    const h = HEADS[id];
+    if (h) {
+      $('sba-mascot').textContent = h[0];
+      $('sba-title').textContent = h[1];
+      $('sba-subtitle').textContent = h[2];
+      $('sba-subtitle').style.display = h[2] ? 'block' : 'none';
+    }
+    $('sba-card').classList.toggle('danger', id === 'sba-panel-delete');
+    $('sba-foot').style.display = (id === 'sba-panel-settings' || id === 'sba-panel-delete') ? 'none' : 'flex';
+  }
+
+  function open(panel) {
+    $('sba-overlay').classList.add('open');
+    closeMenu();
+    showPanel(panel || 'sba-panel-search');
+    if (!panel || panel === 'sba-panel-search') setTimeout(() => { const i = $('sba-input'); if (i) i.focus(); }, 60);
+    try { RAW.set(KEY_PROMPTED, '1'); } catch (e) {}
+    detectMode();
+  }
+  function close() {
+    if ($('sba-done-btn').dataset.reload === '1') { applyAndReload(); return; }
+    $('sba-overlay').classList.remove('open');
+    ['sba-status','sba-status-verify','sba-status-register','sba-status-login','sba-status-delete']
+      .forEach(id => setStatus($(id), ''));
+    ['sba-pass1','sba-pass2','sba-pass-login','sba-del-pass','sba-del-user'].forEach(id => { if ($(id)) $(id).value = ''; });
+    $('sba-diag').classList.remove('open');
+  }
+
+  function toggleMenu() {
+    if (!session) { open(); return; }
+    const m = $('sba-menu'), willOpen = !m.classList.contains('open');
+    m.classList.toggle('open', willOpen);
+    $('sba-chip').setAttribute('aria-expanded', String(willOpen));
+  }
+  function closeMenu() {
+    $('sba-menu').classList.remove('open');
+    $('sba-chip').setAttribute('aria-expanded', 'false');
+  }
+
+  function busy(btn, on, label) {
+    btn.disabled = on;
+    if (on) { btn._old = btn.textContent; btn.textContent = label || '⏳ Un momento…'; }
+    else if (btn._old) { btn.textContent = btn._old; }
+  }
+
+  /* ── 1. Buscar ───────────────────────────────────────────── */
+  async function doSearch() {
+    const btn = $('sba-search-btn'), q = $('sba-input').value.trim();
+    if (!q) { setStatus($('sba-status'), 'Escribe tu nombre de usuario primero.', 'error'); return; }
+    busy(btn, true, '⏳ Buscando…');
+    setStatus($('sba-status'), '');
+    try {
+      candidate = await lookupUser(q);
+      if (await accountExists(candidate.id)) {
+        paintAvatar($('sba-login-avatar'), candidate.id);
+        $('sba-login-name').textContent = candidate.displayName;
+        $('sba-login-user').textContent = '@' + candidate.username;
+        showPanel('sba-panel-login');
+        setTimeout(() => $('sba-pass-login').focus(), 60);
+      } else {
+        paintAvatar($('sba-profile-avatar'), candidate.id);
+        $('sba-profile-name').textContent = candidate.displayName;
+        $('sba-profile-user').textContent = '@' + candidate.username;
+        $('sba-profile-id').textContent = 'ID ' + candidate.id;
+        $('sba-open-profile').href = profileUrl(candidate.id);
+        showPanel('sba-panel-confirm');
+      }
+    } catch (err) {
+      setStatus($('sba-status'), err.message || 'Algo ha fallado.', 'error');
+    } finally { busy(btn, false); }
+  }
+
+  /* ── 2. Verificar ────────────────────────────────────────── */
+  async function startVerify() {
+    if (!candidate) { open(); return; }
+    pendingCode = 'SBM-' + Math.random().toString(36).slice(2, 10).toUpperCase();
+    if (hasWorker()) {
+      try {
+        const r = await fetch(apiBase() + '/auth/challenge', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: candidate.id })
+        });
+        if (r.ok) { const j = await r.json(); if (j && j.code) pendingCode = j.code; }
+      } catch (e) {}
+    }
+    $('sba-code').textContent = pendingCode;
+    $('sba-open-profile').href = profileUrl(candidate.id);
+    setStatus($('sba-status-verify'), '');
+    showPanel('sba-panel-verify');
+  }
+
+  async function checkVerify() {
+    if (!candidate) { showPanel('sba-panel-search'); return; }
+    const btn = $('sba-check-btn');
+    busy(btn, true, '⏳ Comprobando…');
+    setStatus($('sba-status-verify'), '');
+    try {
+      if (hasWorker()) {
+        const r = await fetch(apiBase() + '/auth/verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: candidate.id })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) throw new Error(j.error || 'Aún no veo el código en tu descripción.');
+        ticket = j.ticket;
+        resetMode = !!j.exists;
+      } else {
+        const desc = await readDescription(candidate.id);
+        if (desc.indexOf(pendingCode) === -1) {
+          throw new Error('Aún no veo el código. Guarda los cambios en Roblox y espera unos segundos.');
+        }
+        ticket = 'local';
+        resetMode = !!localAccounts()[candidate.id];
+      }
+      $('sba-reg-note').innerHTML = resetMode
+        ? '<strong>Perfil verificado.</strong> Elige una contraseña nueva para tu cuenta.'
+        : '<strong>Perfil verificado.</strong> Ponle una contraseña a la cuenta para poder volver a entrar sin repetir todo esto.';
+      $('sba-register-btn').textContent = resetMode ? '🔑 Cambiar contraseña' : '🎉 Crear mi cuenta';
+      showPanel('sba-panel-register');
+      setTimeout(() => $('sba-pass1').focus(), 60);
+    } catch (err) {
+      setStatus($('sba-status-verify'), err.message || 'No se pudo verificar.', 'error');
+    } finally { busy(btn, false); }
+  }
+
+  /* ── 3. Crear cuenta / cambiar contraseña ────────────────── */
+  async function doRegister() {
+    const btn = $('sba-register-btn');
+    const p1 = $('sba-pass1').value, p2 = $('sba-pass2').value;
+    const problem = passwordProblem(p1);
+    if (problem) { setStatus($('sba-status-register'), problem, 'error'); $('sba-pass1').focus(); return; }
+    if (p1 !== p2) { setStatus($('sba-status-register'), 'Las dos contraseñas no coinciden.', 'error'); $('sba-pass2').focus(); return; }
+
+    busy(btn, true, '⏳ Creando…');
+    setStatus($('sba-status-register'), '');
+    try {
+      let token = null;
+      if (hasWorker()) {
+        const r = await fetch(apiBase() + (resetMode ? '/auth/reset' : '/auth/register'), {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticket: ticket, password: p1 })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) throw new Error(j.error || 'No se pudo crear la cuenta.');
+        token = j.token;
+      } else {
+        const map = localAccounts();
+        map[candidate.id] = {
+          id: candidate.id, username: candidate.username, displayName: candidate.displayName,
+          password: await hashPassword(p1),
+          createdAt: (map[candidate.id] && map[candidate.id].createdAt) || Date.now()
+        };
+        saveLocalAccounts(map);
+      }
+
+      const isNew = !resetMode;
+      if (isNew) adoptGuestData(candidate.id);
+
+      session = {
+        id: candidate.id, username: candidate.username, displayName: candidate.displayName,
+        verified: true, token: token, mode: hasWorker() ? 'server' : 'local',
+        createdAt: Date.now(), since: Date.now()
+      };
+      persistSession();          // por si cierra el diálogo sin pulsar el botón final
+      renderChip();
+      $('sba-done-title').textContent = isNew ? '¡Cuenta creada!' : '¡Contraseña cambiada!';
+      $('sba-done-text').textContent = isNew
+        ? 'Tu progreso ahora se guarda en el espacio de @' + candidate.username + '. Lo que ya tenías se ha traído aquí.'
+        : 'Ya puedes entrar con la contraseña nueva.';
+      showPanel('sba-panel-done');
+      $('sba-done-btn').dataset.reload = '1';
+    } catch (err) {
+      setStatus($('sba-status-register'), err.message || 'No se pudo completar.', 'error');
+    } finally { busy(btn, false); }
+  }
+
+  /* ── 4. Entrar ───────────────────────────────────────────── */
+  async function doLogin() {
+    const btn = $('sba-login-btn'), pw = $('sba-pass-login').value;
+    if (!pw) { setStatus($('sba-status-login'), 'Escribe tu contraseña.', 'error'); return; }
+    busy(btn, true, '⏳ Entrando…');
+    setStatus($('sba-status-login'), '');
+    try {
+      let token = null, acc = candidate;
+      if (hasWorker()) {
+        const r = await fetch(apiBase() + '/auth/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: candidate.id, password: pw })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) throw new Error(j.error || 'No se pudo entrar.');
+        token = j.token;
+        acc = j.account || candidate;
+      } else {
+        const stored = localAccounts()[candidate.id];
+        if (!stored || !(await checkPassword(pw, stored.password))) throw new Error('Contraseña incorrecta.');
+        acc = stored;
+      }
+      session = {
+        id: String(acc.id), username: acc.username, displayName: acc.displayName || acc.username,
+        verified: true, token: token, mode: hasWorker() ? 'server' : 'local',
+        createdAt: acc.createdAt || Date.now(), since: Date.now()
+      };
+      applyAndReload();
+    } catch (err) {
+      setStatus($('sba-status-login'), err.message || 'No se pudo entrar.', 'error');
+      busy(btn, false);
+    }
+  }
+
+  /* ── 5. Ajustes ──────────────────────────────────────────── */
+  function openSettings() {
+    if (!session) { open(); return; }
+    paintAvatar($('sba-set-avatar'), session.id);
+    $('sba-set-name').textContent = session.displayName || session.username;
+    $('sba-set-user').textContent = '@' + session.username;
+    const d = session.createdAt ? new Date(session.createdAt) : null;
+    $('sba-set-since').textContent = d
+      ? 'Cuenta creada el ' + d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    $('sba-del-target').textContent = session.username;
+    $('sba-del-user').placeholder = session.username;
+    open('sba-panel-settings');
+  }
+
+  function refreshDeleteButton() {
+    const nameOk = $('sba-del-user').value.trim() === (session ? session.username : '');
+    const passOk = $('sba-del-pass').value.length > 0;
+    $('sba-del-btn').disabled = !(nameOk && passOk);
+  }
+
+  async function doDelete() {
+    if (!session) return;
+    const btn = $('sba-del-btn'), pw = $('sba-del-pass').value;
+    busy(btn, true, '⏳ Eliminando…');
+    setStatus($('sba-status-delete'), '');
+    try {
+      if (hasWorker()) {
+        const r = await fetch(apiBase() + '/auth/account', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.token },
+          body: JSON.stringify({ password: pw })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) throw new Error(j.error || 'No se pudo eliminar.');
+      } else {
+        const map = localAccounts();
+        const stored = map[session.id];
+        if (!stored || !(await checkPassword(pw, stored.password))) throw new Error('Contraseña incorrecta.');
+        delete map[session.id];
+        saveLocalAccounts(map);
+      }
+      wipeAccountData(session.id);
+      session = null;
+      applyAndReload();
+    } catch (err) {
+      setStatus($('sba-status-delete'), err.message || 'No se pudo eliminar.', 'error');
+      busy(btn, false);
+    }
+  }
+
+  function logout() {
+    session = null;
+    candidate = null;
+    ticket = null;
+    applyAndReload();
+  }
+
+  /* ── Diagnóstico ─────────────────────────────────────────── */
+  async function diagnose() {
+    const box = $('sba-diag');
+    box.classList.add('open');
+    const lines = [];
+    const b = readBase();
+    lines.push('Modo: ' + (hasWorker() ? 'servidor' : 'local'));
+    lines.push('apiBase:   ' + (SB_AUTH.apiBase || '(vacío)'));
+    lines.push('proxyBase: ' + (SB_AUTH.proxyBase || '(vacío)'));
+    lines.push('Separación de datos: ' + (window.__SB_RAW ? 'activa' : 'NO instalada (falta el script del <head>)'));
+    lines.push('Espacio actual: ' + (window.__SB_NS || '(invitado)'));
+    box.textContent = lines.join('\n');
+    if (!b) { lines.push('', '✖ Sin servidor.'); box.textContent = lines.join('\n'); return; }
+
+    async function probe(label, run) {
+      try { lines.push('✔ ' + label + ' → ' + (await run())); }
+      catch (e) { lines.push('✖ ' + label + ' → ' + (e.message || e)); }
+      box.textContent = lines.join('\n');
+    }
+    lines.push('');
+    await probe('Buscar por nombre', async () => {
+      const r = await fetch(b + '/users/v1/usernames/users', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernames: ['Roblox'], excludeBannedUsers: false })
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return 'ok';
+    });
+    await probe('Leer descripción', async () => {
+      const r = await fetch(b + '/users/v1/users/1');
+      if (r.status === 404) throw new Error('ruta no enrutada en el Worker');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return 'ok';
+    });
+    await probe('Miniaturas de avatar', async () => {
+      const r = await fetch(b + '/thumbnails/v1/users/avatar-headshot?userIds=1&size=150x150&format=Png&isCircular=false');
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' (se usará el de reserva)');
+      return 'ok';
+    });
+    if (hasWorker()) {
+      await probe('Worker /auth/health', async () => {
+        const r = await fetch(apiBase() + '/auth/health');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const j = await r.json();
+        return 'kv=' + (j.kv ? 'ok' : 'FALTA') + ' secret=' + (j.secret ? 'ok' : 'FALTA');
+      });
+    } else {
+      lines.push('· Cuentas en servidor: desactivadas (apiBase vacío)');
+      box.textContent = lines.join('\n');
+    }
+  }
+
+  /* ── Enganches ───────────────────────────────────────────── */
+  function bind() {
+    $('sba-chip').addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+    $('sba-close').addEventListener('click', close);
+    $('sba-guest').addEventListener('click', close);
+
+    $('sba-search-btn').addEventListener('click', doSearch);
+    $('sba-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+
+    $('sba-verify-btn').addEventListener('click', startVerify);
+    $('sba-back-btn').addEventListener('click', () => { showPanel('sba-panel-search'); $('sba-input').focus(); });
+    $('sba-verify-back').addEventListener('click', () => showPanel('sba-panel-confirm'));
+    $('sba-check-btn').addEventListener('click', checkVerify);
+
+    $('sba-register-btn').addEventListener('click', doRegister);
+    $('sba-pass2').addEventListener('keydown', (e) => { if (e.key === 'Enter') doRegister(); });
+    $('sba-pass1').addEventListener('input', function () {
+      const s = passwordScore(this.value);
+      $('sba-meter').className = this.value ? 'l' + s : '';
+      $('sba-meter-text').textContent = !this.value ? '\u00a0'
+        : ['Muy débil', 'Débil', 'Aceptable', 'Buena', 'Excelente'][s];
+    });
+
+    $('sba-login-btn').addEventListener('click', doLogin);
+    $('sba-pass-login').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+    $('sba-login-back').addEventListener('click', () => { showPanel('sba-panel-search'); $('sba-input').focus(); });
+    $('sba-forgot-btn').addEventListener('click', startVerify);
+
+    $('sba-done-btn').addEventListener('click', function () {
+      if (this.dataset.reload === '1') applyAndReload(); else close();
+    });
+
+    $('sba-menu-settings').addEventListener('click', () => { closeMenu(); openSettings(); });
+    $('sba-menu-switch').addEventListener('click', () => { closeMenu(); candidate = null; open('sba-panel-search'); });
+    $('sba-menu-logout').addEventListener('click', logout);
+    $('sba-set-logout').addEventListener('click', logout);
+
+    $('sba-set-delete').addEventListener('click', () => {
+      $('sba-del-user').value = ''; $('sba-del-pass').value = '';
+      refreshDeleteButton();
+      showPanel('sba-panel-delete');
+    });
+    $('sba-del-back').addEventListener('click', () => showPanel('sba-panel-settings'));
+    $('sba-del-user').addEventListener('input', refreshDeleteButton);
+    $('sba-del-pass').addEventListener('input', refreshDeleteButton);
+    $('sba-del-btn').addEventListener('click', doDelete);
+
+    $('sba-diag-btn').addEventListener('click', () => {
+      const box = $('sba-diag');
+      if (box.classList.contains('open')) box.classList.remove('open'); else diagnose();
+    });
+
+    $('sba-code-copy').addEventListener('click', function () {
+      const txt = $('sba-code').textContent;
+      const done = () => { this.textContent = '¡Copiado!'; setTimeout(() => { this.textContent = 'Copiar'; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(done);
+      else done();
+    });
+
+    $('sba-overlay').addEventListener('click', (e) => { if (e.target === $('sba-overlay')) close(); });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest || !e.target.closest('#sba-chip-wrap')) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if ($('sba-overlay').classList.contains('open')) close();
+      closeMenu();
+    });
+  }
+
+  function init() {
+    loadLocal();
+    bind();
+    renderChip();
+    refreshFromServer();
+
+    let prompted = false;
+    try { prompted = RAW.get(KEY_PROMPTED) === '1'; } catch (e) {}
+    if (SB_AUTH.autoPrompt && !session && !prompted) {
+      setTimeout(() => {
+        if ($('sba-overlay').classList.contains('open')) return;
+        const busyNow = Array.from(document.querySelectorAll('[id$="-overlay"], #cookie-notice')).some(el => {
+          if (el.id === 'sba-overlay') return false;
+          const cs = getComputedStyle(el);
+          return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0';
+        });
+        if (!busyNow) open();
+      }, 1600);
+    }
+  }
+
+  window.SBAccount = {
+    get: () => (session ? Object.assign({}, session) : null),
+    isLoggedIn: () => !!session,
+    isVerified: () => !!session,
+    open: (panel) => open(panel),
+    settings: openSettings,
+    close: close,
+    logout: logout,
+    diagnose: diagnose,
+    config: SB_AUTH,
+    authHeaders: () => (session && session.token ? { Authorization: 'Bearer ' + session.token } : {}),
+    namespace: () => (session ? '::u' + session.id : null)
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 
