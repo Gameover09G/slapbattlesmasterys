@@ -7795,7 +7795,8 @@ input[type="range"].slap-volume::-moz-range-track {
   var origGet = proto.getItem,
       origSet = proto.setItem,
       origDel = proto.removeItem,
-      origKey = proto.key;
+      origKey = proto.key,
+      origClr = proto.clear;
 
   /* Acceso sin namespace, para migrar y borrar cuentas */
   window.__SB_RAW = {
@@ -7803,7 +7804,8 @@ input[type="range"].slap-volume::-moz-range-track {
     set: function (k, v) { return origSet.call(LS, k, v); },
     del: function (k) { return origDel.call(LS, k); },
     key: function (i) { return origKey.call(LS, i); },
-    len: function () { return LS.length; }
+    len: function () { return LS.length; },
+    clear: function () { return origClr.call(LS); }
   };
 
   /* Claves globales al navegador: nunca se separan por cuenta */
@@ -7812,6 +7814,7 @@ input[type="range"].slap-volume::-moz-range-track {
     'slap_battles_accounts_v1': 1,
     'slap_battles_account_prompted_v1': 1,
     'slap_battles_avatar_cache_v1': 1,
+    'slap_battles_sync_v1': 1,
     'cookieNoticeAck': 1,
     'slap_battles_changelog_seen': 1
   };
@@ -32522,6 +32525,26 @@ const FEEDBACK_CONFIG = {
   transition: background .15s, border-color .15s, transform .12s;
 }
 .sba-menu-btn:hover { background: #333; border-color: var(--sba-yellow-3); transform: translateX(2px); }
+/* Estado de la sincronización en la nube */
+.sba-sync {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-bottom: 8px; padding: 7px 10px;
+  background: var(--sba-sunk); border: 2px solid #3a3a3a; border-radius: 10px;
+  font-size: 0.72rem; color: var(--sba-muted); line-height: 1.25;
+}
+.sba-sync #sba-sync-text { overflow: hidden; text-overflow: ellipsis; }
+.sba-sync.saved   { border-color: #2f6b3f; color: #b7e8c4; }
+.sba-sync.saving,
+.sba-sync.loading { border-color: var(--sba-yellow-3); color: #f0dc9a; }
+.sba-sync.error   { border-color: var(--sba-red); color: #ffbdbd; }
+.sba-sync.offline { border-color: #555; color: #cfcfcf; }
+.sba-sync button {
+  flex: 0 0 auto; width: 24px; height: 24px; padding: 0; cursor: pointer;
+  background: #333; color: inherit; border: 2px solid #4a4a4a; border-radius: 7px;
+  font-size: 0.85rem; line-height: 1;
+}
+.sba-sync button:hover:not(:disabled) { border-color: var(--sba-yellow); color: var(--sba-yellow); }
+.sba-sync button:disabled { opacity: .5; cursor: progress; }
 .sba-menu-btn.danger:hover { border-color: var(--sba-red); color: #ffbdbd; }
 
 .sba-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 0.68rem; font-weight: 600; border: 2px solid var(--sba-ink); }
@@ -32743,6 +32766,11 @@ const FEEDBACK_CONFIG = {
         <div id="sba-menu-state" style="margin-top:5px"></div>
       </div>
     </div>
+    <div class="sba-sync" id="sba-sync-line" style="display:none">
+      <span id="sba-sync-text">☁️ Sincronizado</span>
+      <button type="button" id="sba-sync-now" title="Sincronizar ahora">⟳</button>
+    </div>
+
     <a class="sba-menu-btn" id="sba-menu-profile" href="#" target="_blank" rel="noopener" role="menuitem">🔗 Ver perfil en Roblox</a>
     <button class="sba-menu-btn" id="sba-menu-settings" type="button" role="menuitem">⚙️ Ajustes de la cuenta</button>
     <button class="sba-menu-btn" id="sba-menu-switch" type="button" role="menuitem">🔄 Cambiar de cuenta</button>
@@ -32945,6 +32973,7 @@ const FEEDBACK_CONFIG = {
   const KEY_ACCOUNTS = 'slap_battles_accounts_v1';
   const KEY_PROMPTED = 'slap_battles_account_prompted_v1';
   const KEY_AVATARS  = 'slap_battles_avatar_cache_v1';
+  const KEY_SYNC     = 'slap_battles_sync_v1';
   const PBKDF2_ITER  = 100000;   // mismo tope que Cloudflare Workers, para que los hashes sean intercambiables
 
   const RAW = window.__SB_RAW || {
@@ -32952,7 +32981,8 @@ const FEEDBACK_CONFIG = {
     set: (k, v) => localStorage.setItem(k, v),
     del: (k) => localStorage.removeItem(k),
     key: (i) => localStorage.key(i),
-    len: () => localStorage.length
+    len: () => localStorage.length,
+    clear: () => localStorage.clear()
   };
 
   /* Roblox retiró /headshot-thumbnail/image, así que la única vía es la
@@ -33080,6 +33110,7 @@ const FEEDBACK_CONFIG = {
   const GLOBAL_KEYS = {
     'slap_battles_account_v1': 1, 'slap_battles_accounts_v1': 1,
     'slap_battles_account_prompted_v1': 1, 'slap_battles_avatar_cache_v1': 1,
+    'slap_battles_sync_v1': 1,
     'cookieNoticeAck': 1, 'slap_battles_changelog_seen': 1
   };
 
@@ -33107,6 +33138,302 @@ const FEEDBACK_CONFIG = {
     }
     doomed.forEach(k => { try { RAW.del(k); } catch (e) {} });
     return doomed.length;
+  }
+
+  /* ============================================================
+     SINCRONIZACIÓN DEL PROGRESO CON EL SERVIDOR
+
+     El problema que arregla: hasta ahora el progreso vivía solo en
+     el localStorage del navegador, separado por cuenta. Eso hace que
+     cada dispositivo tenga su propio progreso aunque sea la misma
+     cuenta. El Worker ya tenía las rutas GET/PUT /progress, pero
+     nadie las llamaba.
+
+     Cómo funciona ahora:
+       · Al entrar (login)  → manda el servidor. Se borra lo que
+         hubiera en el espacio de esa cuenta en este dispositivo y
+         se escribe lo que venga de la nube. Si la nube está vacía
+         (cuenta recién creada), se sube lo de aquí como semilla.
+       · Al abrir la página con sesión → se compara. Si cambió en
+         otro sitio, se trae y se recarga; si cambió aquí, se sube.
+       · Mientras juegas → cada escritura en localStorage programa
+         una subida (con retardo, para no llamar en cada clic).
+
+     El progreso de invitado (sin sesión) vive en claves sin sufijo
+     "::uID", así que no se mezcla ni se sube nunca. Al iniciar
+     sesión deja de verse automáticamente: la app pasa a leer solo
+     el espacio de la cuenta.
+     ============================================================ */
+  const SYNC_DEBOUNCE = 2500;      // ms de espera antes de subir
+  const SYNC_MAX_BYTES = 880000;   // el Worker rechaza a partir de ~900 KB
+
+  let syncReady   = false;   // hasta que no termine el arranque no se sube nada
+  let syncTimer   = null;
+  let syncInFlight = false;
+  let syncPendingWhileBusy = false;
+  let syncState   = 'idle';  // idle | saving | saved | error | offline
+  let syncError   = '';
+  let syncLastAt  = 0;
+
+  const cloudOn = () => hasWorker() && !!session && !!session.token && session.mode !== 'local';
+
+  /* Hash barato (FNV-1a) para saber si algo cambió sin comparar
+     cadenas enormes cada vez. */
+  function hashOf(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+    }
+    return h.toString(16);
+  }
+
+  /* Libreta de a dónde llegó la sincronización de cada cuenta.
+     Es una clave global del navegador: no se sube nunca. */
+  function syncMeta(userId) {
+    let all = {};
+    try { all = JSON.parse(RAW.get(KEY_SYNC) || '{}'); } catch (e) { all = {}; }
+    return all[userId] || { hash: null, serverAt: 0, touchedAt: 0 };
+  }
+  function saveSyncMeta(userId, patch) {
+    let all = {};
+    try { all = JSON.parse(RAW.get(KEY_SYNC) || '{}'); } catch (e) { all = {}; }
+    all[userId] = Object.assign(syncMeta(userId), patch);
+    try { RAW.set(KEY_SYNC, JSON.stringify(all)); } catch (e) {}
+    return all[userId];
+  }
+
+  /* Todo lo que pertenece a esta cuenta, con el sufijo quitado. */
+  function snapshotAccountData(userId) {
+    const ns = '::u' + userId;
+    const out = {};
+    for (let i = 0; i < RAW.len(); i++) {
+      const k = RAW.key(i);
+      if (!k || k.length <= ns.length || k.slice(-ns.length) !== ns) continue;
+      const bare = k.slice(0, -ns.length);
+      if (GLOBAL_KEYS[bare]) continue;
+      const v = RAW.get(k);
+      if (typeof v === 'string') out[bare] = v;
+    }
+    return out;
+  }
+
+  /* Deja el espacio de la cuenta exactamente como venga de la nube.
+     Usa RAW a propósito: así no dispara el enganche de subida. */
+  function writeAccountData(userId, data) {
+    wipeAccountData(userId);
+    const ns = '::u' + userId;
+    let n = 0;
+    Object.keys(data || {}).forEach(k => {
+      if (GLOBAL_KEYS[k] || typeof data[k] !== 'string') return;
+      try { RAW.set(k + ns, data[k]); n++; } catch (e) {}
+    });
+    return n;
+  }
+
+  function makePayload(userId) {
+    return { v: 1, userId: String(userId), updatedAt: Date.now(), data: snapshotAccountData(userId) };
+  }
+
+  function renderSync(state, msg) {
+    syncState = state;
+    syncError = msg || '';
+    if (state === 'saved') syncLastAt = Date.now();
+    const el = $('sba-sync-line');
+    if (!el) return;
+    if (!session) { el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    const text = {
+      idle:    session.mode === 'local' ? '💾 Solo en este navegador' : '☁️ Sincronizado',
+      loading: '⏳ Buscando tu progreso…',
+      saving:  '⏳ Guardando…',
+      saved:   '☁️ Guardado en la nube',
+      error:   '⚠️ ' + (msg || 'No se pudo guardar'),
+      offline: '📴 Sin conexión — se guardará luego'
+    }[state] || '';
+    $('sba-sync-text').textContent = text;
+    el.className = 'sba-sync ' + state;
+  }
+
+  /* ── Llamadas al Worker ──────────────────────────────────── */
+  async function cloudGet(token) {
+    const r = await fetch(apiBase() + '/progress', {
+      headers: { Authorization: 'Bearer ' + token },
+      cache: 'no-store'
+    });
+    if (r.status === 401) { const e = new Error('Tu sesión ha caducado. Vuelve a entrar.'); e.expired = true; throw e; }
+    if (!r.ok) throw new Error('El servidor respondió ' + r.status + '.');
+    const j = await r.json().catch(() => ({}));
+    if (!j || !j.ok) throw new Error(j && j.error ? j.error : 'Respuesta inesperada del servidor.');
+    return { data: j.data || null, savedAt: j.savedAt || (j.data && j.data.updatedAt) || 0 };
+  }
+
+  async function cloudPut(token, payload, keepalive) {
+    const body = JSON.stringify(payload);
+    if (body.length > SYNC_MAX_BYTES) {
+      const e = new Error('Tu progreso ocupa demasiado para la nube (' + Math.round(body.length / 1024) + ' KB).');
+      e.tooBig = true;
+      throw e;
+    }
+    const r = await fetch(apiBase() + '/progress', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: body,
+      keepalive: !!keepalive
+    });
+    if (r.status === 401) { const e = new Error('Tu sesión ha caducado. Vuelve a entrar.'); e.expired = true; throw e; }
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      throw new Error(j.error || ('El servidor respondió ' + r.status + '.'));
+    }
+    const j = await r.json().catch(() => ({}));
+    return j.savedAt || Date.now();
+  }
+
+  function sessionExpired() {
+    session = null;
+    persistSession();
+    renderChip();
+    renderSync('error', 'Sesión caducada — vuelve a entrar');
+  }
+
+  /* ── Subida ──────────────────────────────────────────────── */
+  async function pushNow(keepalive) {
+    if (!cloudOn()) return false;
+    if (syncInFlight) { syncPendingWhileBusy = true; return false; }
+    syncInFlight = true;
+    if (!keepalive) renderSync('saving');
+    const userId = session.id;
+    try {
+      const payload = makePayload(userId);
+      const hash = hashOf(JSON.stringify(payload.data));
+      const savedAt = await cloudPut(session.token, payload, keepalive);
+      saveSyncMeta(userId, { hash: hash, serverAt: savedAt, touchedAt: payload.updatedAt });
+      if (!keepalive) renderSync('saved');
+      return true;
+    } catch (err) {
+      if (err && err.expired) { sessionExpired(); return false; }
+      if (!keepalive) renderSync(navigator.onLine === false ? 'offline' : 'error', err.message);
+      return false;
+    } finally {
+      syncInFlight = false;
+      if (syncPendingWhileBusy) { syncPendingWhileBusy = false; queuePush(); }
+    }
+  }
+
+  function queuePush() {
+    if (!syncReady || !cloudOn()) return;
+    saveSyncMeta(session.id, { touchedAt: Date.now() });
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => { syncTimer = null; pushNow(false); }, SYNC_DEBOUNCE);
+  }
+
+  /* Sube ya lo que estuviera esperando (al cerrar sesión, al ocultar
+     la pestaña, al cerrar la página). */
+  function flushPush(keepalive) {
+    if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; }
+    if (!cloudOn()) return Promise.resolve(false);
+    return pushNow(!!keepalive);
+  }
+
+  /* ── Enganche: cualquier escritura de la app programa una subida ── */
+  (function hookWrites() {
+    if (!window.Storage || !Storage.prototype) return;
+    const proto = Storage.prototype;
+    const set = proto.setItem, del = proto.removeItem, clr = proto.clear;
+
+    function touched(k) {
+      if (GLOBAL_KEYS[String(k)]) return;   // ajustes del navegador, no de la cuenta
+      queuePush();
+    }
+    proto.setItem = function (k, v) {
+      const out = set.apply(this, arguments);
+      if (this === window.localStorage) touched(k);
+      return out;
+    };
+    proto.removeItem = function (k) {
+      const out = del.apply(this, arguments);
+      if (this === window.localStorage) touched(k);
+      return out;
+    };
+    proto.clear = function () {
+      const out = clr.apply(this, arguments);
+      if (this === window.localStorage) queuePush();
+      return out;
+    };
+  })();
+
+  /* ── Arranque: decidir quién manda ───────────────────────── */
+  async function syncOnLoad() {
+    if (!cloudOn()) { syncReady = true; renderSync('idle'); return; }
+    const userId = session.id;
+    renderSync('loading');
+    let remote;
+    try {
+      remote = await cloudGet(session.token);
+    } catch (err) {
+      if (err && err.expired) { sessionExpired(); syncReady = true; return; }
+      renderSync(navigator.onLine === false ? 'offline' : 'error', err.message);
+      syncReady = true;         // sin nube, pero que al menos se pueda reintentar
+      return;
+    }
+
+    const meta        = syncMeta(userId);
+    const localData   = snapshotAccountData(userId);
+    const localHash   = hashOf(JSON.stringify(localData));
+    const remoteData  = (remote.data && remote.data.data) ? remote.data.data : null;
+    const remoteHash  = remoteData ? hashOf(JSON.stringify(remoteData)) : null;
+    const remoteAt    = remote.savedAt || 0;
+
+    /* La nube está vacía: primera vez de esta cuenta. Subimos lo de aquí. */
+    if (!remoteData) {
+      syncReady = true;
+      if (Object.keys(localData).length) await pushNow(false);
+      else renderSync('idle');
+      return;
+    }
+
+    /* Idénticos: nada que hacer. */
+    if (remoteHash === localHash) {
+      saveSyncMeta(userId, { hash: localHash, serverAt: remoteAt });
+      syncReady = true;
+      renderSync('idle');
+      return;
+    }
+
+    const localChanged  = meta.hash !== null && meta.hash !== localHash;
+    const serverChanged = remoteAt > (meta.serverAt || 0);
+    const firstTimeHere = meta.hash === null;   // este dispositivo nunca sincronizó
+
+    /* Cuándo gana el servidor:
+         · este dispositivo es nuevo para la cuenta (o nunca sincronizó)
+         · el servidor cambió y aquí no
+         · cambiaron los dos, pero el servidor es más reciente          */
+    const serverWins =
+      firstTimeHere ||
+      (serverChanged && !localChanged) ||
+      (serverChanged && localChanged && remoteAt > (meta.touchedAt || 0));
+
+    if (serverWins) {
+      writeAccountData(userId, remoteData);
+      saveSyncMeta(userId, { hash: remoteHash, serverAt: remoteAt, touchedAt: remoteAt });
+      /* La app ya tiene el progreso viejo en memoria, así que hay que
+         releer. Recargar es lo mismo que hace cambiar de cuenta. */
+      let already = false;
+      try { already = sessionStorage.getItem('sb_sync_reloaded') === '1'; } catch (e) {}
+      if (!already) {
+        try { sessionStorage.setItem('sb_sync_reloaded', '1'); } catch (e) {}
+        location.reload();
+        return;
+      }
+      syncReady = true;
+      renderSync('saved');
+      return;
+    }
+
+    /* Manda lo de aquí: subir. */
+    syncReady = true;
+    await pushNow(false);
   }
 
   /* ── Avatares ────────────────────────────────────────────── */
@@ -33441,9 +33768,43 @@ const FEEDBACK_CONFIG = {
       };
       persistSession();          // por si cierra el diálogo sin pulsar el botón final
       renderChip();
+
+      /* Cuenta nueva → subir a la nube lo que se acaba de adoptar, para
+         que ya esté disponible en el móvil. Cambio de contraseña → el
+         servidor manda, igual que en el login. */
+      let cloudNote = '';
+      if (cloudOn()) {
+        busy(btn, true, '⏳ Sincronizando…');
+        try {
+          if (isNew) {
+            const seed = makePayload(session.id);
+            const savedAt = await cloudPut(token, seed, false);
+            saveSyncMeta(session.id, {
+              hash: hashOf(JSON.stringify(seed.data)), serverAt: savedAt, touchedAt: seed.updatedAt
+            });
+            cloudNote = ' Ya se guarda en la nube: podrás seguir desde el móvil.';
+          } else {
+            const remote = await cloudGet(token);
+            const remoteData = (remote.data && remote.data.data) ? remote.data.data : null;
+            if (remoteData) {
+              writeAccountData(session.id, remoteData);
+              saveSyncMeta(session.id, {
+                hash: hashOf(JSON.stringify(remoteData)),
+                serverAt: remote.savedAt || Date.now(),
+                touchedAt: remote.savedAt || Date.now()
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('No se pudo sincronizar tras registrar:', e);
+          cloudNote = ' (No se pudo subir a la nube ahora; se reintentará solo.)';
+        }
+      }
+
+      try { sessionStorage.removeItem('sb_sync_reloaded'); } catch (e) {}
       $('sba-done-title').textContent = isNew ? '¡Cuenta creada!' : '¡Contraseña cambiada!';
       $('sba-done-text').textContent = isNew
-        ? 'Tu progreso ahora se guarda en el espacio de @' + candidate.username + '. Lo que ya tenías se ha traído aquí.'
+        ? 'Tu progreso ahora se guarda en el espacio de @' + candidate.username + '. Lo que ya tenías se ha traído aquí.' + cloudNote
         : 'Ya puedes entrar con la contraseña nueva.';
       showPanel('sba-panel-done');
       $('sba-done-btn').dataset.reload = '1';
@@ -33479,6 +33840,47 @@ const FEEDBACK_CONFIG = {
         verified: true, token: token, mode: hasWorker() ? 'server' : 'local',
         createdAt: acc.createdAt || Date.now(), since: Date.now()
       };
+
+      /* Traer el progreso de la cuenta ANTES de recargar. Aquí manda
+         siempre el servidor: si en este dispositivo ya había algo
+         guardado bajo esta cuenta, se descarta y se pone lo de la nube.
+         (El progreso de invitado no se toca: vive en claves aparte y
+         simplemente deja de mostrarse al haber sesión.) */
+      if (cloudOn()) {
+        busy(btn, true, '⏳ Cargando tu progreso…');
+        try {
+          const remote = await cloudGet(token);
+          const remoteData = (remote.data && remote.data.data) ? remote.data.data : null;
+          if (remoteData) {
+            writeAccountData(session.id, remoteData);
+            saveSyncMeta(session.id, {
+              hash: hashOf(JSON.stringify(remoteData)),
+              serverAt: remote.savedAt || Date.now(),
+              touchedAt: remote.savedAt || Date.now()
+            });
+          } else {
+            /* La nube está vacía (cuenta creada antes de que existiera
+               la sincronización): se sube lo que haya aquí como semilla. */
+            const seed = makePayload(session.id);
+            if (Object.keys(seed.data).length) {
+              const savedAt = await cloudPut(token, seed, false);
+              saveSyncMeta(session.id, {
+                hash: hashOf(JSON.stringify(seed.data)), serverAt: savedAt, touchedAt: seed.updatedAt
+              });
+            } else {
+              saveSyncMeta(session.id, { hash: hashOf('{}'), serverAt: 0, touchedAt: 0 });
+            }
+          }
+        } catch (e) {
+          /* Si la nube falla justo ahora no bloqueamos la entrada: se
+             entra igual y se reintenta al cargar la página. */
+          console.warn('No se pudo traer el progreso de la nube:', e);
+          if (e && e.expired) throw e;
+          setStatus($('sba-status-login'), '⚠️ Entrando sin poder leer la nube: ' + (e.message || ''), 'warn');
+        }
+      }
+
+      try { sessionStorage.removeItem('sb_sync_reloaded'); } catch (e) {}
       applyAndReload();
     } catch (err) {
       setStatus($('sba-status-login'), err.message || 'No se pudo entrar.', 'error');
@@ -33528,8 +33930,12 @@ const FEEDBACK_CONFIG = {
         delete map[session.id];
         saveLocalAccounts(map);
       }
+      if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; }   // no resucitar lo borrado
+      syncReady = false;
       wipeAccountData(session.id);
+      saveSyncMeta(session.id, { hash: null, serverAt: 0, touchedAt: 0 });
       session = null;
+      try { sessionStorage.removeItem('sb_sync_reloaded'); } catch (e) {}
       applyAndReload();
     } catch (err) {
       setStatus($('sba-status-delete'), err.message || 'No se pudo eliminar.', 'error');
@@ -33537,10 +33943,15 @@ const FEEDBACK_CONFIG = {
     }
   }
 
-  function logout() {
+  async function logout() {
+    /* Antes de salir, subir lo que quedara pendiente: si no, lo último
+       que hiciste se queda solo en este dispositivo. */
+    try { await flushPush(false); } catch (e) {}
+    syncReady = false;
     session = null;
     candidate = null;
     ticket = null;
+    try { sessionStorage.removeItem('sb_sync_reloaded'); } catch (e) {}
     applyAndReload();
   }
 
@@ -33566,6 +33977,14 @@ const FEEDBACK_CONFIG = {
     lines.push('Proxy de Roblox:   ' + (SB_AUTH.proxyBase || '(vacío)'));
     lines.push('Separación de datos: ' + (window.__SB_RAW ? 'activa' : 'NO instalada'));
     lines.push('Espacio actual: ' + (window.__SB_NS || '(invitado)'));
+    if (session) {
+      const m = syncMeta(session.id);
+      const sizeKb = Math.round(JSON.stringify(snapshotAccountData(session.id)).length / 1024);
+      lines.push('Nube: ' + (cloudOn() ? 'activa' : 'inactiva') +
+                 ' · estado=' + syncState + (syncTimer ? ' (subida pendiente)' : ''));
+      lines.push('Progreso local: ' + sizeKb + ' KB · último guardado en nube: ' +
+                 (m.serverAt ? new Date(m.serverAt).toLocaleString('es-ES') : 'nunca'));
+    }
     paint();
 
     async function probe(label, run) {
@@ -33625,6 +34044,21 @@ const FEEDBACK_CONFIG = {
              ' secret=' + (health.secret ? 'ok' : 'FALTA') +
              ' version=' + (health.version || 'ANTIGUA');
     });
+
+    if (session && session.token) {
+      await probe('/progress (GET)', async () => {
+        const r = await fetch(apiBase() + '/progress', {
+          headers: { Authorization: 'Bearer ' + session.token }, cache: 'no-store'
+        });
+        if (r.status === 401) throw new Error('sesión caducada — vuelve a entrar');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const j = await r.json();
+        if (!j.data) return 'sin progreso guardado todavía';
+        const n = Object.keys((j.data && j.data.data) || {}).length;
+        return n + ' claves · guardado ' +
+               (j.savedAt ? new Date(j.savedAt).toLocaleString('es-ES') : 'en fecha desconocida');
+      });
+    }
 
     /* Si no hubo respuesta, averiguar por qué */
     if (!health) {
@@ -33693,6 +34127,14 @@ const FEEDBACK_CONFIG = {
     $('sba-menu-settings').addEventListener('click', () => { closeMenu(); openSettings(); });
     $('sba-menu-switch').addEventListener('click', () => { closeMenu(); candidate = null; open('sba-panel-search'); });
     $('sba-menu-logout').addEventListener('click', logout);
+    $('sba-sync-now').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const b = $('sba-sync-now');
+      if (b.disabled) return;
+      b.disabled = true;
+      try { await flushPush(false); await syncOnLoad(); }
+      finally { b.disabled = false; }
+    });
     $('sba-set-logout').addEventListener('click', logout);
 
     $('sba-set-delete').addEventListener('click', () => {
@@ -33733,6 +34175,21 @@ const FEEDBACK_CONFIG = {
     bind();
     renderChip();
     refreshFromServer();
+    renderSync(session ? 'loading' : 'idle');
+
+    /* Traer/subir el progreso de la cuenta. Se hace en cuanto carga,
+       para que abrir la página en el móvil muestre lo del ordenador. */
+    syncOnLoad();
+
+    /* Salvavidas: al cambiar de pestaña o cerrar, subir lo pendiente.
+       keepalive deja terminar la petición aunque la página se muera. */
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && syncTimer) flushPush(true);
+    });
+    window.addEventListener('pagehide', () => { if (syncTimer) flushPush(true); });
+    window.addEventListener('online', () => {
+      if (cloudOn() && (syncState === 'offline' || syncState === 'error')) pushNow(false);
+    });
 
     let prompted = false;
     try { prompted = RAW.get(KEY_PROMPTED) === '1'; } catch (e) {}
@@ -33760,7 +34217,19 @@ const FEEDBACK_CONFIG = {
     diagnose: diagnose,
     config: SB_AUTH,
     authHeaders: () => (session && session.token ? { Authorization: 'Bearer ' + session.token } : {}),
-    namespace: () => (session ? '::u' + session.id : null)
+    namespace: () => (session ? '::u' + session.id : null),
+    /* Sincronización en la nube */
+    sync: () => flushPush(false).then(() => syncOnLoad()),
+    push: () => flushPush(false),
+    syncStatus: () => ({
+      enabled: cloudOn(),
+      ready: syncReady,
+      state: syncState,
+      error: syncError,
+      lastSavedAt: syncLastAt || null,
+      pending: !!syncTimer,
+      meta: session ? syncMeta(session.id) : null
+    })
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
