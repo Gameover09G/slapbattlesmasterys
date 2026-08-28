@@ -8912,15 +8912,7 @@ input[type="range"].slap-volume::-moz-range-track {
 const CHANGELOGS = [
   // ▼ AÑADE LAS VERSIONES NUEVAS AQUÍ ARRIBA — la primera = la más reciente ▼
   {
-    version: "pre-2.0 (parte 2) - LOGIN",
-    date: "03/08/2026",
-    entries: [
-      { emoji: "🔗", color: "#ffffff", text: "Sistema de cuentas para que tu progreso se guarde entre cuentas. Usa un sistema de verificacion para evitar cojer las cuentas de otras personas."},
-    ]
-  },
-  
-  {
-    version: "pre-2.0 (parte 1) - OVERHAUL",
+    version: "pre-2.0 - OVERHAUL",
     date: "03/08/2026",
     entries: [
       { emoji: "💬", color: "#ffffff", text: "Sistema de dialogos."},
@@ -32979,8 +32971,34 @@ const FEEDBACK_CONFIG = {
 
   const $ = (id) => document.getElementById(id);
   const apiBase   = () => SB_AUTH.apiBase.replace(/\/+$/, '');
-  const readBase  = () => (SB_AUTH.apiBase || SB_AUTH.proxyBase).replace(/\/+$/, '');
+  const readBase  = () => (SB_AUTH.proxyBase || SB_AUTH.apiBase).replace(/\/+$/, '');
   const hasWorker = () => !!SB_AUTH.apiBase;
+
+  /* Los dos Workers, sin repetir. El de lectura va primero: si el de
+     cuentas está mal configurado, los avatares y las búsquedas siguen
+     funcionando por el proxy de siempre. */
+  function readBases() {
+    const list = [];
+    if (SB_AUTH.proxyBase) list.push(SB_AUTH.proxyBase.replace(/\/+$/, ''));
+    if (SB_AUTH.apiBase && list.indexOf(apiBase()) === -1) list.push(apiBase());
+    return list;
+  }
+
+  /* Llamada de solo lectura a Roblox: prueba un Worker y, si no
+     responde, el otro. */
+  async function roFetch(path, opts) {
+    const list = readBases();
+    if (!list.length) throw new Error('No hay servidor configurado.');
+    let lastErr = null;
+    for (let i = 0; i < list.length; i++) {
+      try {
+        const r = await fetch(list[i] + path, opts);
+        if (r.status === 404 && i < list.length - 1) { lastErr = new Error('HTTP 404'); continue; }
+        return r;
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('No se pudo contactar con el servidor.');
+  }
   const profileUrl = (id) => 'https://www.roblox.com/users/' + id + '/profile';
 
   function setStatus(el, msg, kind) {
@@ -33088,11 +33106,10 @@ const FEEDBACK_CONFIG = {
   /* ── Avatares ────────────────────────────────────────────── */
   async function resolveAvatar(userId) {
     if (avatarCache[userId]) return avatarCache[userId];
-    const b = readBase();
-    if (b) {
+    if (readBases().length) {
       try {
-        const r = await fetch(b + '/thumbnails/v1/users/avatar-headshot?userIds=' + userId +
-                              '&size=150x150&format=Png&isCircular=false');
+        const r = await roFetch('/thumbnails/v1/users/avatar-headshot?userIds=' + userId +
+                                '&size=150x150&format=Png&isCircular=false');
         if (r.ok) {
           const j = await r.json();
           const item = (j.data || [])[0];
@@ -33118,10 +33135,10 @@ const FEEDBACK_CONFIG = {
     const q = String(query).trim();
     const byId = q.match(/^(\d{3,})$/) || q.match(/roblox\.com\/users\/(\d+)/i);
     if (byId) {
-      const id = byId[1], b = readBase();
-      if (b) {
+      const id = byId[1];
+      if (readBases().length) {
         try {
-          const r = await fetch(b + '/users/v1/users/' + id);
+          const r = await roFetch('/users/v1/users/' + id);
           if (r.ok) {
             const u = await r.json();
             return { id: String(u.id || id), username: u.name || ('user' + id), displayName: u.displayName || u.name || ('user' + id) };
@@ -33135,12 +33152,11 @@ const FEEDBACK_CONFIG = {
     if (!name) throw new Error('Escribe tu nombre de usuario.');
     if (!/^[A-Za-z0-9_]{3,20}$/.test(name)) throw new Error('Ese nombre no es válido en Roblox. Prueba con el enlace de tu perfil.');
 
-    const b = readBase();
-    if (!b) throw new Error('No hay servidor configurado. Pega el enlace de tu perfil.');
+    if (!readBases().length) throw new Error('No hay servidor configurado. Pega el enlace de tu perfil.');
 
     let r;
     try {
-      r = await fetch(b + '/users/v1/usernames/users', {
+      r = await roFetch('/users/v1/usernames/users', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usernames: [name], excludeBannedUsers: false })
       });
@@ -33165,10 +33181,9 @@ const FEEDBACK_CONFIG = {
   }
 
   async function readDescription(userId) {
-    const b = readBase();
-    if (!b) throw new Error('La verificación necesita un servidor configurado.');
-    const r = await fetch(b + '/users/v1/users/' + userId);
-    if (r.status === 404) throw new Error('Tu Worker no enruta /users/v1/users/{id}. Despliega slap-auth-worker.js.');
+    if (!readBases().length) throw new Error('La verificación necesita un servidor configurado.');
+    const r = await roFetch('/users/v1/users/' + userId);
+    if (r.status === 404) throw new Error('Ningún Worker enruta /users/v1/users/{id}.');
     if (!r.ok) throw new Error('No se pudo leer tu perfil (HTTP ' + r.status + ').');
     return (await r.json()).description || '';
   }
@@ -33517,55 +33532,117 @@ const FEEDBACK_CONFIG = {
   }
 
   /* ── Diagnóstico ─────────────────────────────────────────── */
+  /* Distingue tres cosas que se confunden mucho:
+       · el Worker no existe / URL mal escrita  → ni siquiera conecta
+       · el Worker vive pero rechaza este origen → CORS
+       · el Worker responde pero le falta una ruta → HTTP 404          */
+  async function reachable(url) {
+    try { await fetch(url, { mode: 'no-cors' }); return true; }
+    catch (e) { return false; }
+  }
+
   async function diagnose() {
     const box = $('sba-diag');
     box.classList.add('open');
     const lines = [];
-    const b = readBase();
+    const paint = () => { box.textContent = lines.join('\n'); };
+
+    lines.push('Origen de esta página: ' + location.origin);
     lines.push('Modo: ' + (hasWorker() ? 'servidor' : 'local'));
-    lines.push('apiBase:   ' + (SB_AUTH.apiBase || '(vacío)'));
-    lines.push('proxyBase: ' + (SB_AUTH.proxyBase || '(vacío)'));
-    lines.push('Separación de datos: ' + (window.__SB_RAW ? 'activa' : 'NO instalada (falta el script del <head>)'));
+    lines.push('Worker de cuentas: ' + (SB_AUTH.apiBase || '(vacío)'));
+    lines.push('Proxy de Roblox:   ' + (SB_AUTH.proxyBase || '(vacío)'));
+    lines.push('Separación de datos: ' + (window.__SB_RAW ? 'activa' : 'NO instalada'));
     lines.push('Espacio actual: ' + (window.__SB_NS || '(invitado)'));
-    box.textContent = lines.join('\n');
-    if (!b) { lines.push('', '✖ Sin servidor.'); box.textContent = lines.join('\n'); return; }
+    paint();
 
     async function probe(label, run) {
       try { lines.push('✔ ' + label + ' → ' + (await run())); }
       catch (e) { lines.push('✖ ' + label + ' → ' + (e.message || e)); }
-      box.textContent = lines.join('\n');
+      paint();
     }
-    lines.push('');
-    await probe('Buscar por nombre', async () => {
-      const r = await fetch(b + '/users/v1/usernames/users', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernames: ['Roblox'], excludeBannedUsers: false })
-      });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return 'ok';
-    });
-    await probe('Leer descripción', async () => {
-      const r = await fetch(b + '/users/v1/users/1');
-      if (r.status === 404) throw new Error('ruta no enrutada en el Worker');
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return 'ok';
-    });
-    await probe('Miniaturas de avatar', async () => {
-      const r = await fetch(b + '/thumbnails/v1/users/avatar-headshot?userIds=1&size=150x150&format=Png&isCircular=false');
-      if (!r.ok) throw new Error('HTTP ' + r.status + ' (se usará el de reserva)');
-      return 'ok';
-    });
-    if (hasWorker()) {
-      await probe('Worker /auth/health', async () => {
-        const r = await fetch(apiBase() + '/auth/health');
+
+    /* Cada Worker por separado, para saber cuál falla */
+    const bases = readBases();
+    for (let i = 0; i < bases.length; i++) {
+      const b = bases[i];
+      const tag = (b === apiBase() && hasWorker()) ? 'cuentas' : 'proxy';
+      lines.push('');
+      lines.push('── Worker de ' + tag + ' ──');
+      paint();
+
+      await probe('Buscar por nombre', async () => {
+        const r = await fetch(b + '/users/v1/usernames/users', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usernames: ['Roblox'], excludeBannedUsers: false })
+        });
         if (!r.ok) throw new Error('HTTP ' + r.status);
-        const j = await r.json();
-        return 'kv=' + (j.kv ? 'ok' : 'FALTA') + ' secret=' + (j.secret ? 'ok' : 'FALTA');
+        return 'ok';
       });
-    } else {
-      lines.push('· Cuentas en servidor: desactivadas (apiBase vacío)');
-      box.textContent = lines.join('\n');
+      await probe('Leer descripción', async () => {
+        const r = await fetch(b + '/users/v1/users/1');
+        if (r.status === 404) throw new Error('ruta no enrutada');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return 'ok';
+      });
+      await probe('Miniaturas de avatar', async () => {
+        const r = await fetch(b + '/thumbnails/v1/users/avatar-headshot?userIds=1&size=150x150&format=Png&isCircular=false');
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' (se usará el de reserva)');
+        return 'ok';
+      });
     }
+
+    if (!hasWorker()) {
+      lines.push('');
+      lines.push('· Cuentas en servidor: desactivadas (apiBase vacío).');
+      lines.push('  Las cuentas se crean solo en este navegador.');
+      paint();
+      return;
+    }
+
+    lines.push('');
+    lines.push('── Cuentas ──');
+    paint();
+
+    let health = null;
+    await probe('/auth/health', async () => {
+      const r = await fetch(apiBase() + '/auth/health');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      health = await r.json();
+      return 'kv=' + (health.kv ? 'ok' : 'FALTA') +
+             ' secret=' + (health.secret ? 'ok' : 'FALTA') +
+             ' version=' + (health.version || 'ANTIGUA');
+    });
+
+    /* Si no hubo respuesta, averiguar por qué */
+    if (!health) {
+      lines.push('');
+      const alive = await reachable(apiBase() + '/auth/health');
+      if (!alive) {
+        lines.push('➤ El Worker no responde. Revisa que la URL sea exacta y que');
+        lines.push('  esté desplegado: ábrela en una pestaña y mira si sale JSON.');
+      } else {
+        lines.push('➤ El Worker SÍ existe, pero rechaza este origen: es CORS.');
+        lines.push('  En el Worker, pon la variable ALLOWED_ORIGINS con:');
+        lines.push('     ' + location.origin);
+        lines.push('  (sin barra final, sin la ruta) y pulsa Deploy después.');
+      }
+      paint();
+      return;
+    }
+
+    if (!health.version) {
+      lines.push('');
+      lines.push('➤ Ese Worker tiene el código antiguo: no sabe de contraseñas.');
+      lines.push('  Vuelve a pegar slap-auth-worker.js y despliega.');
+    }
+    if (health.kv === false)     lines.push('➤ Falta el binding KV llamado SLAP_AUTH.');
+    if (health.secret === false) lines.push('➤ Falta el secreto SESSION_SECRET.');
+    if (health.origins && health.origins !== '*' &&
+        health.origins.split(',').map(s => s.trim()).indexOf(location.origin) === -1) {
+      lines.push('➤ ALLOWED_ORIGINS no incluye ' + location.origin);
+      lines.push('  Valor actual: ' + health.origins);
+    }
+    paint();
   }
 
   /* ── Enganches ───────────────────────────────────────────── */
