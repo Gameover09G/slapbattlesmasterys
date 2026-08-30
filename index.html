@@ -34270,11 +34270,11 @@ const FEEDBACK_CONFIG = {
 
 #rit-stage{ position:absolute; left:0; right:0; top:0; bottom:0;
   display:flex; flex-direction:column; align-items:center; justify-content:center; }
-#rit-heart{ width:clamp(22px,3.4vw,34px); height:auto; margin-bottom:clamp(10px,2vh,22px);
+#rit-heart{ width:clamp(34px,5vw,56px); height:auto; margin-bottom:clamp(10px,2vh,22px);
   image-rendering:pixelated; filter:drop-shadow(0 0 6px rgba(255,40,60,.55));
   animation:rit-heartbeat 1.15s ease-in-out infinite; }
 @keyframes rit-heartbeat{ 0%,100%{transform:scale(1);}12%{transform:scale(1.18);}24%{transform:scale(1);}36%{transform:scale(1.12);} }
-#rit-heart svg{ display:block; width:100%; height:auto; }
+#rit-heart svg,#rit-heart img{ display:block; width:100%; height:auto; image-rendering:pixelated; }
 
 #rit-char{ position:relative; width:clamp(120px,20vw,190px); height:auto; image-rendering:pixelated;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,.6)); transition:transform .18s ease; }
@@ -34379,7 +34379,7 @@ const FEEDBACK_CONFIG = {
     '<div id="rit-scanlines"></div><div id="rit-vignette"></div>'+
     '<div id="rit-toptext"></div>'+
     '<div id="rit-stage">'+
-      '<div id="rit-heart">'+HEART_SVG()+'</div>'+
+      '<div id="rit-heart"></div>'+
       '<div id="rit-char"></div>'+
       '<img id="rit-banner" alt="">'+
     '</div>'+
@@ -34404,6 +34404,8 @@ const FEEDBACK_CONFIG = {
         dlg=$('rit-dlg'), dlgText=$('rit-dlg-text'), dlgNext=$('rit-next'),
         glitch=$('rit-glitch'), scare=$('rit-scare'), scareImg=$('rit-scare-img'),
         black=$('rit-black'), eyes=$('rit-eyes'), shred=$('rit-shred'), finalEl=$('rit-final');
+
+  imgOrFallback($('rit-heart'),'slapicon.png',HEART_SVG());   // slapicon con corazón pixel de reserva
 
   function HEART_SVG(){
     return '<svg viewBox="0 0 16 15" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">'+
